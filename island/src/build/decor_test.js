@@ -1,0 +1,16 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:900,height:600}}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')}); const errs=[];
+const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{localStorage.setItem('island_nick','Gracz');localStorage.setItem('island_lang','ru');});
+await p.goto('http://localhost:8765/index.html#world=DecorWorldKey12345&admin=z'); await p.waitForTimeout(1800);
+await p.evaluate(()=>edEnter());
+const r=await p.evaluate(()=>{ const ok=c=>c&&!isSpecial(c)&&!wet(c)&&!c.st&&!c.props.length;
+  const hx=Math.round(hero.x), hy=Math.round(hero.y);
+  const free=cells.filter(c=>ok(c)&&!(c.x===hx&&c.y===hy)).sort((a,b)=>Math.hypot(a.x-hx,a.y-hy)-Math.hypot(b.x-hx,b.y-hy));
+  const names=["prop_stump","prop_log","prop_mushrooms","prop_flowers","prop_barrel","prop_crate","prop_signpost","prop_bush_berry"]; const st={changes:[],seen:new Set()};
+  names.forEach((n,i)=>{ edTool=n; edApplyCell(free[i].x,free[i].y,st); }); edCommit(st,"{}");
+  edCat="decor"; edRender();
+  return names.map((n,i)=>n+":"+free[i].props.join()+":"+free[i].blocked); });
+console.log(r);
+await p.waitForTimeout(300); await p.screenshot({path:'D_ed.png'});
+console.log('errs',errs); await b.close();})();
