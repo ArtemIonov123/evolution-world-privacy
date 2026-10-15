@@ -210,6 +210,8 @@ canvas.drag{cursor:grabbing}
 .edshop img{width:28px;height:28px;image-rendering:pixelated;flex:none}
 .edshop span{flex:1;min-width:0}
 .edchk{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
+.edchk.big{font-size:13px;color:var(--ink);flex:1;gap:6px}
+.edchk.big input{width:18px;height:18px}
 .edil{display:flex;align-items:center;gap:5px;flex:1;min-width:0;font-size:13px}
 .edil img,.edicon{width:24px;height:24px;image-rendering:pixelated;flex:none}
 .edsel{flex:1;min-width:0;font:13px var(--f-body);padding:4px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
@@ -507,6 +509,7 @@ const I18N={
     s_bats:"Pokonane nietoperze", ed_t_zone_bat:"Nietoperze", ed_src_bat:"Nietoperz", ed_mob_hp:"Życie (HP)", ed_src_rods:"Wędki", ed_src_rods_sub:"wytrzymałość i siła",
     ed_rod_dur:"Wytrzymałość (ile ryb)", ed_rod_sp:"Czas brania %", ed_rod_rare:"Rzadkie ryby %",
     ed_rod_hint:"Czas brania: 100% = normalnie, mniej = szybciej. Rzadkie ryby: 100% = normalnie, więcej = częściej szczupak i złota rybka.",
+    ed_mob_when:"Kiedy się pojawia", ed_mob_day:"W dzień", ed_mob_night:"W nocy", ed_mob_count:"ile:", ed_mob_day_note:"W dzień jest neutralny — atakuje dopiero, gdy go uderzysz. W nocy atakuje sam. Po 23:00 przychodzi o jednego więcej.",
     ed_tab_drop:"Drop", ed_drop_mob_wolf:"Wilk — łup", ed_drop_item:"Przedmiot", ed_drop_ch:"Szansa %", ed_drop_min:"Min", ed_drop_max:"Max", ed_drop_add:"+ dodaj przedmiot",
     ed_xp_kill:"XP za pokonanie", ed_drop_trees:"Drzewa", ed_logs_big:"Polana z dużego drzewa", ed_logs_small:"Polana z małego drzewa", ed_xp_tree:"XP za drzewo",
     ed_drop_fish:"Ryby", ed_fish_hint:"Waga = jak często bierze (więcej = częściej). Obok — wychodzący procent przy zwykłej wędce.", ed_fish_w:"Waga",
@@ -626,6 +629,7 @@ const I18N={
     s_bats:"Побеждено летучих мышей", ed_t_zone_bat:"Мыши", ed_src_bat:"Летучая мышь", ed_mob_hp:"Здоровье (HP)", ed_src_rods:"Удочки", ed_src_rods_sub:"прочность и сила",
     ed_rod_dur:"Прочность (сколько рыб)", ed_rod_sp:"Время поклёвки %", ed_rod_rare:"Редкая рыба %",
     ed_rod_hint:"Время поклёвки: 100% = обычно, меньше = быстрее. Редкая рыба: 100% = обычно, больше = чаще щука и золотая рыбка.",
+    ed_mob_when:"Когда появляется", ed_mob_day:"Днём", ed_mob_night:"Ночью", ed_mob_count:"сколько:", ed_mob_day_note:"Днём моб нейтральный — нападает, только если ударишь его. Ночью нападает сам. После 23:00 приходит на одного больше.",
     ed_tab_drop:"Дроп", ed_drop_mob_wolf:"Волк — добыча", ed_drop_item:"Предмет", ed_drop_ch:"Шанс %", ed_drop_min:"Мин", ed_drop_max:"Макс", ed_drop_add:"+ добавить предмет",
     ed_xp_kill:"XP за победу", ed_drop_trees:"Деревья", ed_logs_big:"Поленьев с большого дерева", ed_logs_small:"Поленьев с малого дерева", ed_xp_tree:"XP за дерево",
     ed_drop_fish:"Рыба", ed_fish_hint:"Вес = как часто клюёт (больше — чаще). Рядом — итоговый процент с обычной удочкой.", ed_fish_w:"Вес",
@@ -684,7 +688,7 @@ try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v;
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
 // тексты и цены, которые админ поменял в редакторе (world/config)
-const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{},mobHp:{},rods:{}};
+const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{},mobHp:{},rods:{},mobTime:{}};
 function tr(k,p){
   const ck=CFG.texts[LANG]&&CFG.texts[LANG][k];
   if(TOUCH&&I18N.pl[k+"_t"]) k=k+"_t";   // на телефоне — подсказки для пальцев вместо клавиш
@@ -2476,18 +2480,17 @@ function updateAnimals(dt){
   if(spawnT<=0){ spawnT=1;
     const hares=animals.filter(a=>a.kind==="hare"&&!a.leaving), wolves=animals.filter(a=>a.kind==="wolf"&&!a.leaving&&!(a.dying>0));
     if(day){ if(hares.length<3){ const z=zonePick("hare",c=>freeCell(c)&&farFromAll(c,4)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,5)); if(c) spawnAnimal("hare",c); }
-      if(wolves.filter(w=>w.calm).length<2&&Math.random()<0.08){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5), c=z!==undefined?z:randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5);
-        if(c){ spawnAnimal("wolf",c); animals[animals.length-1].calm=true; } } }
+    }
     else for(const a of hares){ a.leaving=true; const [tp]=nearestP(a.x,a.y); setPath(a,fleeCell(a,tp?tp.x:a.x,tp?tp.y:a.y,3,6)); a.speed=3; }
-    if(night){
-      const want=(hourNow()>=23||hourNow()<4)?3:2;
-      if(wolves.length<want){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>6), c=z!==undefined?z:randomCell(c=>freeCell(c)&&edgeCell(c)&&farFromAll(c,8)&&nearestFire(c.x,c.y)[1]>6);
-        if(c){ spawnAnimal("wolf",c); const w=animals[animals.length-1]; w.howlT=1.6; if(!wolves.length) say("wolf_near","night_sub"); } }
-    } else for(const a of wolves){ if(a.calm||a.aggro) continue; a.leaving=true; setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; }
-    const bats=animals.filter(a=>a.kind==="bat"&&!a.leaving&&!(a.dying>0));
-    if(night){ const wantB=(hourNow()>=23||hourNow()<4)?3:2;
-      if(bats.length<wantB&&Math.random()<0.35){ const c=batSpawnCell(farFromAll); if(c){ spawnAnimal("bat",c); const b=animals[animals.length-1]; b.fly=2.2; b.home={x:c.x,y:c.y}; b.phase=Math.random(); b.attackT=1.5; } } }
-    else for(const b of bats){ b.leaving=true; b.path=[]; }
+    // мобы: в редакторе для каждого — днём / ночью и сколько; днём нейтральны, пока их не тронешь
+    const per=night?"n":(day?"d":null);
+    if(per) for(const kind of MOBS){
+      const list=animals.filter(a=>a.kind===kind&&!a.leaving&&!(a.dying>0));
+      if(!mobOn(kind,per)){ for(const a of list) if(!a.aggro) mobLeave(a); continue; }
+      const base=mobCount(kind,per), want=base+(per==="n"&&base>0&&(hourNow()>=23||hourNow()<4)?1:0);
+      if(list.length>want+1){ const a=list.find(x=>!x.aggro); if(a) mobLeave(a); }
+      else if(list.length<want&&Math.random()<(kind==="bat"?0.35:per==="n"?1:0.1)) spawnMob(kind,per,farFromAll,list.length);
+    }
   }
   let anyChase=false;
   for(let i=animals.length-1;i>=0;i--){
@@ -2847,6 +2850,7 @@ function applyConfig(d){
     for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) CFG[f][k]=Math.min(9999,Math.round(v)); }
   CFG.off={}; const off=d&&d.off&&typeof d.off==="object"?d.off:{}; for(const [k,v] of Object.entries(off)) if(v===true) CFG.off[k]=true;
   const ids=new Set(ITEMS.map(i=>i.id)), nmap=(src,hi)=>{ const o={}; if(src&&typeof src==="object") for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) o[k]=Math.min(hi,Math.round(v)); return o; };
+  CFG.mobTime={}; if(d&&d.mobTime&&typeof d.mobTime==='object') for(const k of MOBS){ const o=d.mobTime[k]; if(o&&typeof o==='object') CFG.mobTime[k]={d:o.d?1:0,n:o.n?1:0,dn:Math.max(0,Math.min(20,o.dn|0)),nn:Math.max(0,Math.min(20,o.nn|0))}; }
   CFG.mobHp=nmap(d&&d.mobHp,999); CFG.rods={}; if(d&&d.rods&&typeof d.rods==='object') for(const id of RODS){ const o=nmap(d.rods[id],1000); if(o.dur===0) delete o.dur; if(Object.keys(o).length) CFG.rods[id]=o; }
   CFG.xp=nmap(d&&d.xp,5000); CFG.xpFish=nmap(d&&d.xpFish,5000); CFG.fishW=nmap(d&&d.fishW,1000); CFG.logs=nmap(d&&d.logs,20); CFG.fisher=nmap(d&&d.fisher,9999);
   CFG.drops={}; const dr=d&&d.drops&&typeof d.drops==="object"?d.drops:{};
@@ -2862,7 +2866,7 @@ function zonePick(kind,filter){
   return null;
 }
 function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off},
-  drops:JSON.parse(JSON.stringify(CFG.drops)),mobHp:{...CFG.mobHp},rods:JSON.parse(JSON.stringify(CFG.rods)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
+  drops:JSON.parse(JSON.stringify(CFG.drops)),mobTime:JSON.parse(JSON.stringify(CFG.mobTime)),mobHp:{...CFG.mobHp},rods:JSON.parse(JSON.stringify(CFG.rods)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
 async function saveConfig(){
   if(!NET.db||!edCfg) return; const d=JSON.parse(JSON.stringify(edCfg));
   await NET.db.doc("world/config").set(d).catch(()=>{});
@@ -2888,7 +2892,8 @@ let edDropSel=null;
 // карточки «источников» дропа; новые мобы и боссы добавляются в MOBS и появятся здесь сами
 function dropCards(){
   const n=k=>dropTable(k).length;
-  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL(m==="bat"?"bat_wing":"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})})),
+  const when=m=>{ const t=edCfg.mobTime[m]||MOB_TIME[m]||{}; return (t.d&&t.dn?" · ☀"+t.dn:"")+(t.n&&t.nn?" · ☾"+t.nn:"")||" · —"; };
+  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL(m==="bat"?"bat_wing":"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})+when(m)})),
     {key:"trees",img:SPRITES.tree_small,label:tr("ed_drop_trees"),sub:tr("ed_src_trees_sub",{a:edCfg.logs.tree_big??LOGS.tree_big,b:edCfg.logs.tree_small??LOGS.tree_small})},
     {key:"fish",img:iconURL("karas"),label:tr("ed_drop_fish"),sub:tr("ed_src_fish_sub",{n:FISH.length})},
     {key:"quests",img:SPRITES.ui_quests||iconURL("coin"),label:tr("ed_drop_quests"),sub:tr("ed_src_quest_sub",{xp:edCfg.xp.quest??XP_DEF.quest})},
@@ -2928,6 +2933,13 @@ function renderDropTab(p){
     p.appendChild(mkEl("b","sub",tr("ed_drop_reward")));
     row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
     row(tr("ed_mob_hp"),numInput(edCfg.mobHp,mob,MOB_HP[mob]??3));
+    p.appendChild(mkEl("b","sub",tr("ed_mob_when")));
+    const mt=edCfg.mobTime[mob]||(edCfg.mobTime[mob]={...MOB_TIME[mob]});
+    for(const [per,lab] of [["d","ed_mob_day"],["n","ed_mob_night"]]){
+      const l=mkEl("label","edchk big"), cb=mkEl("input"); cb.type="checkbox"; cb.checked=!!mt[per];
+      cb.onchange=()=>{ mt[per]=cb.checked?1:0; cfgDirty=true; }; l.append(cb,document.createTextNode(tr(lab)));
+      const cnt=valInput(mt,per+"n",0,20); row(l,mkEl("small","muted",tr("ed_mob_count")),cnt); }
+    p.appendChild(mkEl("p","muted",tr("ed_mob_day_note")));
   } else if(edDropSel==="trees"){
     row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
     row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
@@ -3199,6 +3211,20 @@ function edDrawMarks(){
 const MOB_HP={wolf:4,bat:2};
 const mobHp=k=>CFG.mobHp&&CFG.mobHp[k]!=null?CFG.mobHp[k]:(MOB_HP[k]??3);
 const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat");
+// когда и сколько мобов: d — днём (нейтральные), n — ночью
+const MOB_TIME={wolf:{d:1,n:1,dn:2,nn:2},bat:{d:0,n:1,dn:2,nn:2}};
+const mobT=(k,f)=>CFG.mobTime&&CFG.mobTime[k]&&CFG.mobTime[k][f]!=null?CFG.mobTime[k][f]:(MOB_TIME[k]?MOB_TIME[k][f]:0);
+const mobOn=(k,per)=>!!mobT(k,per)&&mobCount(k,per)>0;
+const mobCount=(k,per)=>mobT(k,per+"n")|0;
+function mobLeave(a){ a.leaving=true; if(a.kind==="wolf"){ setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; } else a.path=[]; }
+function spawnMob(kind,per,farFromAll,existing){
+  if(kind==="bat"){ const c=batSpawnCell(farFromAll); if(!c) return; spawnAnimal("bat",c); const b=animals[animals.length-1]; b.fly=2.2; b.home={x:c.x,y:c.y}; b.phase=Math.random(); b.attackT=1.5; return; }
+  let c;
+  if(per==="d"){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5); c=z!==undefined?z:randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5); }
+  else { const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>6); c=z!==undefined?z:randomCell(c=>freeCell(c)&&edgeCell(c)&&farFromAll(c,8)&&nearestFire(c.x,c.y)[1]>6); }
+  if(!c) return; spawnAnimal(kind,c); const w=animals[animals.length-1];
+  if(per==="n"){ w.howlT=1.6; if(!existing) say("wolf_near","night_sub"); }
+}
 // ---- летучая мышь: ночью кружит у деревьев, пикирует на игрока и кусает ----
 function batSpawnCell(farFromAll){
   const z=zonePick("bat",c=>!c.water&&farFromAll(c,6)); if(z!==undefined) return z;
@@ -3210,7 +3236,7 @@ function updateBat(a,dt,tp,dh){
   let tx,ty,sp;
   if(a.leaving){ a.fly=(a.fly||1.6)+dt*1.5; return; }
   if(a.retreatT>0){ a.retreatT-=dt; tx=a.rx; ty=a.ry; sp=2.8; }
-  else if(tp&&(a.aggro||dh<4.5)){ tx=tp.x+Math.sin(a.flap*3)*0.3; ty=tp.y+Math.cos(a.flap*2.6)*0.3; sp=2.6;
+  else if(tp&&(a.aggro||(dh<4.5&&isNight()))){ tx=tp.x+Math.sin(a.flap*3)*0.3; ty=tp.y+Math.cos(a.flap*2.6)*0.3; sp=2.6;
     if(dh<0.8&&!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=2.2; a.lunge=0.25; a.lungeTo=[tp.x,tp.y]; biteTarget(tp,a);
       const ang=Math.random()*Math.PI*2; a.rx=tp.x+Math.cos(ang)*2.5; a.ry=tp.y+Math.sin(ang)*2.5; a.retreatT=0.9; } } }
   else { if(!a.wp||a.think<=0||Math.hypot(a.wp[0]-a.x,a.wp[1]-a.y)<0.3){ a.think=2+Math.random()*2; const an=Math.random()*Math.PI*2, r=Math.random()*3; a.wp=[home.x+Math.cos(an)*r,home.y+Math.sin(an)*r]; }
