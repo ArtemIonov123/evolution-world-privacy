@@ -118,6 +118,12 @@ canvas.drag{cursor:grabbing}
 .quick .btn{font-family:var(--f-body);font-weight:700;font-size:13px;letter-spacing:0}
 /* кнопки окон и окна персонажа */
 .hotbar{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:3}
+.bossbar{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;width:min(320px,calc(100% - 360px));min-width:200px;padding:5px 10px;text-align:center}
+.bossbar b{display:block;font-family:var(--f-display);font-weight:400;font-size:12px;color:#ff9a7a;letter-spacing:.05em}
+.bossbar i{display:block;height:10px;margin-top:4px;border:2px solid var(--edge);background:#3d3257}
+.bossbar s{display:block;height:100%;width:100%;background:#e8402c;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);transition:width .2s}
+.bossbar small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+@media (max-width:720px){ .bossbar{top:60px;width:min(260px,calc(100% - 40px))} }
 .hb{position:relative;width:44px;height:44px;display:grid;place-items:center;padding:0;background:var(--panel);border:2px solid var(--edge);
   box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);cursor:pointer;color:var(--ink)}
 .hb img{width:32px;height:32px;image-rendering:pixelated}
@@ -380,6 +386,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
     <div class="quick"><button class="btn" data-q="q_hi">Cześć!</button><button class="btn" data-q="q_come">Chodź tu!</button><button class="btn" data-q="q_wolves">Wilki!</button><button class="btn" data-q="q_thanks">Dzięki!</button></div>
   </div>
   <div class="hp panel" id="hp" role="img" aria-label="Zdrowie"></div>
+  <div class="bossbar panel" id="bossBar" hidden><b id="bossName"></b><i><s id="bossHp"></s></i><small id="bossNum"></small></div>
   <div class="inv panel" id="inv" hidden></div>
   <div class="hotbar" id="hotbar">
     <button class="hb" data-win="bag" data-i18n-label="win_bag" aria-label="Torba" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 8h10l2 12H5z M9 8V6a3 3 0 0 1 6 0v2" stroke-linejoin="round"/></svg></button>
@@ -420,9 +427,14 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 
 <script>
 const SPRITES = /*SPRITES*/;
-const MAP = /*MAP*/;
+// зона: остров или пещера (общий данж). Пещера — отдельная карта; переход — перезагрузкой страницы
+const ZONE=(()=>{ try{ return sessionStorage.getItem("island_zone")==="cave"?"cave":"island"; }catch(e){ return "island"; } })(), CAVE=ZONE==="cave";
+const CAVE_DEFAULT = {"levels":["0000044444444444400000","0004442222222222444000","0044222222222222224400","0042222222222222222400","0042222222222222222400","0044222222222222224400","0004444111221114444000","0000033111111113300000","0003331111111111333000","0033111111111111113300","0331111111111111111330","0311111113333311111113","0311111133000331111113","0331111130000031111113","0031111330000033111133","0031111130000031111330","0033111113333311111300","0003311111111111111300","0000333311111113333300","0000000333333333000000"],"tops":[".....cccccccccccc.....","...cccrrrcrrrrcrccc...","..ccrrrrcrrrrcrrrrcc..","..crrrrcrrrccrrrrcrc..","..crrrcrrrrcrrrrcrrc..","..ccrcrrrrcrrrrcrrcc..","...ccccrrrrrrrrcccc...",".....ccrrrrrrrrcc.....","...cccrrrrwwwrrrccc...","..ccrrorrrwwwvrrrocc..",".ccrroorrrvvvrrrrrrcc.",".crrrrrrrcccccrrrrrrrc",".crrmrrrcc...ccrrrrrrc",".ccrrrrrc.....crroorrc","..crrrrcc.....ccrrrrcc","..crrrrrc.....crrrrcc.","..ccrrrrrcccccrrrrrc..","...ccrrrrrrrrrrrrrrc..","....ccccrrrrrrrccccc..",".......ccccccccc......"],"stairs":{},"props":[[4,9,"prop_crystal"],[17,10,"prop_crystal"],[4,3,"prop_crystal"],[17,4,"prop_crystal"],[3,13,"prop_mushrooms"],[18,15,"prop_mushrooms"],[6,16,"rock_small"]],"start":[11,18],"exit":[12,18],"boss":[11,3],"zones":{"spider":[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[14,11],[15,11],[16,11],[17,11],[18,11],[19,11],[20,11],[2,12],[3,12],[4,12],[5,12],[6,12],[7,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[3,13],[4,13],[5,13],[6,13],[7,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],[3,14],[4,14],[5,14],[6,14],[16,14],[17,14],[18,14],[19,14],[3,15],[4,15],[5,15],[6,15],[7,15],[15,15],[16,15],[17,15],[18,15],[4,16],[5,16],[6,16],[7,16],[14,16],[15,16],[16,16],[17,16],[18,16]],"bat":[[6,8],[7,8],[8,8],[9,8],[13,8],[14,8],[15,8],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[13,9],[14,9],[15,9],[16,9],[17,9],[3,10],[4,10],[5,10],[6,10],[7,10],[8,10],[9,10],[10,10],[11,10],[12,10],[13,10],[14,10],[15,10],[16,10],[17,10],[18,10]],"hare":[],"wolf":[]},"hut":null,"npc":null,"merchant":null,"stall":null,"pier":null};
+const ISLAND_MAP = /*MAP*/;
+const MAP = CAVE ? JSON.parse(JSON.stringify(CAVE_DEFAULT)) : ISLAND_MAP;
+const ZC=n=>CAVE?"cave_"+n:n, MAP_DOC=CAVE?"world/map_cave":"world/map";
 // своя карта мира (из редактора): сначала из кэша браузера, база присылает свежую
-function mapKey(){ return "island_map_"+(window.__islandWorld||"claude"); }
+function mapKey(){ return "island_map_"+(window.__islandWorld||"claude")+(CAVE?"_cave":""); }
 function validMap(m){ try{
   if(!m||!Array.isArray(m.levels)||!Array.isArray(m.tops)) return false;
   const d=m.levels.length, w=(m.levels[0]||"").length; if(d<8||d>40||w<8||w>40||m.tops.length!==d) return false;
@@ -432,7 +444,7 @@ function validMap(m){ try{
   return /[1-9]/.test(m.levels.join("")); }catch(e){ return false; } }
 let MAP_V=0;
 try{ const raw=localStorage.getItem(mapKey()); if(raw){ const o=JSON.parse(raw);
-  if(o&&validMap(o.m)){ Object.assign(MAP,{hut:null,npc:null,merchant:null,stall:null,pier:null,zones:null},o.m); MAP_V=o.v||0; } } }catch(e){}
+  if(o&&validMap(o.m)){ Object.assign(MAP,{hut:null,npc:null,merchant:null,stall:null,pier:null,zones:null,cave:null,exit:null,boss:null},o.m); MAP_V=o.v||0; } } }catch(e){}
 
 // ================= Языки =================
 const I18N={
@@ -489,7 +501,12 @@ const I18N={
     npc_crafted:"Gotowe! {item} — trzymaj. Załóż w oknie Ekwipunek.", coins:"monet",
     xp:"+{n} XP", lvl_float:"POZIOM {n}!", lvl_up:"Nowy poziom: {n}!", lvl_up_sub:"zdrowie odnowione", blocked_bite:"Unik!",
     ed_open:"Edytor mapy", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
-    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", ed_t_prop_stump:"Pieniek", ed_t_prop_log:"Kłoda", ed_t_prop_mushrooms:"Grzyby", ed_t_prop_flowers:"Kwiatki", ed_t_prop_barrel:"Beczka", ed_t_prop_crate:"Skrzynia", ed_t_prop_signpost:"Drogowskaz", ed_t_prop_bush_berry:"Krzak z jagodami", ed_t_stairs_del:"Usuń schody", ed_stairs_sub:"stuknij pole — schody same skierują się w górę; stuknij schody — obróć", ed_t_n:"Piasek", ed_t_N:"Mokry piasek", ed_t_r:"Żwir", ed_t_m:"Błoto", ed_t_f:"Kwiaty", ed_t_o:"Mech", ed_t_c:"Bruk", ed_t_p:"Deski", ed_t_z:"Śnieg", ed_t_u:"Jesienna trawa", ed_fence_sub:"stuknij płot, aby go obrócić; przeciągnij palcem — ułoży się wzdłuż linii", ed_g_water:"Woda", ed_t_prop_lily_pad:"Lilie wodne", ed_t_prop_reeds:"Trzcina", ed_t_prop_rock_water:"Kamień w wodzie", ed_cat_land:"Ziemia", ed_cat_water:"Woda", ed_cat_decor:"Dekor", ed_cat_places:"Miejsca", ed_t_up:"Wyżej", ed_t_down:"Niżej", ed_t_stairs:"Schody",
+    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", go_cave:"Idziesz do jaskini", go_exit:"Idziesz do wyjścia", cave_enter:"Schodzisz do jaskini…", cave_leave:"Wychodzisz na wyspę…",
+    cave_hello:"Jesteś w jaskini", where_cave:"w jaskini", where_island:"na wyspie", spider_killed:"Pająk pokonany!", boss_killed:"Golem pokonany!", boss_killed_sub:"skarb w torbie · golem wróci za kilka minut",
+    boss_name:"KAMIENNY GOLEM", boss_summon:"Golem wzywa nietoperze!", fish_spider_silk:"Pajęczyna", fish_golem_core:"Serce golema", fish_sword_steel:"Stalowy miecz",
+    ed_t_cave:"Wejście do jaskini", ed_t_exit:"Wyjście", ed_t_boss:"Boss", ed_t_zone_spider:"Pająki", ed_t_prop_crystal:"Kryształ", ed_src_spider:"Pająk", ed_src_golem:"Golem (boss)",
+    ed_boss_rsp:"Odrodzenie (minuty)", ed_boss_rsp_short:"wraca po {n} min", ed_boss_note:"Golem stoi w miejscu «Boss» w jaskini. Łup dostają wszyscy, którzy go bili.",
+    ed_spider_note:"W jaskini pająki są zawsze (liczba — z pola «nocą»). Na wyspie — tylko jeśli zaznaczysz.", ed_t_prop_stump:"Pieniek", ed_t_prop_log:"Kłoda", ed_t_prop_mushrooms:"Grzyby", ed_t_prop_flowers:"Kwiatki", ed_t_prop_barrel:"Beczka", ed_t_prop_crate:"Skrzynia", ed_t_prop_signpost:"Drogowskaz", ed_t_prop_bush_berry:"Krzak z jagodami", ed_t_stairs_del:"Usuń schody", ed_stairs_sub:"stuknij pole — schody same skierują się w górę; stuknij schody — obróć", ed_t_n:"Piasek", ed_t_N:"Mokry piasek", ed_t_r:"Żwir", ed_t_m:"Błoto", ed_t_f:"Kwiaty", ed_t_o:"Mech", ed_t_c:"Bruk", ed_t_p:"Deski", ed_t_z:"Śnieg", ed_t_u:"Jesienna trawa", ed_fence_sub:"stuknij płot, aby go obrócić; przeciągnij palcem — ułoży się wzdłuż linii", ed_g_water:"Woda", ed_t_prop_lily_pad:"Lilie wodne", ed_t_prop_reeds:"Trzcina", ed_t_prop_rock_water:"Kamień w wodzie", ed_cat_land:"Ziemia", ed_cat_water:"Woda", ed_cat_decor:"Dekor", ed_cat_places:"Miejsca", ed_t_up:"Wyżej", ed_t_down:"Niżej", ed_t_stairs:"Schody",
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
@@ -545,7 +562,7 @@ const I18N={
     heal:"+{n} zdrowia", minus_hp:"-{n}", ate:"Mniam! Zdrowie: {hp}/5", full_hp:"Nie jestem głodny",
     hurt:"Wilk gryzie!", hurt_sub:"uciekaj do ogniska", wolf_chase:"Wilk cię wyczuł!", wolf_near:"Słychać wycie wilków…",
     fainted:"Obudziłeś się rano przy chacie Bogdana. Zgubione monety: {c}.", hp_label:"Zdrowie",
-    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", you:"ty", someone:"Gracz",
+    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", players_title_cave:"W jaskini", hurt_cave:"Au! Ugryzienie!", hurt_golem:"Golem uderza!", hurt_cave_sub:"zjedz miksturę z torby albo uciekaj do wyjścia", title_h_cave:"Jaskinia", you:"ty", someone:"Gracz",
     player_joined:"Na wyspę przybył nowy gracz", loaded:"Wczytano zapisany postęp", chat:"Czat", chat_ph:"Napisz wiadomość…", send:"Wyślij",
     q_hi:"Cześć!", q_come:"Chodź tu!", q_wolves:"Wilki!", q_thanks:"Dzięki!",
     nick_title:"Jak masz na imię?", nick_text:"Ten nick zobaczą inni gracze nad twoim bohaterem.", nick_ph:"Twój nick",
@@ -609,7 +626,12 @@ const I18N={
     npc_crafted:"Готово! {item} — держи. Надень в окне Снаряжение.", coins:"монет",
     xp:"+{n} XP", lvl_float:"УРОВЕНЬ {n}!", lvl_up:"Новый уровень: {n}!", lvl_up_sub:"здоровье восстановлено", blocked_bite:"Увернулся!",
     ed_open:"Редактор карты", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
-    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", ed_t_prop_stump:"Пень", ed_t_prop_log:"Бревно", ed_t_prop_mushrooms:"Грибы", ed_t_prop_flowers:"Цветочки", ed_t_prop_barrel:"Бочка", ed_t_prop_crate:"Ящик", ed_t_prop_signpost:"Указатель", ed_t_prop_bush_berry:"Куст с ягодами", ed_t_stairs_del:"Убрать лестницу", ed_stairs_sub:"тапни клетку — лестница сама встанет вверх; тапни лестницу — повернётся", ed_t_n:"Песок", ed_t_N:"Мокрый песок", ed_t_r:"Гравий", ed_t_m:"Грязь", ed_t_f:"Цветы", ed_t_o:"Мох", ed_t_c:"Брусчатка", ed_t_p:"Доски", ed_t_z:"Снег", ed_t_u:"Осенняя трава", ed_fence_sub:"тапни по забору — повернётся; веди пальцем — ляжет вдоль линии", ed_g_water:"Вода", ed_t_prop_lily_pad:"Кувшинки", ed_t_prop_reeds:"Камыш", ed_t_prop_rock_water:"Камень в воде", ed_cat_land:"Земля", ed_cat_water:"Вода", ed_cat_decor:"Декор", ed_cat_places:"Места", ed_t_up:"Выше", ed_t_down:"Ниже", ed_t_stairs:"Лестница",
+    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", go_cave:"Идёшь к пещере", go_exit:"Идёшь к выходу", cave_enter:"Спускаешься в пещеру…", cave_leave:"Выходишь на остров…",
+    cave_hello:"Ты в пещере", where_cave:"в пещере", where_island:"на острове", spider_killed:"Паук повержен!", boss_killed:"Голем повержен!", boss_killed_sub:"сокровища в сумке · голем вернётся через несколько минут",
+    boss_name:"КАМЕННЫЙ ГОЛЕМ", boss_summon:"Голем зовёт летучих мышей!", fish_spider_silk:"Паутина", fish_golem_core:"Сердце голема", fish_sword_steel:"Стальной меч",
+    ed_t_cave:"Вход в пещеру", ed_t_exit:"Выход", ed_t_boss:"Босс", ed_t_zone_spider:"Пауки", ed_t_prop_crystal:"Кристалл", ed_src_spider:"Паук", ed_src_golem:"Голем (босс)",
+    ed_boss_rsp:"Возрождение (минуты)", ed_boss_rsp_short:"вернётся через {n} мин", ed_boss_note:"Голем стоит на месте «Босс» в пещере. Лут получают все, кто его бил.",
+    ed_spider_note:"В пещере пауки есть всегда (сколько — из поля «ночью»). На острове — только если отметишь.", ed_t_prop_stump:"Пень", ed_t_prop_log:"Бревно", ed_t_prop_mushrooms:"Грибы", ed_t_prop_flowers:"Цветочки", ed_t_prop_barrel:"Бочка", ed_t_prop_crate:"Ящик", ed_t_prop_signpost:"Указатель", ed_t_prop_bush_berry:"Куст с ягодами", ed_t_stairs_del:"Убрать лестницу", ed_stairs_sub:"тапни клетку — лестница сама встанет вверх; тапни лестницу — повернётся", ed_t_n:"Песок", ed_t_N:"Мокрый песок", ed_t_r:"Гравий", ed_t_m:"Грязь", ed_t_f:"Цветы", ed_t_o:"Мох", ed_t_c:"Брусчатка", ed_t_p:"Доски", ed_t_z:"Снег", ed_t_u:"Осенняя трава", ed_fence_sub:"тапни по забору — повернётся; веди пальцем — ляжет вдоль линии", ed_g_water:"Вода", ed_t_prop_lily_pad:"Кувшинки", ed_t_prop_reeds:"Камыш", ed_t_prop_rock_water:"Камень в воде", ed_cat_land:"Земля", ed_cat_water:"Вода", ed_cat_decor:"Декор", ed_cat_places:"Места", ed_t_up:"Выше", ed_t_down:"Ниже", ed_t_stairs:"Лестница",
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
@@ -665,7 +687,7 @@ const I18N={
     heal:"+{n} здоровья", minus_hp:"-{n}", ate:"Ням! Здоровье: {hp}/5", full_hp:"Я не голоден",
     hurt:"Волк кусает!", hurt_sub:"беги к костру", wolf_chase:"Волк тебя учуял!", wolf_near:"Слышен вой волков…",
     fainted:"Ты очнулся утром у хижины Богдана. Потеряно монет: {c}.", hp_label:"Здоровье",
-    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", you:"ты", someone:"Игрок",
+    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", players_title_cave:"В пещере", hurt_cave:"Ай! Укусили!", hurt_golem:"Голем бьёт!", hurt_cave_sub:"выпей зелье из сумки или беги к выходу", title_h_cave:"Пещера", you:"ты", someone:"Игрок",
     player_joined:"На остров пришёл новый игрок", loaded:"Загружен сохранённый прогресс", chat:"Чат", chat_ph:"Напиши сообщение…", send:"Отправить",
     q_hi:"Привет!", q_come:"Иди сюда!", q_wolves:"Волки!", q_thanks:"Спасибо!",
     nick_title:"Как тебя зовут?", nick_text:"Этот ник увидят другие игроки над твоим героем.", nick_ph:"Твой ник",
@@ -703,7 +725,8 @@ function say(main,sub,p,force){
 }
 function applyLang(){
   document.documentElement.lang=LANG;
-  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(CAVE&&el.dataset.i18n==="title_h"?"title_h_cave":el.dataset.i18n));
+  { const sk=document.getElementById("skipTime"); if(sk&&CAVE) sk.hidden=true; }
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.placeholder=tr(el.dataset.i18nPh));
   document.querySelectorAll("[data-q]").forEach(el=>el.textContent=tr(el.dataset.q));
   if(typeof renderPlayers==="function") renderPlayers();
@@ -739,7 +762,7 @@ const TOP_SPRITE = {g:"block_grass",G:"block_grass_2",d:"block_grass_dark",s:"bl
 const LAND_TILES="gGdsenNrmfocpzu", GRASSY="gGdfou";   // виды земли; «травяные» — где растут деревья и бегают зайцы
 const TOP_NAME = {g:"трава",G:"трава",d:"тёмная трава",s:"каменная тропа",e:"земля",w:"вода"};
 const BLOCKING = new Set(["tree_big","tree_small","bush","rock_big","fence_left","fence_right","prop_reeds","prop_rock_water",
-  "prop_barrel","prop_crate","prop_stump","prop_log","prop_signpost","prop_bush_berry"]);
+  "prop_barrel","prop_crate","prop_stump","prop_log","prop_signpost","prop_bush_berry","prop_crystal"]);
 // водный декор ставится только на воду; любые другие prop_* — только на сушу
 const WATER_PROPS=new Set(["prop_lily_pad","prop_reeds","prop_rock_water"]);
 const isWaterProp=n=>WATER_PROPS.has(n);
@@ -769,7 +792,7 @@ const walkZ=c=> wet(c) ? c.L-0.3 : c.st ? c.L+0.5 : c.L;  // вода чуть �
 
 // ---------- Камера и поворот ----------
 let rot=0, rotTarget=0, anim=null, ca=1, sa=0;
-const SKY=getComputedStyle(document.documentElement).getPropertyValue("--sky").trim()||"#a99ad6";
+const SKY=CAVE?"#120d1c":(getComputedStyle(document.documentElement).getPropertyValue("--sky").trim()||"#a99ad6");
 let scale=2, panX=0, panY=0, follow=true, showGrid=false, hover=null;
 let rotQPrev=0;
 function setRot(r){rot=r; const a=r*Math.PI/2; ca=Math.cos(a); sa=Math.sin(a);
@@ -856,6 +879,7 @@ function goTo(c){
   if(typeof c==="object"&&isMob(c)){ if(placing) return; attackWolf(c); return; }
   if(placing){ if(c&&typeof c==="object") placeFireAt(c); return; }
   if(typeof c==="object"&&c.fire){ goAdjacent(c,()=>openFireMenu(c.fire),"go_fire"); return; }
+  if(c==="portal"||c.portal){ goAdjacent(PORTAL,usePortal,CAVE?"go_exit":"go_cave"); return; }
   if(c==="merchant"||c.merchHere||c.stall){ goTrade(); return; }
   if(c==="npc"||c==="hut"||c.hutPart||c.npcHere){ goTalk(); return; }
   if(c.water){ goFish(c); return; }
@@ -964,7 +988,7 @@ function drawSprites(anchor){
     for(let z=0;z<c.L;z++){
       if(wet(c)&&z===c.L-1) continue;
       const p=proj(X,Y,z+1), top=z===c.L-1;
-      const name=top?TOP_SPRITE[c.t]:(z<2?"block_rock":"block_grass");
+      const name=top?TOP_SPRITE[c.t]:(z<2||CAVE?"block_rock":"block_grass");
       ctx.drawImage(img[name],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y));
     }
     if(c.st){ const sn=stairSprite(c.st,q); if(sn==="block_stone_path") drawStairsBack(c); else { const p=proj(X,Y,c.L+1); ctx.drawImage(img[sn],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y)); } }
@@ -972,6 +996,7 @@ function drawSprites(anchor){
     if(c.leaves.length) drawLandedLeaves(c);
     if(c.fire) drawFire(c);
     if(c.stump) drawStump(c);
+    if(c.portal) drawPortal(c);
     if(c.props.length){
       const p=proj(X,Y,wet(c)?walkZ(c):c.L);
       for(const name of c.props){
@@ -1027,6 +1052,9 @@ function drawPropFallback(n,px,py){
   if(n==="prop_lily_pad"){ for(const [x,y] of [[-8,-2],[3,-4],[-1,2]]){ R(x-1,y-1,9,5,"#1b1528"); R(x,y,7,3,"#4caa3c"); R(x+1,y,3,1,"#7cd05a"); } R(4,-6,3,2,"#ff9ac8"); return; }
   if(n==="prop_reeds"){ for(const x of [-5,-2,1,4]){ const h=18+((x*7)&7); R(x,-h,1,h,"#3c7a2c"); if(x%2===0) R(x-1,-h-1,3,6,"#7a4a24"); } R(-7,-1,15,2,"rgba(230,246,255,.6)"); return; }
   if(n==="prop_rock_water"){ R(-8,-7,16,9,"#1b1528"); R(-7,-6,14,7,"#8a8a96"); R(-5,-6,8,2,"#a8a8b4"); R(-6,-6,5,1,"#5a8a3c"); R(-10,1,20,2,"rgba(240,250,255,.7)"); return; }
+  if(n==="prop_crystal"){ const gl=0.75+0.25*Math.sin(T*2+px*0.1);
+    for(const [x,h,w] of [[-7,12,5],[-2,18,6],[4,11,5]]){ R(x-1,-h-1,w+2,h+1,"#1b1528"); R(x,-h,w,h,"#3aa8d8"); R(x,-h,2,h,`rgba(200,245,255,${gl})`); R(x+1,-h-1,w-2,1,"#e8fbff"); }
+    R(-9,-1,19,2,"#1b1528"); return; }
   R(-3,-6,6,6,"#ff00ff");
 }
 const FENCE_BASE=27;   // y середины основания забора в его картинке
@@ -1163,6 +1191,11 @@ const FISH=[
 const ICON_SPRITE={karas:"fish_karas",okun:"fish_okun",shchuka:"fish_shchuka",gold:"fish_gold",boot:"item_boot"};
 const ICONS={};
 const ICON_FALLBACK={
+  spider_silk:(x,y)=>{ const dx=x-16, dy=y-16, r=Math.hypot(dx,dy); if(r>13) return null; const a=Math.atan2(dy,dx);
+    if(Math.abs(Math.sin(a*4))<0.12||Math.abs(r-4)<0.6||Math.abs(r-8)<0.6||Math.abs(r-12)<0.6) return r>12.4?"#9a94b4":"#f4f0ff"; return null; },
+  golem_core:(x,y)=>{ const d=Math.abs(x-16)/9+Math.abs(y-16)/12; if(d>1) return null; if(d>0.85) return "#1b1528"; return d<0.35?"#e8fbff":x<16?"#7ae0ff":"#3aa8d8"; },
+  sword_steel:(x,y)=>{ const along=((x-6)-(y-26))/Math.SQRT2, d=Math.abs((x-6)+(y-26))/Math.SQRT2; if(along<0||along>28) return null;
+    if(along<7){ if(d>1.6) return null; return "#7a4a24"; } if(along<9){ if(d>4.5) return null; return "#c8a040"; } if(d>2.2) return null; return d<0.8?"#ffffff":"#b8c4d0"; },
   club:(x,y)=>{ const along=((x-6)-(y-26))/Math.SQRT2, d=Math.abs((x-6)+(y-26))/Math.SQRT2;
     if(along<0||along>27) return null; const r=along>17?3.4:1.8; if(d>r) return null; return along>17?(d>2.2?"#8a5a2e":"#c89058"):(d>1?"#7a4a24":"#b07a40"); },
   pelt:(x,y)=>{ const e=((x-16)/11)**2+((y-17)/8)**2; if(e>1) return null; if(e>0.75) return "#4c4c5c"; return (x+y*2)%7===0?"#5a5a68":((y<15)?"#8a8a98":"#6c6c7c"); },
@@ -1257,8 +1290,8 @@ function makeIcon(f){
     g.fillStyle="rgba(255,255,255,.55)"; g.fillRect(16,16-(f.slim?3:4),3,1); }
   return cv2;
 }
-const WOOD={id:"wood"}, ITEMS=[{id:"coin"},{id:"club"},{id:"sword_wood"},{id:"cap_leather"},{id:"armor_leather"},{id:"boots_leather"},{id:"amulet_fang"},{id:"sword_iron"},{id:"helm_iron"},{id:"rod_wood"},{id:"rod_bamboo"},{id:"rod_steel"},{id:"potion"},{id:"potion_big"},{id:"bait"},...FISH,{id:"cooked"},{id:"meat_raw"},{id:"meat_cooked"},WOOD,{id:"pelt"},{id:"fang"},{id:"bat_wing"}];
-for(const k of ["club","pelt","fang","meat_raw","meat_cooked","potion","sword_wood","cap_leather","armor_leather","boots_leather","amulet_fang","sword_iron","helm_iron","potion_big","bait","rod_wood","rod_bamboo","rod_steel","bat_wing"]) ICON_SPRITE[k]="item_"+k;
+const WOOD={id:"wood"}, ITEMS=[{id:"coin"},{id:"club"},{id:"sword_wood"},{id:"cap_leather"},{id:"armor_leather"},{id:"boots_leather"},{id:"amulet_fang"},{id:"sword_iron"},{id:"helm_iron"},{id:"rod_wood"},{id:"rod_bamboo"},{id:"rod_steel"},{id:"potion"},{id:"potion_big"},{id:"bait"},...FISH,{id:"cooked"},{id:"meat_raw"},{id:"meat_cooked"},WOOD,{id:"pelt"},{id:"fang"},{id:"bat_wing"},{id:"spider_silk"},{id:"golem_core"},{id:"sword_steel"}];
+for(const k of ["club","pelt","fang","meat_raw","meat_cooked","potion","sword_wood","cap_leather","armor_leather","boots_leather","amulet_fang","sword_iron","helm_iron","potion_big","bait","rod_wood","rod_bamboo","rod_steel","bat_wing","spider_silk","golem_core","sword_steel"]) ICON_SPRITE[k]="item_"+k;
 ICON_SPRITE.cooked="fish_cooked"; ICON_SPRITE.campfire="item_campfire";
 ICON_SPRITE.coin="item_coin";
 ICON_SPRITE.wood="item_wood";
@@ -1267,13 +1300,13 @@ const inv={};
 // ================= RPG: уровень, навыки, снаряжение, ремесло и окна =================
 const GEAR={club:{slot:"weapon",atk:1}, sword_wood:{slot:"weapon",atk:2}, cap_leather:{slot:"head",def:1},
   armor_leather:{slot:"body",def:2}, boots_leather:{slot:"feet",def:1}, amulet_fang:{slot:"neck",hp:1},
-  sword_iron:{slot:"weapon",atk:3}, helm_iron:{slot:"head",def:2},
+  sword_iron:{slot:"weapon",atk:3}, helm_iron:{slot:"head",def:2}, sword_steel:{slot:"weapon",atk:4},
   rod_wood:{slot:"rod",rod:1}, rod_bamboo:{slot:"rod",rod:2}, rod_steel:{slot:"rod",rod:3}};
 const SLOTS=["head","neck","body","weapon","feet","rod"];
 const RECIPES=[{id:"rod_wood",need:{wood:2},coin:0},{id:"sword_wood",need:{wood:4},coin:10},{id:"cap_leather",need:{pelt:1},coin:5},{id:"boots_leather",need:{pelt:2},coin:5},
   {id:"armor_leather",need:{pelt:3},coin:10},{id:"amulet_fang",need:{fang:3},coin:10}];
 const equip={weapon:null,head:null,body:null,feet:null,neck:null,rod:null};
-const prog={xp:0, ri:0, sk:{fight:0,fish:0,chop:0}, st:{wolves:0,bats:0,fish:0,trees:0,fires:0,faints:0,time:0}};
+const prog={xp:0, ri:0, sk:{fight:0,fish:0,chop:0}, st:{wolves:0,bats:0,spiders:0,bosses:0,fish:0,trees:0,fires:0,faints:0,time:0}};
 function lvlInfo(xp){ let l=1,need=20; while(xp>=need&&l<60){ xp-=need; l++; need=20*l; } return {l,into:xp,need}; }
 const heroLevel=()=>lvlInfo(prog.xp).l;
 const skillLvl=k=>1+Math.floor(Math.sqrt((prog.sk[k]||0)/8));
@@ -1325,7 +1358,7 @@ function itemDesc(id){
   if(id==="bat_wing") return tr("d_wing",{c:sellPrice(id)});
   if(id==="bait") return tr("d_bait");
   if(PRICE[id]) return tr("d_fish",{c:PRICE[id]});
-  if(id==="pelt"||id==="fang") return tr("d_mat",{c:sellPrice(id)});
+  if(id==="pelt"||id==="fang"||id==="spider_silk"||id==="golem_core") return tr("d_mat",{c:sellPrice(id)});
   if(id==="meat_raw") return tr("d_meat");
   if(id==="wood") return tr("d_wood");
   if(id==="coin") return tr("d_coin");
@@ -1450,7 +1483,7 @@ if(MERCHC){ MERCHC.merchHere=true; MERCHC.props=[]; MERCHC.blocked=true; }
 { const s=STALL_POS&&cellAt(STALL_POS[0],STALL_POS[1]); if(s&&!s.water&&!s.merchHere){ s.props=[STALL_POS[2]]; s.stall=true; s.blocked=true; } }
 { const p=PIER_POS&&cellAt(PIER_POS[0],PIER_POS[1]); if(p&&p.water) p.pier=PIER_POS[2]; }
 const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"rod_wood",p:6},{id:"rod_bamboo",p:25},{id:"rod_steel",p:70},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
-const SELL_P={rod_wood:2,rod_bamboo:10,rod_steel:30,bat_wing:3,club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
+const SELL_P={spider_silk:4,golem_core:40,sword_steel:30,rod_wood:2,rod_bamboo:10,rod_steel:30,bat_wing:3,club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
   pelt:4,fang:3,meat_raw:2,meat_cooked:5};
 const sellPrice=id=>CFG.sell[id]!=null?CFG.sell[id]:(SELL_P[id]??PRICE[id]??0);
 let shopTab="buy", shopMsg=null;
@@ -1806,7 +1839,7 @@ function finishFall(c){
   c.remoteFall=false;   // через 5–10 с где-то вырастет новое
 }
 // новое деревце в свободном месте на траве, подальше от героя и других деревьев
-function sproutTree(){
+function sproutTree(){ if(CAVE) return;
   const onPath=c=>hero.path.some(([px,py])=>Math.round(px)===c.x&&Math.round(py)===c.y);
   const cand=cells.filter(c=>!c.water&&!c.st&&GRASSY.includes(c.t)&&!c.props.length&&!c.stump&&!c.blocked
     &&Math.hypot(c.x-hero.x,c.y-hero.y)>2.5&&!onPath(c)
@@ -1901,6 +1934,51 @@ if(HUT){
 const NPCC = MAP.npc ? cellAt(MAP.npc[0],MAP.npc[1]) : null;
 const npc = NPCC ? {x:NPCC.x, y:NPCC.y, z:walkZ(NPCC), facing:"se", t:0, turnT:3} : null;
 if(NPCC){ NPCC.npcHere=true; NPCC.blocked=true; NPCC.props=[]; }
+// ================= Пещера: вход на острове, выход в пещере =================
+const PORTAL=(()=>{
+  const p=CAVE?MAP.exit:MAP.cave, ok=c=>c&&!wet(c)&&!c.hutPart&&!c.npcHere&&!c.merchHere&&!c.stall&&!c.st;
+  let c=p&&cellAt(p[0],p[1]);
+  if(!ok(c)){   // вход не задан — сами выбираем сухую клетку подальше от старта, с проходом рядом
+    const st=MAP.start, free=n=>n&&!n.blocked&&!wet(n);
+    const cand=cells.filter(k=>ok(k)&&!k.props.some(n=>n.startsWith("tree"))&&DIRS4.some(([dx,dy])=>{ const n=cellAt(k.x+dx,k.y+dy); return free(n)&&Math.abs(walkZ(n)-walkZ(k))<=1; }));
+    cand.sort((a,b)=>(b.L*1.5+Math.min(9,Math.hypot(b.x-st[0],b.y-st[1])))-(a.L*1.5+Math.min(9,Math.hypot(a.x-st[0],a.y-st[1])))||a.y-b.y||a.x-b.x);
+    c=cand[0]||null; }
+  if(c){ c.portal=true; c.props=[]; c.blocked=true; }
+  return c;
+})();
+// где появиться после перехода: у входа/выхода или (после обморока в пещере) у хижины
+let SPAWN_FIXED=false;
+{ let sp=null; try{ sp=sessionStorage.getItem("island_spawn"); sessionStorage.removeItem("island_spawn"); }catch(e){}
+  const near=t=>t&&[...Array(9)].map((_,i)=>cellAt(t.x+(i%3)-1,t.y+((i/3)|0)-1)).filter(n=>n&&!n.blocked&&!wet(n)&&Math.abs(walkZ(n)-walkZ(t))<=1)
+    .sort((a,b)=>depthOf(b.x-MX,b.y-MY)-depthOf(a.x-MX,a.y-MY))[0];
+  const spot=sp==="portal"?near(PORTAL):sp==="faint"?near(NPCC):null;
+  if(spot){ hero.x=spot.x; hero.y=spot.y; hero.z=walkZ(spot); SPAWN_FIXED=true; } }
+function usePortal(){
+  if(!PORTAL||fainting) return;
+  fainting=true; hero.path=[]; document.getElementById("fade").style.opacity="1"; say(CAVE?"cave_leave":"cave_enter");
+  saveNow();
+  try{ sessionStorage.setItem("island_zone",CAVE?"island":"cave"); sessionStorage.setItem("island_spawn","portal"); }catch(e){}
+  setTimeout(()=>location.reload(),1100);
+}
+function saveNow(){ try{ lastSaveJSON=""; saveT=0; saving=false; tickSave(0); }catch(e){} }
+function drawPortal(c){
+  worldTransform(); ctx.imageSmoothingEnabled=false;
+  const [px,py]=proj(c.x-MX,c.y-MY,c.L), im=img[CAVE?"cave_exit":"cave_entrance"];
+  if(im){ ctx.drawImage(im,Math.round(px-im.width/2),Math.round(py-im.height+12)); return; }
+  const R=(x,y,w,h,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(px+x),Math.round(py+y),w,h)};
+  if(!CAVE){   // каменный холм с тёмным проходом
+    const rocks=[[-22,-14,14,14],[-14,-26,12,14],[-4,-32,12,12],[8,-26,12,14],[14,-14,10,14],[-20,-4,40,8]];
+    for(const [x,y,w,h] of rocks){ R(x-1,y-1,w+2,h+2,"#1b1528"); R(x,y,w,h,"#8a8494"); R(x,y,w,2,"#aaa4b4"); R(x+1,y+h-3,w-2,2,"#6a6474"); }
+    R(-9,-20,18,20,"#1b1528"); R(-7,-18,14,18,"#0a0710"); R(-5,-22,10,3,"#1b1528");
+    R(-12,-30,4,3,"#5a8a3c"); R(9,-22,5,2,"#5a8a3c");
+    const fl=Math.sin(T*12)>0?1:0; R(13,-22,2,8,"#6a4422"); R(12,-26-fl,4,4,"#ffb040"); R(13,-27-fl,2,2,"#fff0a0");
+  } else {     // выход: столб света сверху и верёвочная лестница
+    ctx.save(); ctx.globalAlpha=0.28+0.06*Math.sin(T*2); ctx.fillStyle="#fff2c8";
+    ctx.beginPath(); ctx.moveTo(px-10,py-70); ctx.lineTo(px+10,py-70); ctx.lineTo(px+18,py+4); ctx.lineTo(px-18,py+4); ctx.closePath(); ctx.fill(); ctx.restore();
+    R(-7,-62,2,64,"#6a4422"); R(5,-62,2,64,"#6a4422"); for(let y=-58;y<0;y+=8) R(-6,y,12,2,"#a07040");
+  }
+}
+function pickPortal(wx,wy){ if(!PORTAL) return false; const [fx,fy]=proj(PORTAL.x-MX,PORTAL.y-MY,PORTAL.L); return Math.abs(wx-fx)<=22&&wy>=fy-(CAVE?60:36)&&wy<=fy+8; }
 let quest="none";          // none → active → done
 let rodLevel=1;            // 2 — удочка от Богдана: редкая рыба чаще, клюёт быстрее
 const PRICE={karas:2, okun:3, shchuka:6, gold:25, boot:1, cooked:8};
@@ -2123,6 +2201,7 @@ function updateNPC(dt){
 function pickEntity(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale;
   if(npc){ const [fx,fy]=proj(npc.x-MX,npc.y-MY,npc.z); if(Math.abs(wx-fx)<=11&&wy>=fy-44&&wy<=fy+4) return "npc"; }
+  if(pickPortal(wx,wy)) return "portal";
   if(pickMerchant(wx,wy)) return "merchant";
   if(HUT){
     const g=hutGeom(), pts=[];
@@ -2237,6 +2316,7 @@ const DAY_LEN=420;                 // секунд на сутки (7 минут
 let clock=8/24;                    // доля суток, 0 = полночь; старт в 8:00
 const hourNow=()=>clock*24;
 function darkness(){               // 0 — день, 1 — глубокая ночь
+  if(CAVE) return 0.94;
   const h=hourNow();
   if(h>=7&&h<17.5) return 0;
   if(h>=17.5&&h<21) return (h-17.5)/3.5;
@@ -2244,12 +2324,13 @@ function darkness(){               // 0 — день, 1 — глубокая н�
   return 1-(h-5)/2;
 }
 function duskAmt(){                // оранжевый закат и розовый рассвет
+  if(CAVE) return 0;
   const h=hourNow();
   if(h>=16.5&&h<20.5) return Math.sin((h-16.5)/4*Math.PI);
   if(h>=4.5&&h<7.5) return Math.sin((h-4.5)/3*Math.PI)*0.6;
   return 0;
 }
-const isNight=()=>{const h=hourNow(); return h>=20.5||h<5.5;};
+const isNight=()=>{ if(CAVE) return true; const h=hourNow(); return h>=20.5||h<5.5;};
 let wasNight=null, lastClockText="";
 function updateClock(dt){
   { const nc=netClock(); clock=nc!==null?nc:(clock+dt/DAY_LEN)%1; }
@@ -2286,7 +2367,13 @@ function collectLights(){
     L.push({x:p[0],y:p[1],r:82+fl,c:"255,186,110",a:1});
   }
   if(HUT){ const p=proj(HUT.hx+0.5-MX,HUT.hy+0.9-MY,HUT.Z+1.7); L.push({x:p[0],y:p[1],r:48,c:"255,200,120",a:0.75}); }
-  const hp=proj(hero.x-MX,hero.y-MY,hero.z+1.5); L.push({x:hp[0],y:hp[1],r:30,c:"170,185,255",a:0.35});
+  const hp=proj(hero.x-MX,hero.y-MY,hero.z+1.5);
+  if(CAVE){ L.push({x:hp[0],y:hp[1],r:78+Math.sin(T*9)*2,c:"255,206,150",a:0.95});      // в пещере у героя факел
+    for(const r of remotes.values()){ const q=proj(r.x-MX,r.y-MY,r.z+1.5); L.push({x:q[0],y:q[1],r:66,c:"255,206,150",a:0.85}); }
+    if(PORTAL){ const q=proj(PORTAL.x-MX,PORTAL.y-MY,PORTAL.L+1.2); L.push({x:q[0],y:q[1],r:70,c:"255,240,200",a:0.9}); }
+    for(const c of cells) for(const n of c.props) if(n==="prop_crystal"){ const q=proj(c.x-MX,c.y-MY,c.L+0.6); L.push({x:q[0],y:q[1],r:46+Math.sin(T*2+c.x)*3,c:"130,210,255",a:0.8}); }
+    for(const a of animals) if(a.kind==="golem"&&a.alpha>0.2){ const q=proj(a.x-MX,a.y-MY,a.z+1.6); L.push({x:q[0],y:q[1],r:a.slamT>0?60:34,c:a.slamT>0?"255,120,90":"120,220,255",a:0.8}); } }
+  else L.push({x:hp[0],y:hp[1],r:30,c:"170,185,255",a:0.35});
   for(const f of fireflies){ if(f.b<=0.05) continue; const p=proj(f.x-MX,f.y-MY,f.z); L.push({x:p[0],y:p[1],r:9,c:"210,255,130",a:0.55*f.b}); }
   return L;
 }
@@ -2366,11 +2453,14 @@ function hurtHero(n,from){
   // отбрасывает от волка
   if(from){ const dx=hero.x-from.x, dy=hero.y-from.y, dd=Math.hypot(dx,dy)||1, nx=hero.x+dx/dd*0.35, ny=hero.y+dy/dd*0.35, c=cellAt(Math.round(nx),Math.round(ny));
     if(c&&!c.blocked&&Math.abs(walkZ(c)-hero.z)<1.2){ hero.x=nx; hero.y=ny; } }
-  if(hero.hp<=0) faint(); else say("hurt","hurt_sub");
+  if(hero.hp<=0) faint(); else if(CAVE) say(from&&from.kind==="golem"?"hurt_golem":"hurt_cave","hurt_cave_sub"); else say("hurt","hurt_sub");
 }
 function faint(){
   fainting=true; fadeT=0; hero.path=[]; marker=null; closeDialog(); prog.st.faints++;
   document.getElementById("fade").style.opacity="1";
+  if(CAVE){ setTimeout(()=>{ const lost=Math.floor((inv.coin||0)*0.3); if(lost){ inv.coin-=lost; if(!inv.coin) delete inv.coin; }
+    hero.hp=HP_MAX; saveNow(); try{ sessionStorage.setItem("island_zone","island"); sessionStorage.setItem("island_spawn","faint"); }catch(e){}
+    setTimeout(()=>location.reload(),900); },1100); return; }
   setTimeout(()=>{
     // очнулся утром у хижины Богдана
     const spot=[...Array(9)].map((_,i)=>cellAt(NPCC.x+(i%3)-1,NPCC.y+((i/3)|0)-1)).find(c=>c&&!c.blocked)||NPCC;
@@ -2547,6 +2637,7 @@ function updateAnimals(dt){
   const farFromAll=(c,r)=>P.every(p=>Math.hypot(c.x-p.x,c.y-p.y)>r);
   spawnT-=dt;
   if(spawnT<=0){ spawnT=1;
+    if(CAVE) caveSpawn(farFromAll); else {
     const hares=animals.filter(a=>a.kind==="hare"&&!a.leaving), wolves=animals.filter(a=>a.kind==="wolf"&&!a.leaving&&!(a.dying>0));
     if(day){ if(hares.length<3){ const z=zonePick("hare",c=>freeCell(c)&&farFromAll(c,4)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&GRASSY.includes(c.t)&&farFromAll(c,5)); if(c) spawnAnimal("hare",c); }
     }
@@ -2560,7 +2651,7 @@ function updateAnimals(dt){
       if(list.length>want+1){ const a=list.find(x=>!x.aggro); if(a) mobLeave(a); }
       else if(list.length<want&&Math.random()<(kind==="bat"?0.35:per==="n"?1:0.1)) spawnMob(kind,per,farFromAll,list.length);
     }
-  }
+  } }
   let anyChase=false;
   for(let i=animals.length-1;i>=0;i--){
     const a=animals[i];
@@ -2599,6 +2690,8 @@ function updateAnimals(dt){
           if(freeCell(c)) setPath(a,c); a.speed=1.6; if(Math.random()<0.12) a.howlT=1.5; }
       } else if(a.state!=="wander"||(a.think<=0&&!a.path.length)){ a.state="wander"; a.think=3+Math.random()*3; setPath(a,fleeCell(a,a.x,a.y,2,4)); a.speed=1.3; }
     }
+    if(a.kind==="spider"){ updateSpider(a,dt,tp,dh); moveAnimal(a,dt); continue; }
+    if(a.kind==="golem"){ updateGolem(a,dt,tp,dh,P); moveAnimal(a,dt); continue; }
     if(a.kind==="bat"){ if(a.aggro&&(!tp||dh>8)) a.aggro=false; updateBat(a,dt,tp,dh); continue; }
     moveAnimal(a,dt);
   }
@@ -2634,6 +2727,7 @@ function drawWolfP(g,frame,moving,night){
 }
 function drawAnimal(a){
   if(a.kind==="bat") return drawBat(a);
+  if(a.kind==="spider"||a.kind==="golem") return drawBeast(a);
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
   let [fx,fy]=proj(a.x-MX,a.y-MY,a.z);
@@ -2667,9 +2761,11 @@ const WOLF_HP=4, ATK_TIME=0.36, ATK_HIT=0.14, ATK_CD=0.75, ATK_RANGE=1.15;
 const LOOT_PRICE={pelt:4, fang:3, meat_raw:2, meat_cooked:5};
 // ---- дроп, опыт и цены рыбака (настраиваются во вкладке «Дроп») ----
 const DROP_DEF={wolf:[{id:"pelt",ch:100,a:1,b:1},{id:"meat_raw",ch:100,a:1,b:1},{id:"fang",ch:50,a:1,b:1}],
-  bat:[{id:"bat_wing",ch:100,a:1,b:1},{id:"coin",ch:40,a:1,b:2}]};
-const MOBS=["wolf","bat"];                       // сюда добавятся новые мобы и боссы
-const XP_DEF={wolf:10,bat:6,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
+  bat:[{id:"bat_wing",ch:100,a:1,b:1},{id:"coin",ch:40,a:1,b:2}],
+  spider:[{id:"spider_silk",ch:100,a:1,b:2},{id:"coin",ch:50,a:1,b:3}],
+  golem:[{id:"coin",ch:100,a:30,b:60},{id:"potion_big",ch:100,a:1,b:2},{id:"golem_core",ch:100,a:1,b:1},{id:"sword_steel",ch:35,a:1,b:1}]};
+const MOBS=["wolf","bat","spider"], BOSSES=["golem"];                       // сюда добавятся новые мобы и боссы
+const XP_DEF={wolf:10,bat:6,spider:12,golem:150,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
 const FISHER_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
 const dropTable=m=>CFG.drops[m]||DROP_DEF[m]||[];
 const xpOf=k=>CFG.xp[k]!=null?CFG.xp[k]:XP_DEF[k];
@@ -2693,8 +2789,8 @@ const hasWeapon=()=>!!equip.weapon;
 function pickWolf(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale; let best=null, bd=1e9;
   for(const a of animals){ if(!isMob(a)||a.dying>0||a.alpha<0.3||!a.drawn) continue;
-    const dx=wx-a.drawn.x, dy=wy-(a.drawn.y-12);
-    if(Math.abs(dx)<=20&&dy>=-22&&dy<=14){ const d=Math.hypot(dx,dy); if(d<bd){bd=d;best=a;} } }
+    const big=a.kind==="golem", dx=wx-a.drawn.x, dy=wy-(a.drawn.y-(big?24:12));
+    if(Math.abs(dx)<=(big?28:20)&&dy>=(big?-30:-22)&&dy<=(big?26:14)){ const d=Math.hypot(dx,dy); if(d<bd){bd=d;best=a;} } }
   return best;
 }
 function attackWolf(a){
@@ -2732,9 +2828,16 @@ function applyHit(a,peer,fromX,fromY,dmg=1,crit=false){
   if(a.dying>0) return;
   a.hp=(a.hp??mobHp(a.kind))-dmg; a.hurtT=0.3; a.lunge=0;
   hitFx.push({x:a.x,y:a.y,z:a.z,t:0,txt:"-"+dmg+(crit?"!":""),col:crit?"#ff8a2a":"#ffd66b"});
-  const dx=a.x-fromX, dy=a.y-fromY, dd=Math.hypot(dx,dy)||1, nx=a.x+dx/dd*0.4, ny=a.y+dy/dd*0.4, c=cellAt(Math.round(nx),Math.round(ny));
-  if(c&&!c.blocked&&Math.abs(walkZ(c)-a.z)<1.2){ a.x=nx; a.y=ny; }
-  a.path=[]; a.state="chase"; a.aggro=true; a.aggroT=0; a.attackT=Math.max(a.attackT,0.25); a.think=0.2;
+  (a.hitters||(a.hitters=new Set())).add(peer||"me");
+  if(a.kind!=="golem"){
+    const dx=a.x-fromX, dy=a.y-fromY, dd=Math.hypot(dx,dy)||1, nx=a.x+dx/dd*0.4, ny=a.y+dy/dd*0.4, c=cellAt(Math.round(nx),Math.round(ny));
+    if(c&&!c.blocked&&Math.abs(walkZ(c)-a.z)<1.2){ a.x=nx; a.y=ny; }
+    a.path=[]; a.state="chase"; a.attackT=Math.max(a.attackT,0.25); }
+  a.aggro=true; a.aggroT=0; a.think=0.2;
+  if(a.hp<=0&&a.kind==="golem"){ a.dying=3; a.path=[]; a.slamT=0; bossDeadAt=Date.now();
+    if(NET.db) NET.db.doc("world/cave_boss").set({dead:bossDeadAt}).catch(()=>{});
+    for(const pr of a.hitters){ if(!NET.room||pr===NET.myPeer||pr==="me") giveLoot(a); else { kills.push({i:a.nid,p:pr,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); } }
+    return; }
   if(a.hp<=0){ a.dying=2.4; a.path=[]; a.howlT=0;
     if(!NET.room||peer===NET.myPeer) giveLoot(a);
     else { kills.push({i:a.nid,p:peer,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); } }
@@ -2743,7 +2846,10 @@ function giveLoot(a){
   const got=rollDrops(a&&a.kind?a.kind:"wolf");
   for(const [id,n] of got){ inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:id==="coin"?"#ffd66b":"#f0e0c0",t:-0.25*floats.length}); }
   const kind=a&&a.kind||"wolf"; renderInv();
-  if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; } else { say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; }
+  if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; }
+  else if(kind==="spider"){ say("spider_killed","bat_killed_sub"); prog.st.spiders=(prog.st.spiders||0)+1; }
+  else if(kind==="golem"){ say("boss_killed","boss_killed_sub"); prog.st.bosses=(prog.st.bosses||0)+1; }
+  else { say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; }
   addXP(xpOf(kind),"fight");
   if(quest2==="active"&&(inv.pelt||0)>=2) setTimeout(()=>say("pelts_ready","pelts_ready_sub"),1600);
 }
@@ -2756,7 +2862,7 @@ function processRemoteHits(){
 }
 function checkMyKills(h){
   for(const k of h.kl||[]){ if(!k||k.p!==NET.myPeer) continue; const s=num(k.s,0,1e9,0);
-    if(s>(lastKill[NET.hostPeer]||0)){ lastKill[NET.hostPeer]=s; giveLoot({kind:k.k==="bat"?"bat":"wolf"}); } }
+    if(s>(lastKill[NET.hostPeer]||0)){ lastKill[NET.hostPeer]=s; giveLoot({kind:[...MOBS,...BOSSES].includes(k.k)?k.k:"wolf"}); } }
 }
 function updateHitFx(dt){ for(let i=hitFx.length-1;i>=0;i--){ hitFx[i].t+=dt; if(hitFx[i].t>0.9) hitFx.splice(i,1); } }
 function drawHitFx(){
@@ -2814,9 +2920,11 @@ const ED_GROUPS=[
     ["e","block_dirt"],["m","block_mud"],["n","block_sand"],["N","block_sand_wet"],["r","block_gravel"],["s","block_stone_path"],["c","block_cobble_dark"],["p","block_planks"],["z","block_snow"]],"land"],
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"],["stairs_del",null]],"land"],
   ["ed_g_water",[["w","water_deep_0"],["v","water_shallow_0"],["prop_lily_pad","prop_lily_pad"],["prop_reeds","prop_reeds"],["prop_rock_water","prop_rock_water"],["erase",null]],"water"],
-  ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["erase",null]],"decor"],
-  ["ed_g_places",[["start",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]],"places"],
-  ["ed_g_zones",[["zone_hare","hare_se_0"],["zone_wolf","wolf_se_0"],["zone_bat","bat_se_0"],["zone_erase",null]],"places"],
+  ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["prop_crystal",null],["erase",null]],"decor"],
+  ...(CAVE?[["ed_g_places",[["start",null],["exit",null],["boss",null]],"places"],
+    ["ed_g_zones",[["zone_spider",null],["zone_bat","bat_se_0"],["zone_erase",null]],"places"]]
+  :[["ed_g_places",[["start",null],["cave",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]],"places"],
+    ["ed_g_zones",[["zone_hare","hare_se_0"],["zone_wolf","wolf_se_0"],["zone_bat","bat_se_0"],["zone_spider",null],["zone_erase",null]],"places"]]),
 ];
 // новые картинки prop_*.png от GPT сами попадают в «Декор» (водные — в «Воду»)
 if(typeof SPRITES!=="undefined"){ const dec=ED_GROUPS.find(g=>g[0]==="ed_g_objects")[1];
@@ -2824,9 +2932,9 @@ if(typeof SPRITES!=="undefined"){ const dec=ED_GROUPS.find(g=>g[0]==="ed_g_objec
 const ED_CATS=["land","water","decor","places"]; let edCat="land";
 const edLabel=id=>{ const t=tr("ed_t_"+id); return t==="ed_t_"+id?id.replace(/^prop_/,"").replace(/_/g," "):t; };
 let edCellCtx=null;   // клетка, к которой сейчас применяется инструмент
-const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier"];
+const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier","cave","exit","boss"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
-const isSpecial=c=>c&&(c.hutPart||c.npcHere||c.merchHere||c.stall||c.pier||c.fire);
+const isSpecial=c=>c&&(c.hutPart||c.npcHere||c.merchHere||c.stall||c.pier||c.fire||c.portal);
 function setCellState(x,y,s){
   let c=cellAt(x,y);
   if(!s){ if(c&&!isSpecial(c)){ const i=cells.indexOf(c); if(i>=0) cells.splice(i,1); grid[y][x]=null; } return; }
@@ -2863,7 +2971,7 @@ function edApplyCell(x,y,stroke){
   const k=x+","+y; if(stroke.seen.has(k)) return; stroke.seen.add(k);
   if(x<0||y<0||x>=W||y>=D) return;
   if(edTool.startsWith("zone_")){ const c=cellAt(x,y); if(!c||c.water) return;
-    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; delete edDraft.zones.bat[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
+    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; delete edDraft.zones.bat[k]; delete edDraft.zones.spider[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
   const c=cellAt(x,y); if(isSpecial(c)) return;
   edCellCtx=[x,y]; const before=snapCell(c), s=edNewState(edTool,before); edCellCtx=null;
   if(s===undefined||JSON.stringify(before)===JSON.stringify(s)) return;
@@ -2921,6 +3029,8 @@ function edPlace(t,x,y){
     if(cs.some(k=>!k||k.water||k.L!==cs[0].L)) return false; edDraft.hut=[x,y]; return true; }
   if(t==="pier"){ if(!c||!c.water) return false; edDraft.pier=[x,y,"pier_"+edDir]; return true; }
   if(!land) return false;
+  if(t==="cave"||t==="exit"){ if(c.st||c.hutPart||c.npcHere||c.merchHere||c.stall||wet(c)) return false; edDraft[t]=[x,y]; return true; }
+  if(t==="boss"){ edDraft.boss=[x,y]; return true; }
   if(t==="start") edDraft.start=[x,y]; else if(t==="npc") edDraft.npc=[x,y]; else if(t==="merchant") edDraft.merchant=[x,y];
   else if(t==="stall") edDraft.stall=[x,y,"stall_"+edDir];
   return true;
@@ -2986,8 +3096,8 @@ let edDropSel=null;
 // карточки «источников» дропа; новые мобы и боссы добавляются в MOBS и появятся здесь сами
 function dropCards(){
   const n=k=>dropTable(k).length;
-  const when=m=>{ const t=edCfg.mobTime[m]||MOB_TIME[m]||{}; return (t.d&&t.dn?" · ☀"+t.dn:"")+(t.n&&t.nn?" · ☾"+t.nn:"")||" · —"; };
-  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL(m==="bat"?"bat_wing":"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})+when(m)})),
+  const when=m=>{ if(BOSSES.includes(m)) return " · "+tr("ed_boss_rsp_short",{n:edCfg.mobHp[m+"_rsp"]??5}); const t=edCfg.mobTime[m]||MOB_TIME[m]||{}; return (t.d&&t.dn?" · ☀"+t.dn:"")+(t.n&&t.nn?" · ☾"+t.nn:"")||" · —"; };
+  return [...[...MOBS,...BOSSES].map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL({bat:"bat_wing",spider:"spider_silk",golem:"golem_core"}[m]||"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})+when(m)})),
     {key:"trees",img:SPRITES.tree_small,label:tr("ed_drop_trees"),sub:tr("ed_src_trees_sub",{a:edCfg.logs.tree_big??LOGS.tree_big,b:edCfg.logs.tree_small??LOGS.tree_small})},
     {key:"fish",img:iconURL("karas"),label:tr("ed_drop_fish"),sub:tr("ed_src_fish_sub",{n:FISH.length})},
     {key:"quests",img:SPRITES.ui_quests||iconURL("coin"),label:tr("ed_drop_quests"),sub:tr("ed_src_quest_sub",{xp:edCfg.xp.quest??XP_DEF.quest})},
@@ -3027,13 +3137,14 @@ function renderDropTab(p){
     p.appendChild(mkEl("b","sub",tr("ed_drop_reward")));
     row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
     row(tr("ed_mob_hp"),numInput(edCfg.mobHp,mob,MOB_HP[mob]??3));
-    p.appendChild(mkEl("b","sub",tr("ed_mob_when")));
+    if(BOSSES.includes(mob)){ row(tr("ed_boss_rsp"),numInput(edCfg.mobHp,mob+"_rsp",5)); p.appendChild(mkEl("p","muted",tr("ed_boss_note"))); }
+    else { p.appendChild(mkEl("b","sub",tr("ed_mob_when")));
     const mt=edCfg.mobTime[mob]||(edCfg.mobTime[mob]={...MOB_TIME[mob]});
     for(const [per,lab] of [["d","ed_mob_day"],["n","ed_mob_night"]]){
       const l=mkEl("label","edchk big"), cb=mkEl("input"); cb.type="checkbox"; cb.checked=!!mt[per];
       cb.onchange=()=>{ mt[per]=cb.checked?1:0; cfgDirty=true; }; l.append(cb,document.createTextNode(tr(lab)));
       const cnt=valInput(mt,per+"n",0,20); row(l,mkEl("small","muted",tr("ed_mob_count")),cnt); }
-    p.appendChild(mkEl("p","muted",tr("ed_mob_day_note")));
+    p.appendChild(mkEl("p","muted",tr(mob==="spider"?"ed_spider_note":"ed_mob_day_note"))); }
   } else if(edDropSel==="trees"){
     row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
     row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
@@ -3091,20 +3202,20 @@ function edSerialize(){
   for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(!inb(x,y)) continue; if(c.st) stairs[x+","+y]=c.st;
     for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([x,y,n]); }
   const mv=p=>p&&inb(p[0]+ox,p[1]+oy)?[p[0]+ox,p[1]+oy,...p.slice(2)]:null;
-  const zones={}; for(const z of ["hare","wolf","bat"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
+  const zones={}; for(const z of ["hare","wolf","bat","spider"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
   return {zones,levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
-    merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier)};
+    merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier),cave:mv(edDraft.cave),exit:mv(edDraft.exit),boss:mv(edDraft.boss)};
 }
 const sameP=(a,b)=>JSON.stringify(a||null)===JSON.stringify(b||null);
-function edNeedsReload(m){ return edW()!==W||edD()!==D||edAdd.l||edAdd.t||!sameP(m.hut,MAP.hut)||!sameP(m.npc,MAP.npc)||!sameP(m.merchant,MAP.merchant)||!sameP(m.stall,MAP.stall)||!sameP(m.pier,MAP.pier); }
+function edNeedsReload(m){ return edW()!==W||edD()!==D||edAdd.l||edAdd.t||!sameP(m.hut,MAP.hut)||!sameP(m.npc,MAP.npc)||!sameP(m.merchant,MAP.merchant)||!sameP(m.stall,MAP.stall)||!sameP(m.pier,MAP.pier)||!sameP(m.cave||null,PORTAL&&!CAVE?[PORTAL.x,PORTAL.y]:null)||!sameP(m.exit||null,PORTAL&&CAVE?[PORTAL.x,PORTAL.y]:null)||!sameP(m.boss||null,MAP.boss||null); }
 async function edSaveMap(m,reload){
   if(!validMap(m)){ say("ed_bad_map"); return; }
   const v=Date.now(); edSaving=true; MAP_V=v; Object.assign(MAP,m);
   try{ localStorage.setItem(mapKey(),JSON.stringify({v,m})); }catch(e){}
   if(NET.db){
-    await NET.db.doc("world/map").set({v,m:JSON.stringify(m)}).catch(()=>{});
-    for(const id of netTreeIds) NET.db.doc("trees/"+id).delete().catch(()=>{});
-    for(const id of fireDocs) NET.db.doc("fires/"+id).delete().catch(()=>{});
+    await NET.db.doc(MAP_DOC).set({v,m:JSON.stringify(m)}).catch(()=>{});
+    for(const id of netTreeIds) NET.db.doc(ZC("trees")+"/"+id).delete().catch(()=>{});
+    for(const id of fireDocs) NET.db.doc(ZC("fires")+"/"+id).delete().catch(()=>{});
   }
   edUndo.length=0; edSaving=false;
   if(reload){ say("ed_saved_reload"); try{ sessionStorage.setItem("island_reedit","1"); lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
@@ -3115,7 +3226,7 @@ let confirmReset=false;
 async function edReset(){
   if(!confirmReset){ confirmReset=true; edRender(); setTimeout(()=>{confirmReset=false; edRender();},4000); return; }
   try{ localStorage.removeItem(mapKey()); sessionStorage.setItem("island_reedit","1"); }catch(e){}
-  if(NET.db) await NET.db.doc("world/map").delete().catch(()=>{});
+  if(NET.db) await NET.db.doc(MAP_DOC).delete().catch(()=>{});
   MAP_V=0; setTimeout(()=>location.reload(),400);
 }
 // ---- генератор случайного острова ----
@@ -3203,7 +3314,8 @@ function edEnter(){
   if(!isAdmin) return; EDIT=true; closeWin(); if(dialogOpen) closeDialog(); stopFishing(); stopChopping(); hero.path=[]; hero.target=null; marker=null;
   edAdd={t:0,b:0,l:0,r:0}; edUndo.length=0;
   const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
-  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,zones:{hare:zk("hare"),wolf:zk("wolf"),bat:zk("bat")}};
+  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,cave:CAVE?null:(PORTAL?[PORTAL.x,PORTAL.y]:null),exit:CAVE&&PORTAL?[PORTAL.x,PORTAL.y]:null,boss:CAVE?(MAP.boss||null):null,
+    zones:{hare:zk("hare"),wolf:zk("wolf"),bat:zk("bat"),spider:zk("spider")}};
   edTab="map"; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG; edDropSel=null;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
@@ -3251,7 +3363,7 @@ function edRender(){
         g2.fillStyle=WATER_COL[id==="v"?"shallow":"deep"][0]; g2.beginPath(); g2.moveTo(19,4); g2.lineTo(37,14); g2.lineTo(19,24); g2.lineTo(1,14); g2.closePath(); g2.fill();
         if(isWaterProp(id)){ const sv=ctx; ctx=g2; drawPropFallback(id,19,18); ctx=sv; } else { g2.fillStyle="rgba(230,246,255,.8)"; g2.fillRect(12,12,6,1); g2.fillRect(21,16,5,1); }
         b.appendChild(cv2); }
-      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫",stairs_del:"⌫"}[id]||"?"));
+      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫",stairs_del:"⌫",cave:"⛰",exit:"⇡",boss:"☠",zone_spider:"✳",prop_crystal:"◆"}[id]||"?"));
       b.appendChild(mkEl("small",null,edLabel(id)));
       b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,id==="fence"?"ed_fence_sub":id==="stairs"?"ed_stairs_sub":PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
     grp.appendChild(row); if(gk==="ed_g_zones") grp.appendChild(mkEl("p","muted",tr("ed_zone_note"))); tools.appendChild(grp); }
@@ -3266,7 +3378,7 @@ function edRender(){
   sz.appendChild(sg); if(edAdd.t||edAdd.b||edAdd.l||edAdd.r) sz.appendChild(mkEl("p","muted",tr("ed_size_note")));
   p.appendChild(sz);
   const opt=mkEl("div","edopt");
-  opt.appendChild(btn(tr(edGenPending?"ed_gen_confirm":"ed_gen",{w:edW(),d:edD()}),edGenerate,edGenPending?"warn":""));
+  if(!CAVE) opt.appendChild(btn(tr(edGenPending?"ed_gen_confirm":"ed_gen",{w:edW(),d:edD()}),edGenerate,edGenPending?"warn":""));
   opt.appendChild(btn(tr(confirmReset?"ed_reset_confirm":"ed_reset"),edReset,confirmReset?"warn":""));
   p.appendChild(opt);
   edMini();
@@ -3284,7 +3396,7 @@ function edMini(){
     const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
     g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
     if(c.props.some(n=>n.startsWith("tree"))){ g.fillStyle="#1f4a1a"; g.fillRect(offX+(x+0.25)*k,offY+(y+0.25)*k,Math.max(1,k*0.5),Math.max(1,k*0.5)); } }
-  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"],["bat","rgba(170,110,255,.8)"]]) for(const kk of Object.keys(edDraft.zones[z]||{})){
+  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"],["bat","rgba(170,110,255,.8)"],["spider","rgba(255,170,60,.8)"]]) for(const kk of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=kk.split(",").map(Number); g.fillStyle=col; g.fillRect(offX+(x+ox)*k+k*0.2,offY+(y+oy)*k+k*0.2,Math.max(1,k*0.6),Math.max(1,k*0.6)); }
   const dot=(p,col)=>{ if(!p) return; g.fillStyle=col; g.fillRect(offX+(p[0]+ox)*k-1,offY+(p[1]+oy)*k-1,Math.max(3,k+2),Math.max(3,k+2)); };
   if(edDraft){ dot(edDraft.hut,"#d84a2a"); dot(edDraft.npc,"#ffd66b"); dot(edDraft.merchant,"#ff9a3a"); dot(edDraft.start,"#ffffff"); }
@@ -3299,7 +3411,7 @@ function edMiniJump(px,py){
 // метки мест (старт, хижина, NPC…) в режиме редактора
 function edDrawMarks(){
   if(!EDIT||!edDraft) return; worldTransform();
-  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"],["bat","rgba(170,110,255,.42)"]]) for(const k of Object.keys(edDraft.zones[z]||{})){
+  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"],["bat","rgba(170,110,255,.42)"],["spider","rgba(255,170,60,.42)"]]) for(const k of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=k.split(",").map(Number), c=cellAt(x,y); if(!c) continue; const q=cellQuad(c);
     ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
   ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
@@ -3308,12 +3420,110 @@ function edDrawMarks(){
     ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
     ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
 }
+// ================= Пещера: пауки и босс-голем =================
+const KIND_CODE={wolf:"w",bat:"b",hare:"h",spider:"s",golem:"g"}, CODE_KIND={w:"wolf",b:"bat",h:"hare",s:"spider",g:"golem"};
+const GOLEM_SLAM_R=2.3, GOLEM_SLAM_T=1.25;
+let bossDeadAt=0;
+const bossRespawnMs=()=>Math.max(0.5,(CFG.mobHp&&CFG.mobHp.golem_rsp!=null?CFG.mobHp.golem_rsp:5))*60000;
+function caveSpawn(farFromAll){
+  const live=k=>animals.filter(a=>a.kind===k&&!a.leaving&&!(a.dying>0)).length;
+  for(const [k,want] of [["spider",mobCount("spider","n")||0],["bat",Math.max(2,mobCount("bat","n"))]]){
+    if(live(k)>=want||Math.random()>0.3) continue;
+    const z=zonePick(k,c=>freeCell(c)&&farFromAll(c,5)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&farFromAll(c,6));
+    if(!c) continue; spawnAnimal(k,c); const a=animals[animals.length-1]; a.home={x:c.x,y:c.y};
+    if(k==="bat"){ a.fly=2.2; a.phase=Math.random(); a.attackT=1.5; } }
+  const b=MAP.boss&&cellAt(MAP.boss[0],MAP.boss[1]);
+  if(b&&!animals.some(a=>a.kind==="golem")&&Date.now()-bossDeadAt>bossRespawnMs()&&farFromAll(b,2.5)){
+    spawnAnimal("golem",b); const g=animals[animals.length-1]; g.home={x:b.x,y:b.y}; g.slamCd=4; g.attackT=1.2; }
+}
+function updateSpider(a,dt,tp,dh){
+  a.speed=1.1;
+  if(tp&&(dh<5.5||a.aggro)&&dh<9){ a.state="chase"; a.speed=2.3;
+    if(dh<0.95){ a.path=[]; a.facing=facingTo(a,tp.x,tp.y); a.lungeTo=[tp.x,tp.y];
+      if(!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=1.3; a.lunge=0.25; biteTarget(tp,a,1); } } }
+    else if(a.think<=0){ a.think=0.4; setPath(a,cellAt(Math.round(tp.x),Math.round(tp.y))); a.attackT=Math.min(a.attackT,0.6); } }
+  else { a.aggro=false; if(a.think<=0&&!a.path.length){ a.state="wander"; a.think=2+Math.random()*3; const h=a.home||{x:a.x,y:a.y}; setPath(a,fleeCell({x:h.x,y:h.y},h.x,h.y,0.5,2.5)); } }
+}
+function summonBats(a,n){
+  for(let i=0;i<n;i++){ const ang=Math.random()*Math.PI*2, c=cellAt(Math.round(a.x+Math.cos(ang)*2),Math.round(a.y+Math.sin(ang)*2)); if(!c||c.blocked) continue;
+    spawnAnimal("bat",c); const b=animals[animals.length-1]; b.fly=2.4; b.home={x:c.x,y:c.y}; b.aggro=true; b.attackT=1.2; b.alpha=0.6; }
+  floats.push({key:"boss_summon",col:"#c8a0ff",t:0});
+}
+function updateGolem(a,dt,tp,dh,P){
+  const max=mobHp("golem"); a.speed=1.0; a.slamCd=(a.slamCd??4)-dt; a.slamFx=Math.max(0,(a.slamFx||0)-dt);
+  if(a.slamT>0){ a.path=[]; a.slamT-=dt;
+    if(a.slamT<=0){ a.slamT=0; a.slamFx=0.5;
+      for(const p of P) if(p.hp>0&&Math.hypot(p.x-a.x,p.y-a.y)<GOLEM_SLAM_R) biteTarget(p,a,2);
+      for(let i=0;i<28;i++){ const an=i/28*Math.PI*2; chips.push({x:a.x+Math.cos(an)*0.6,y:a.y+Math.sin(an)*0.6,z:a.z*LH+2,vx:Math.cos(an)*2.4,vy:Math.sin(an)*2.4,vz:12+Math.random()*16,t:0,life:0.6,col:i%2?"#b0a890":"#8a8270"}); } }
+    return; }
+  if(!tp||dh>9){ a.idleT=(a.idleT||0)+dt;
+    if(a.idleT>6&&a.home){ if(Math.hypot(a.x-a.home.x,a.y-a.home.y)>0.5&&!a.path.length) setPath(a,cellAt(a.home.x,a.home.y));
+      a.hp=Math.min(max,(a.hp??max)+dt*5); a.sum1=a.sum2=false; a.aggro=false; a.hitters=null; }
+    return; }
+  a.idleT=0; if(dh>6.5&&!a.aggro) return;     // ждёт, пока подойдут
+  a.aggro=true; const hp=a.hp??max;
+  if(!a.sum1&&hp<=max*0.5){ a.sum1=true; summonBats(a,2); }
+  if(!a.sum2&&hp<=max*0.25){ a.sum2=true; summonBats(a,3); }
+  if(a.slamCd<=0&&dh<2.4){ a.slamT=GOLEM_SLAM_T; a.slamCd=6.5; a.path=[]; a.facing=facingTo(a,tp.x,tp.y); return; }
+  if(dh<1.35){ a.path=[]; a.facing=facingTo(a,tp.x,tp.y); a.lungeTo=[tp.x,tp.y];
+    if(!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=1.7; a.lunge=0.3; biteTarget(tp,a,1); } } }
+  else if(a.think<=0){ a.think=0.5; setPath(a,cellAt(Math.round(tp.x),Math.round(tp.y))); a.attackT=Math.min(a.attackT,0.8); }
+}
+function drawSpiderP(g,frame,moving){
+  const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, O="#1b1528", k=moving?frame%2:0;
+  for(let i=0;i<4;i++){ const x=-6+i*4, up=(i+k)%2;            // лапки
+    R(x-1,-9+up,1,4,O); R(x-2,-5+up,1,5-up,O); R(x+1,-9+up,1,4,O); R(x+2,-5+up,1,5-up,O); }
+  R(-9,-12,10,8,O); R(-8,-11,8,6,"#4a3458"); R(-7,-10,3,2,"#6c5080"); R(-5,-8,2,2,"#c03040");   // брюшко
+  R(0,-10,7,6,O); R(1,-9,5,4,"#3a2a48"); R(5,-8,1,1,"#ff4848"); R(5,-6,1,1,"#ff4848"); R(3,-8,1,1,"#ff4848");
+}
+function drawGolemP(g,frame,moving,raise,glow){
+  const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, O="#1b1528", S1="#7c7686", S2="#9a94a4", S3="#5c5666", M="#5a8a3c", b=moving?[0,-1,0,-1][frame%4]:0;
+  R(-11,-12,9,12,O); R(-10,-11,7,10,S3); R(3,-12,9,12,O); R(4,-11,7,10,S3);
+  R(-15,-37+b,30,27,O); R(-14,-36+b,28,25,S1); R(-14,-36+b,28,4,S2); R(-12,-20+b,8,3,S3); R(4,-27+b,9,3,S3); R(-14,-36+b,6,3,M); R(8,-35+b,5,2,M);
+  R(-3,-28+b,7,7,O); R(-2,-27+b,5,5,glow); R(-1,-26+b,2,2,"#ffffff");
+  R(-7,-47+b,14,11,O); R(-6,-46+b,12,9,S2); R(-4,-43+b,3,2,glow); R(2,-43+b,3,2,glow); R(-6,-46+b,4,2,M);
+  const ay=raise?-56:-34, ah=raise?22:24;
+  R(-23,ay+b,9,ah,O); R(-22,ay+1+b,7,ah-2,S1); R(-22,ay+1+b,7,3,S2); R(14,ay+b,9,ah,O); R(15,ay+1+b,7,ah-2,S1); R(15,ay+1+b,7,3,S2);
+}
+function drawBeast(a){
+  if(a.alpha<=0.01) return;
+  worldTransform(); ctx.imageSmoothingEnabled=false;
+  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const big=a.kind==="golem";
+  if(big&&(a.slamT>0||a.slamFx>0)){   // красный круг — куда ударит голем; белая волна — удар
+    const k=a.slamT>0?1-a.slamT/GOLEM_SLAM_T:1, rr=a.slamT>0?GOLEM_SLAM_R:GOLEM_SLAM_R*(1.2-a.slamFx*0.4);
+    ctx.beginPath(); for(let i=0;i<=32;i++){ const an=i/32*Math.PI*2, q=proj(a.x-MX+Math.cos(an)*rr,a.y-MY+Math.sin(an)*rr,a.z); i?ctx.lineTo(...q):ctx.moveTo(...q); }
+    if(a.slamT>0){ ctx.fillStyle=`rgba(255,60,40,${0.12+0.3*k})`; ctx.fill(); ctx.strokeStyle=`rgba(255,120,90,${0.5+0.5*k})`; ctx.lineWidth=1; ctx.stroke(); }
+    else { ctx.strokeStyle=`rgba(255,255,255,${a.slamFx*1.6})`; ctx.lineWidth=2; ctx.stroke(); } }
+  if(a.lunge>0){ const lt=a.lungeTo||[hero.x,hero.y], [hx,hy]=proj(lt[0]-MX,lt[1]-MY,a.z), dx=hx-fx, dy=hy-fy, dd=Math.hypot(dx,dy)||1, k=Math.sin(a.lunge/0.25*Math.PI)*(big?4:5); fx+=dx/dd*k; fy+=dy/dd*k; }
+  ctx.globalAlpha=a.dying>0?Math.min(1,a.dying/1.2)*a.alpha:a.alpha;
+  ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(fx,fy,big?20:10,big?7:4,0,0,Math.PI*2); ctx.fill();
+  const frame=a.moving?Math.floor(a.phase)%4:0;
+  let sp=img[`${a.kind}_${a.facing}_${frame}`], mirror=false;
+  if(!sp&&a.facing[1]==="w"){ sp=img[`${a.kind}_${a.facing[0]}e_${frame}`]; mirror=true; }
+  if(a.dying>0&&img[a.kind+"_dead"]){ sp=img[a.kind+"_dead"]; mirror=a.facing[1]==="w"; }
+  a.drawn={x:Math.round(fx),y:Math.round(fy),sp,name:null,mirror};
+  ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)+(a.dying>0&&!img[a.kind+"_dead"]?Math.round((3-a.dying)*3):0));
+  if(a.hurtT>0) ctx.filter="brightness(2.2)";
+  if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+2); }
+  else { if(a.facing[1]==="w") ctx.scale(-1,1);
+    if(big) drawGolemP(ctx,frame,a.moving,a.slamT>0,a.slamT>0?"#ff6a4a":"#7ae0ff"); else drawSpiderP(ctx,frame,a.moving); }
+  ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
+  if(!big) drawMobHP(a,fx,fy);
+}
+function updateBossBar(){
+  const el=document.getElementById("bossBar"); if(!el) return;
+  const g=CAVE&&animals.find(a=>a.kind==="golem"&&!(a.dying>0)&&a.alpha>0.3&&Math.hypot(a.x-hero.x,a.y-hero.y)<11);
+  if(!g){ if(!el.hidden) el.hidden=true; return; }
+  if(el.hidden){ el.hidden=false; document.getElementById("bossName").textContent=tr("boss_name"); }
+  const max=mobHp("golem"), hp=Math.max(0,g.hp??max); document.getElementById("bossHp").style.width=(100*hp/max).toFixed(1)+"%";
+  document.getElementById("bossNum").textContent=hp+" / "+max;
+}
 // ================= Летучие мыши и удочки =================
-const MOB_HP={wolf:4,bat:2};
+const MOB_HP={wolf:4,bat:2,spider:5,golem:60};
 const mobHp=k=>CFG.mobHp&&CFG.mobHp[k]!=null?CFG.mobHp[k]:(MOB_HP[k]??3);
-const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat");
+const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat"||a.kind==="spider"||a.kind==="golem");
 // когда и сколько мобов: d — днём (нейтральные), n — ночью
-const MOB_TIME={wolf:{d:1,n:1,dn:2,nn:2},bat:{d:0,n:1,dn:2,nn:2}};
+const MOB_TIME={wolf:{d:1,n:1,dn:2,nn:2},bat:{d:0,n:1,dn:2,nn:2},spider:{d:0,n:0,dn:2,nn:4}};
 const mobT=(k,f)=>CFG.mobTime&&CFG.mobTime[k]&&CFG.mobTime[k][f]!=null?CFG.mobTime[k][f]:(MOB_TIME[k]?MOB_TIME[k][f]:0);
 const mobOn=(k,per)=>!!mobT(k,per)&&mobCount(k,per)>0;
 const mobCount=(k,per)=>mobT(k,per+"n")|0;
@@ -3477,9 +3687,9 @@ function myAct(){
 function sendPresence(now){
   if(!NET.room||now-lastSent<100) return; lastSent=now;
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:convF(hero.facing,quarter(),0),m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
-    id:NET.myId,n:myNick,act:myAct(),chat:myChat,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
+    id:NET.myId,n:myNick,act:myAct(),chat:myChat,zn:ZONE,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
-    p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:a.kind==="wolf"?"w":a.kind==="bat"?"b":"h",fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
+    p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||"h",tg:a.slamT>0?+a.slamT.toFixed(2):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
       f:convF(a.facing,quarter(),0),m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
     p.bt=bites.slice(-6); p.kl=kills.length?kills.slice(-6):null;
   }
@@ -3488,12 +3698,15 @@ function sendPresence(now){
 }
 
 // ---- другие игроки ----
+const away=new Map();   // игроки в другой зоне (на острове / в пещере): только в списке
 function onPeersChange(change){
   const me=change.peers.find(p=>p.sameTab); if(me) NET.myPeer=me.peer;
-  const seen=new Set();
+  const seen=new Set(); away.clear();
   for(const p of change.peers){
     if(p.sameTab||p.kind!=="viewer") continue;
     const pr=p.presence||{}; if(pr.v!==1||pr.afk===1) continue;   // АФК (свернул игру или долго бездействует) — как будто нет
+    const zn=pr.zn==="cave"?"cave":"island";
+    if(zn!==ZONE){ away.set(p.peer,{nick:nickOf(pr.n),c:num(pr.c|0,0,PLAYER_HUES.length-1,0)|0,zn,by:p.by||null}); continue; }
     seen.add(p.peer);
     let r=remotes.get(p.peer);
     const x=num(pr.x,-1,W,MX), y=num(pr.y,-1,D,MY);
@@ -3538,7 +3751,7 @@ function mirrorAnimals(h,dt){
     if(!e||typeof e!=="object") continue;
     const id=String(e.i).slice(0,20); ids.add(id);
     let a=animals.find(x=>x.nid===id);
-    const kind=e.k==="w"?"wolf":e.k==="b"?"bat":"hare";
+    const kind=CODE_KIND[e.k]||"hare";
     if(!a){ a={kind,nid:id,x:num(e.x,-1,W,0),y:num(e.y,-1,D,0),z:num(e.z,0,12,1),path:[],speed:1.5,facing:"se",phase:0,think:1,alpha:0,leaving:false,state:"",attackT:1,lunge:0,howlT:0,fleeing:0}; animals.push(a); }
     a.tx=num(e.x,-1,W,a.x); a.ty=num(e.y,-1,D,a.y); a.tz=num(e.z,0,12,a.z); a.facing=FACINGS.includes(e.f)?convF(e.f,0,quarter()):a.facing; a.moving=e.m===1;
     a.alpha+=(num(e.a,0,1,1)-a.alpha)*Math.min(1,dt*6); a.leaving=e.lv===1;
@@ -3546,6 +3759,7 @@ function mirrorAnimals(h,dt){
     if(e.h===1) a.howlT=Math.max(a.howlT,0.5);
     a.hp=num(e.hp,0,999,mobHp(a.kind)); if(a.kind==="bat") a.fly=num(e.fy,0,6,1.5); if(e.hu===1) a.hurtT=Math.max(a.hurtT||0,0.12);
     if(e.dy===1){ if(!(a.dying>0)) a.dying=2.4; } else a.dying=0;
+    if(a.kind==="golem"){ const tg=num(e.tg,0,3,0); if(a.slamT>0&&tg<=0) a.slamFx=0.5; a.slamT=tg; }
   }
   for(let i=animals.length-1;i>=0;i--){ const a=animals[i]; if(!ids.has(a.nid)) animals.splice(i,1); }
   const k=Math.min(1,dt*8);
@@ -3561,7 +3775,7 @@ function mirrorAnimals(h,dt){
     if(!b||b.p!==NET.myPeer) continue; const s=num(b.s,0,1e9,0);
     if(s>(lastBite[NET.hostPeer]||0)){ lastBite[NET.hostPeer]=s;
       const w=animals.filter(isMob).sort((p,q)=>Math.hypot(p.x-hero.x,p.y-hero.y)-Math.hypot(q.x-hero.x,q.y-hero.y))[0];
-      hurtHero(1,w||null); }
+      hurtHero(num(b.n,1,5,1)|0,w||null); }
   }
   hero.hurtT=Math.max(0,hero.hurtT-dt);
 }
@@ -3571,9 +3785,9 @@ function playersForAI(){
   for(const r of remotes.values()) L.push({x:r.tx,y:r.ty,hp:r.hp,me:false,peer:r.peer,busy:false});
   return L;
 }
-function biteTarget(tp,a){
-  if(tp.me){ hurtHero(1,a); return; }
-  biteSeq++; bites.push({p:tp.peer,s:biteSeq}); if(bites.length>6) bites.shift();
+function biteTarget(tp,a,n=1){
+  if(tp.me){ hurtHero(n,a); return; }
+  biteSeq++; bites.push({p:tp.peer,s:biteSeq,n}); if(bites.length>6) bites.shift();
 }
 function updateAnimalsNet(dt){ if(!NET.room||NET.host){ if(NET.room) processRemoteHits(); updateAnimals(dt); } }
 
@@ -3592,10 +3806,11 @@ function renderPlayers(){
   el.hidden=false;
   const sl=[];   // в списке — только те, кто сейчас в игре
   el.textContent="";
-  const head=document.createElement("b"); head.textContent=tr("players_title")+" · "+(remotes.size+1); el.appendChild(head);
+  const head=document.createElement("b"); head.textContent=tr(CAVE?"players_title_cave":"players_title")+" · "+(remotes.size+1+away.size); el.appendChild(head);
   const row=(color,text,off)=>{ const d=document.createElement("div"); d.className="prow"+(off?" off":""); const i=document.createElement("i"); i.style.background=color; const sp=document.createElement("span"); sp.textContent=text; d.append(i,sp); el.appendChild(d); };
   row(hueCss(myHueIdx),myNick?myNick+" ("+tr("you")+")":tr("you"),false);
   for(const r of remotes.values()) row(hueCss(r.c),playerName(r),false);
+  for(const a of away.values()) row(hueCss(a.c),(a.nick||(a.by&&names[a.by])||tr("someone"))+" · "+tr(a.zn==="cave"?"where_cave":"where_island"),true);
   for(const p of sl.slice(0,5)) row(hueCss(p.c),(p.nick||(names[p.by])||tr("someone"))+" · "+tr("sleeping")+" "+agoText(p.last),true);
   if([...remotes.values(),...sl].some(r=>r.by&&!(r.by in names))) resolveNames();
 }
@@ -3671,9 +3886,9 @@ const netClock=()=>clockDoc?(((clockDoc.c0+(Date.now()-clockDoc.t0)/1000/DAY_LEN
 function netSetClock(c){ if(!NET.db) return; clockDoc={t0:Date.now(),c0:c}; NET.db.doc("world/clock").set({t0:clockDoc.t0,c0:c}).catch(()=>{}); }
 const treeKey=c=>`t_${c.x}_${c.y}`, fireKey=c=>`f_${c.x}_${c.y}`;
 function netWrite(path,data){ if(!NET.db) return; NET.db.doc(path).set(data).catch(()=>{}); }
-function netTreeGone(c){ netWrite("trees/"+treeKey(c),{s:"gone",at:Date.now()}); }
-function netTreeGrow(c,name){ netWrite("trees/"+treeKey(c),{s:"grow",k:name,at:Date.now(),dur:Math.round((c.growTime||40)*1000)}); }
-function netFire(f){ netWrite("fires/"+fireKey(f.c),{x:f.c.x,y:f.c.y,until:Math.round(f.until)}); }
+function netTreeGone(c){ netWrite(ZC("trees")+"/"+treeKey(c),{s:"gone",at:Date.now()}); }
+function netTreeGrow(c,name){ netWrite(ZC("trees")+"/"+treeKey(c),{s:"grow",k:name,at:Date.now(),dur:Math.round((c.growTime||40)*1000)}); }
+function netFire(f){ netWrite(ZC("fires")+"/"+fireKey(f.c),{x:f.c.x,y:f.c.y,until:Math.round(f.until)}); }
 function applyTreeDoc(c,d){
   if(!c||!d||typeof d!=="object") return;
   const now=Date.now(), at=num(d.at,0,1e15,now);
@@ -3697,7 +3912,7 @@ function applyFires(docs){
     const d=s.data(); if(!d) continue; fireDocs.add(s.id);
     const c=cellAt(num(d.x,0,W-1,0)|0,num(d.y,0,D-1,0)|0); if(!c) continue;
     const until=num(d.until,0,1e15,0);
-    if(until<now-10*60*1000){ NET.db.doc("fires/"+s.id).delete().catch(()=>{}); continue; }   // давно потухшие убираем
+    if(until<now-10*60*1000){ NET.db.doc(ZC("fires")+"/"+s.id).delete().catch(()=>{}); continue; }   // давно потухшие убираем
     keep.add(c);
     if(c.fire){ if(Math.abs(c.fire.until-until)>500) c.fire.until=until; }
     else if(!c.water&&!c.hutPart&&!c.npcHere&&!treeName(c)){ addFire(c,until,false); }
@@ -3725,14 +3940,14 @@ async function loadSave(){
     recalcHP(); hero.hp=num(d.hp,1,HP_MAX,HP_MAX)|0;
     if(!myNick&&typeof d.nick==="string"&&cleanNick(d.nick).length>=2){ setNick(d.nick); const w=document.getElementById("nickWrap"); if(w) w.hidden=true; }
     const c=cellAt(num(d.x,0,W-1,-1)|0,num(d.y,0,D-1,-1)|0);
-    if(c&&!c.blocked){ hero.x=c.x; hero.y=c.y; hero.z=walkZ(c); hero.path=[]; }
-    renderInv(); renderHP(); say("loaded");
+    if(c&&!c.blocked&&!SPAWN_FIXED&&(d.zn||"island")===ZONE){ hero.x=c.x; hero.y=c.y; hero.z=walkZ(c); hero.path=[]; }
+    renderInv(); renderHP(); say(CAVE?"cave_hello":"loaded");
   }catch(e){}
 }
 function tickSave(dt){
   if(!NET.db||!NET.myId||saving) return;
   saveT-=dt; if(saveT>0) return; saveT=4;
-  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
+  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,zn:ZONE,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
   const j=JSON.stringify(s); if(j===lastSaveJSON) return;
   saving=true; lastSaveJSON=j;
   NET.db.doc(`data/users/${NET.myId}/save`).set(s).catch(()=>{lastSaveJSON="";}).finally(()=>{saving=false;});
@@ -3753,10 +3968,11 @@ async function initNet(){
       if(d&&typeof d.t0==="number"&&typeof d.c0==="number"){ clockDoc={t0:d.t0,c0:d.c0}; lastClockText=""; }
       else if(!s.metadata.fromCache&&!clockDoc) netSetClock(clock);
     },()=>{});
-    db.doc("world/map").onSnapshot(onMapDoc,()=>{});
+    db.doc(MAP_DOC).onSnapshot(onMapDoc,()=>{});
+    if(CAVE) db.doc("world/cave_boss").onSnapshot(s=>{ const d=s.exists?s.data():null; if(d) bossDeadAt=num(d.dead,0,1e15,0); },()=>{});
     db.doc("world/config").onSnapshot(s=>applyConfig(s.exists?s.data():null),()=>{});
-    db.collection("trees").onSnapshot(snap=>{ netTreeIds.clear(); for(const s of snap.docs){ netTreeIds.add(s.id); const m=/^t_(\d+)_(\d+)$/.exec(s.id); if(m) applyTreeDoc(cellAt(+m[1],+m[2]),s.data()); } },()=>{});
-    db.collection("fires").onSnapshot(snap=>applyFires(snap.docs),()=>{});
+    db.collection(ZC("trees")).onSnapshot(snap=>{ netTreeIds.clear(); for(const s of snap.docs){ netTreeIds.add(s.id); const m=/^t_(\d+)_(\d+)$/.exec(s.id); if(m) applyTreeDoc(cellAt(+m[1],+m[2]),s.data()); } },()=>{});
+    db.collection(ZC("fires")).onSnapshot(snap=>applyFires(snap.docs),()=>{});
     db.collection("players").onSnapshot(snap=>applyPlayers(snap.docs),()=>{});
     db.collection("chat").onSnapshot(snap=>applyChat(snap.docs),()=>{});
     document.getElementById("chatBtn").hidden=false;
@@ -3781,7 +3997,7 @@ try{ lastReadTs=+localStorage.getItem("island_chat_read")||0; }catch(e){}
 // моя запись «где я и когда был» — чтобы друзья видели меня спящим, когда меня нет
 function tickPlayerDoc(){
   if(!NET.db||!NET.myId) return;
-  const now=Date.now(), rec={x:Math.round(hero.x*10)/10,y:Math.round(hero.y*10)/10,z:Math.round(hero.z*10)/10,c:myHueIdx,n:myNick};
+  const now=Date.now(), rec={x:Math.round(hero.x*10)/10,y:Math.round(hero.y*10)/10,z:Math.round(hero.z*10)/10,c:myHueIdx,n:myNick,zn:ZONE};
   const j=JSON.stringify(rec);
   if(j===lastPlayerJSON&&now-lastPlayerWrite<60000) return;
   if(now-lastPlayerWrite<3000) return;
@@ -3794,6 +4010,7 @@ function applyPlayers(docs){
     if(s.id===NET.myId) continue;
     const d=s.data(); if(!d) continue;
     const last=num(d.last,0,1e15,0); if(now-last>7*24*3600*1000) continue;   // неделю не заходил — не показываем
+    if((d.zn||"island")!==ZONE) continue;
     seen.add(s.id);
     let p=sleepers.get(s.id); if(!p){ p={kind:"sleeper",by:s.id,phase:Math.random()*6}; sleepers.set(s.id,p); }
     p.x=num(d.x,0,W-1,MX); p.y=num(d.y,0,D-1,MY); p.c=num(d.c|0,0,PLAYER_HUES.length-1,0)|0; p.last=last; p.nick=nickOf(d.n);
@@ -3902,13 +4119,14 @@ function draw3D(anchor){
     for(const sd of SIDES){
       const nu=sd.n[0]*ca-sd.n[1]*sa, nv=sd.n[0]*sa+sd.n[1]*ca; if(nu+nv<=0.001) continue;
       const nb=cellAt(c.x+sd.n[0],c.y+sd.n[1]), nh=nb?(wet(nb)?nb.L-1:nb.L):0, side=(nu-nv)<0?"_L":"_R", sx=X0+sd.dx, sy=Y0+sd.dy;
-      for(let z=nh;z<c.L;z++){const p0=proj(sx,sy,z+1);face(TEX[(z<2?"block_rock":"block_grass")+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,z+1),p0),sub(proj(sx,sy,z),p0));}
+      for(let z=nh;z<c.L;z++){const p0=proj(sx,sy,z+1);face(TEX[(z<2||CAVE?"block_rock":"block_grass")+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,z+1),p0),sub(proj(sx,sy,z),p0));}
       if(c.st){const p0=proj(sx,sy,c.L+.5);face(TEX["block_stone_path"+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,c.L+.5),p0),sub(proj(sx,sy,c.L),p0));}
     }
     const Z=c.st?c.L+.5:c.L, top=c.st?"block_stone_path":TOP_SPRITE[c.t], p0=proj(X0,Y0,Z);
     if(c.fire){ worldTransform(); drawFire(c); }
     if(wet(c)){ worldTransform(); drawWater(c); drawWaterFx(c); if(c.pier) drawMarketProp(c.pier,c); } else face(TEX[top+"_top"],p0,sub(proj(X0+1,Y0,Z),p0),sub(proj(X0,Y0+1,Z),p0));
     if(c.stump){ worldTransform(); drawStump(c); }
+    if(c.portal) drawPortal(c);
     if(c.props.length){
       const ctr=proj(c.x-MX,c.y-MY,wet(c)?walkZ(c):c.L);
       for(const name of c.props){
@@ -4041,7 +4259,7 @@ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let last=performance.now(), dirty=true;
 function frame(now){
   const dt=Math.min(0.05,(now-last)/1000); last=now;
-  T+=dt; updateWind(dt); updateFishing(dt); updateChopping(dt); updateSmoke(dt); updateNPC(dt); updateMerchant(dt); updateClock(dt); updateFires(dt); prog.st.time+=dt; updateCombat(dt); updateAnimalsNet(dt); updateRemotes(dt); updateHitFx(dt); sendPresence(now); tickSave(dt); tickPlayerDoc(); updateFireflies(); syncActions(); syncFishUI(); dirty=true;
+  T+=dt; updateWind(dt); updateFishing(dt); updateChopping(dt); updateSmoke(dt); updateNPC(dt); updateMerchant(dt); updateClock(dt); updateFires(dt); prog.st.time+=dt; updateCombat(dt); updateBossBar(); updateAnimalsNet(dt); updateRemotes(dt); updateHitFx(dt); sendPresence(now); tickSave(dt); tickPlayerDoc(); updateFireflies(); syncActions(); syncFishUI(); dirty=true;
   if(anim){
     const t=Math.min(1,(now-anim.t0)/anim.dur), e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
     setRot(anim.from+(anim.to-anim.from)*e); if(t>=1){setRot(anim.to);anim=null} dirty=true;
