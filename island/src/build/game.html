@@ -196,6 +196,16 @@ canvas.drag{cursor:grabbing}
 .edb.on{box-shadow:inset 0 0 0 2px var(--accent);background:#4b3e6b}
 .edb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .edopt{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.edmrow{display:flex;gap:8px;align-items:flex-start}
+.edmini{width:150px;height:150px;image-rendering:pixelated;border:2px solid var(--edge);cursor:pointer;flex:none}
+.edside{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.edside .btn{font-family:var(--f-body);font-weight:700;letter-spacing:0;font-size:12px;min-height:34px;padding:4px 6px}
+.edside .btn.on{background:var(--accent);color:var(--panel)}
+.edside small{font-size:11px;line-height:1.3}
+.edsizegrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+.edsz{display:flex;align-items:center;gap:4px;font-size:12px}
+.edsz span{flex:1;min-width:0}
+.edsz .btn{font-family:var(--f-body);font-weight:700;min-height:30px;padding:2px 10px}
 .edopt .btn{font-size:12px;min-height:34px;padding:4px 8px}
 .edsize{font-family:var(--f-display);font-size:12px;padding:0 4px}
 .edpanel .muted{color:var(--muted);font-size:12px;margin:0}
@@ -450,8 +460,10 @@ const I18N={
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
-    ed_reset:"Mapa domyślna", ed_reset_confirm:"Na pewno? Stuknij znowu", ed_size_note:"Nowy rozmiar zadziała po zapisie (strona się przeładuje).",
-    ed_hint:"Edytor mapy", ed_hint_sub:"wybierz narzędzie i stukaj w pola · mapę przesuwaj palcem", ed_tap_sub:"stukaj w pola na mapie",
+    ed_mode_paint:"Tryb: rysowanie", ed_mode_move:"Tryb: przesuwanie", ed_fill:"wypełnienie", ed_mini_hint:"Stuknij mini-mapę, aby tam przejść · dwoma palcami przesuwasz mapę",
+    ed_drag_sub:"prowadź palcem, aby malować", ed_g_size:"Rozmiar {w} × {d}", ed_side_t:"Góra", ed_side_b:"Dół", ed_side_l:"Lewo", ed_side_r:"Prawo",
+    ed_gen:"Losowa wyspa {w}×{d}", ed_gen_confirm:"Zastąpić całą mapę? Stuknij znowu", ed_reset:"Mapa domyślna", ed_reset_confirm:"Na pewno? Stuknij znowu", ed_size_note:"Nowy rozmiar zadziała po zapisie (strona się przeładuje).",
+    ed_hint:"Edytor mapy", ed_hint_sub:"wybierz narzędzie i maluj palcem · mapę przesuwaj dwoma palcami", ed_tap_sub:"stukaj w pola na mapie",
     ed_bad_place:"Tu nie można tego postawić", ed_placed:"Miejsce wybrane", ed_placed_sub:"zmiana po zapisie", ed_bad_map:"Mapa jest pusta albo błędna",
     ed_saved:"Mapa zapisana!", ed_saved_sub:"wszyscy gracze zobaczą ją od razu", ed_saved_reload:"Mapa zapisana — przeładowuję…",
     map_changed:"Mapa wyspy się zmieniła!", map_changed_sub:"wczytuję nową…", admin_bad:"Zły kod admina",
@@ -544,8 +556,10 @@ const I18N={
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
-    ed_reset:"Карта по умолчанию", ed_reset_confirm:"Точно? Нажми ещё раз", ed_size_note:"Новый размер применится после сохранения (страница перезагрузится).",
-    ed_hint:"Редактор карты", ed_hint_sub:"выбери инструмент и тапай по клеткам · карту двигай пальцем", ed_tap_sub:"тапай по клеткам на карте",
+    ed_mode_paint:"Режим: рисование", ed_mode_move:"Режим: перемещение", ed_fill:"заливка", ed_mini_hint:"Тапни мини-карту, чтобы перейти · двумя пальцами двигай карту",
+    ed_drag_sub:"веди пальцем, чтобы рисовать", ed_g_size:"Размер {w} × {d}", ed_side_t:"Верх", ed_side_b:"Низ", ed_side_l:"Лево", ed_side_r:"Право",
+    ed_gen:"Случайный остров {w}×{d}", ed_gen_confirm:"Заменить всю карту? Нажми ещё раз", ed_reset:"Карта по умолчанию", ed_reset_confirm:"Точно? Нажми ещё раз", ed_size_note:"Новый размер применится после сохранения (страница перезагрузится).",
+    ed_hint:"Редактор карты", ed_hint_sub:"выбери инструмент и рисуй пальцем · карту двигай двумя пальцами", ed_tap_sub:"тапай по клеткам на карте",
     ed_bad_place:"Сюда это поставить нельзя", ed_placed:"Место выбрано", ed_placed_sub:"применится после сохранения", ed_bad_map:"Карта пустая или с ошибкой",
     ed_saved:"Карта сохранена!", ed_saved_sub:"все игроки увидят её сразу", ed_saved_reload:"Карта сохранена — перезагружаю…",
     map_changed:"Карта острова изменилась!", map_changed_sub:"загружаю новую…", admin_bad:"Неверный код админа",
@@ -2593,14 +2607,18 @@ function atkSprite(facing,t,hue){
 
 // ================= Редактор карты (только для админа) =================
 // Карта хранится в базе (world/map) и в кэше браузера; игроки получают её сразу после сохранения.
-let EDIT=false, isAdmin=false, edTool="g", edBrush=1, edDir="left", edW=W, edD=D, edDraft=null, edSaving=false;
+let EDIT=false, isAdmin=false, edTool="g", edBrush=1, edDir="left", edDraft=null, edSaving=false, edPaint=true;
+let edAdd={t:0,b:0,l:0,r:0}, edStroke=null, edGenPending=null;
 const edUndo=[], netTreeIds=new Set();
+const ED_MIN=10, ED_MAX=40;
+const edW=()=>W+edAdd.l+edAdd.r, edD=()=>D+edAdd.t+edAdd.b;
 const ED_GROUPS=[
   ["ed_g_terrain",[["g","block_grass"],["G","block_grass_2"],["d","block_grass_dark"],["s","block_stone_path"],["e","block_dirt"],["w",null]]],
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"]]],
   ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["erase",null]]],
   ["ed_g_places",[["start",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]]],
 ];
+const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
 const isSpecial=c=>c&&(c.hutPart||c.npcHere||c.merchHere||c.stall||c.pier||c.fire);
 function setCellState(x,y,s){
@@ -2612,33 +2630,66 @@ function setCellState(x,y,s){
   refreshBlocked(c);
 }
 function rebuildTrees(){ TREES.length=0; for(const c of cells) for(const n of c.props) if(n.startsWith("tree")) TREES.push({c,big:n==="tree_big"}); dirty=true; }
-// клетка под пальцем, даже если там пусто (для «поднять» на пустом месте)
+// клетка под пальцем, даже если там пусто (для «выше» на пустом месте)
 function pickGrid(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale, a=wx/HW, b=wy/HH, u=(a+b)/2, v=(b-a)/2;
   const X=u*ca+v*sa, Y=-u*sa+v*ca, x=Math.round(X+MX), y=Math.round(Y+MY);
   return x>=0&&y>=0&&x<W&&y<D?{x,y}:null;
 }
-function edTap(mx,my){
-  const c0=pick(mx,my), g=c0?{x:c0.x,y:c0.y}:pickGrid(mx,my); if(!g) return;
-  const t=edTool, changes=[], draftBefore=JSON.stringify(edDraft);
-  if(["start","hut","npc","merchant","stall","pier"].includes(t)){ if(!edPlace(t,g.x,g.y)) { say("ed_bad_place"); return; }
-    edUndo.push({changes,draft:draftBefore}); dirty=true; say("ed_placed","ed_placed_sub"); return; }
-  const r=edBrush===3&&t!=="stairs"?1:0;
-  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
-    const x=g.x+dx, y=g.y+dy; if(x<0||y<0||x>=W||y>=D) continue;
-    const c=cellAt(x,y); if(isSpecial(c)) continue;
-    const before=snapCell(c); let s=before?{...before,props:[...before.props]}:null;
-    if("gGdsew".includes(t)){ if(!s) continue; s.t=t; if(t==="w"){ s.props=[]; s.st=null; } }
-    else if(t==="up"){ s=s?{...s,L:Math.min(9,s.L+1)}:{L:1,t:"g",st:null,props:[]}; }
-    else if(t==="down"){ if(!s) continue; s=s.L>1?{...s,L:s.L-1}:null; }
-    else if(t==="stairs"){ if(!s||s.t==="w") continue; s.st=s.st===null?"L":s.st==="L"?"R":null; }
-    else if(t==="erase"){ if(!s) continue; s.props=[]; }
-    else { if(!s||s.t==="w") continue; s.props=[t==="fence"?"fence_"+edDir:t]; }
-    if(JSON.stringify(before)===JSON.stringify(s)) continue;
-    changes.push([x,y,before]); setCellState(x,y,s);
-  }
-  if(changes.length){ edUndo.push({changes,draft:draftBefore}); if(edUndo.length>200) edUndo.shift(); rebuildTrees(); }
+const gridUnder=(mx,my)=>{ const c=pick(mx,my); return c?{x:c.x,y:c.y}:pickGrid(mx,my); };
+// новое состояние клетки для текущего инструмента (null — клетку убрать, undefined — без изменений)
+function edNewState(t,before){
+  let s=before?{...before,props:[...before.props]}:null;
+  if("gGdsew".includes(t)){ if(!s) return undefined; s.t=t; if(t==="w"){ s.props=[]; s.st=null; } return s; }
+  if(t==="up") return s?{...s,L:Math.min(9,s.L+1)}:{L:1,t:"g",st:null,props:[]};
+  if(t==="down"){ if(!s) return undefined; return s.L>1?{...s,L:s.L-1}:null; }
+  if(t==="stairs"){ if(!s||s.t==="w") return undefined; s.st=s.st===null?"L":s.st==="L"?"R":null; return s; }
+  if(t==="erase"){ if(!s) return undefined; s.props=[]; return s; }
+  if(!s||s.t==="w") return undefined; s.props=[t==="fence"?"fence_"+edDir:t]; return s;
 }
+function edApplyCell(x,y,stroke){
+  const k=x+","+y; if(stroke.seen.has(k)) return; stroke.seen.add(k);
+  if(x<0||y<0||x>=W||y>=D) return;
+  const c=cellAt(x,y); if(isSpecial(c)) return;
+  const before=snapCell(c), s=edNewState(edTool,before);
+  if(s===undefined||JSON.stringify(before)===JSON.stringify(s)) return;
+  stroke.changes.push([x,y,before]); setCellState(x,y,s);
+}
+function edApplyAt(mx,my,stroke){
+  const g=gridUnder(mx,my); if(!g) return;
+  if(edBrush==="fill"&&"gGdsew".includes(edTool)) return edFill(g.x,g.y,stroke);
+  const r=edTool==="stairs"?0:edBrush===5?2:edBrush===3?1:0;
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++) edApplyCell(g.x+dx,g.y+dy,stroke);
+}
+// заливка: вся связанная область того же вида земли и той же высоты
+function edFill(x,y,stroke){
+  const c0=cellAt(x,y); if(!c0||isSpecial(c0)) return;
+  const fam=t=>"gGd".includes(t)?"grass":t, f0=fam(c0.t), L0=c0.L, q=[c0], seen=new Set([c0]);   // все виды травы — одна область
+  while(q.length&&seen.size<2500){ const c=q.shift();
+    for(const [dx,dy] of DIRS4){ const n=cellAt(c.x+dx,c.y+dy); if(n&&!seen.has(n)&&fam(n.t)===f0&&n.L===L0&&!isSpecial(n)){ seen.add(n); q.push(n); } } }
+  for(const c of seen) edApplyCell(c.x,c.y,stroke);
+}
+function edCommit(stroke,draftBefore){
+  if(!stroke.changes.length&&draftBefore===JSON.stringify(edDraft)) return;
+  edUndo.push({changes:stroke.changes,draft:draftBefore}); if(edUndo.length>200) edUndo.shift();
+  rebuildTrees(); edRender(); edMini();
+}
+function edTap(mx,my){
+  const g=gridUnder(mx,my); if(!g) return;
+  const draftBefore=JSON.stringify(edDraft);
+  if(PLACE_TOOLS.includes(edTool)){ if(!edPlace(edTool,g.x,g.y)){ say("ed_bad_place"); return; }
+    edCommit({changes:[]},draftBefore); dirty=true; say("ed_placed","ed_placed_sub"); return; }
+  const stroke={changes:[],seen:new Set()}; edApplyAt(mx,my,stroke); edCommit(stroke,draftBefore);
+}
+// рисование проведением пальца
+function edStrokeStart(mx,my){ if(PLACE_TOOLS.includes(edTool)||edTool==="stairs"||edBrush==="fill") return false;
+  edStroke={changes:[],seen:new Set(),draft:JSON.stringify(edDraft),last:[mx,my]}; edApplyAt(mx,my,edStroke); return true; }
+function edStrokeMove(mx,my){
+  if(!edStroke) return; const [lx,ly]=edStroke.last, n=Math.max(1,Math.ceil(Math.hypot(mx-lx,my-ly)/6));
+  for(let i=1;i<=n;i++) edApplyAt(lx+(mx-lx)*i/n,ly+(my-ly)*i/n,edStroke);
+  edStroke.last=[mx,my]; rebuildTrees();
+}
+function edStrokeEnd(){ if(!edStroke) return; const s=edStroke; edStroke=null; edCommit(s,s.draft); }
 function edPlace(t,x,y){
   const c=cellAt(x,y), land=c&&!c.water;
   if(t==="hut"){ const cs=[[0,0],[1,0],[0,1],[1,1]].map(([a,b])=>cellAt(x+a,y+b));
@@ -2652,23 +2703,24 @@ function edPlace(t,x,y){
 function edUndoLast(){
   const u=edUndo.pop(); if(!u) return;
   for(let i=u.changes.length-1;i>=0;i--){ const [x,y,s]=u.changes[i]; setCellState(x,y,s); }
-  edDraft=JSON.parse(u.draft); rebuildTrees(); edRender();
+  edDraft=JSON.parse(u.draft); rebuildTrees(); edRender(); edMini();
 }
 // ---- сохранение ----
 function edSerialize(){
-  const levels=[], tops=[], stairs={}, props=[];
-  for(let y=0;y<edD;y++){ let l="",t=""; for(let x=0;x<edW;x++){ const c=cellAt(x,y); if(c){ l+=String(Math.min(9,c.L)); t+=c.t||"g"; } else { l+="0"; t+="."; } } levels.push(l); tops.push(t); }
-  for(const c of cells){ if(c.x>=edW||c.y>=edD) continue; if(c.st) stairs[c.x+","+c.y]=c.st;
-    for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([c.x,c.y,n]); }
-  const inb=p=>p&&p[0]<edW&&p[1]<edD?p:null;
-  return {levels,tops,stairs,props,start:inb(edDraft.start)||[Math.floor(edW/2),Math.floor(edD/2)],hut:inb(edDraft.hut),npc:inb(edDraft.npc),
-    merchant:inb(edDraft.merchant),stall:inb(edDraft.stall),pier:inb(edDraft.pier)};
+  const w=edW(), d=edD(), ox=edAdd.l, oy=edAdd.t, levels=[], tops=[], stairs={}, props=[];
+  for(let y=0;y<d;y++){ let l="",t=""; for(let x=0;x<w;x++){ const c=cellAt(x-ox,y-oy); if(c){ l+=String(Math.min(9,c.L)); t+=c.t||"g"; } else { l+="0"; t+="."; } } levels.push(l); tops.push(t); }
+  const inb=(x,y)=>x>=0&&y>=0&&x<w&&y<d;
+  for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(!inb(x,y)) continue; if(c.st) stairs[x+","+y]=c.st;
+    for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([x,y,n]); }
+  const mv=p=>p&&inb(p[0]+ox,p[1]+oy)?[p[0]+ox,p[1]+oy,...p.slice(2)]:null;
+  return {levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
+    merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier)};
 }
 const sameP=(a,b)=>JSON.stringify(a||null)===JSON.stringify(b||null);
-function edNeedsReload(m){ return edW!==W||edD!==D||!sameP(m.hut,MAP.hut)||!sameP(m.npc,MAP.npc)||!sameP(m.merchant,MAP.merchant)||!sameP(m.stall,MAP.stall)||!sameP(m.pier,MAP.pier); }
-async function edSave(){
-  const m=edSerialize(); if(!validMap(m)){ say("ed_bad_map"); return; }
-  const v=Date.now(), reload=edNeedsReload(m); edSaving=true; MAP_V=v; Object.assign(MAP,m);
+function edNeedsReload(m){ return edW()!==W||edD()!==D||edAdd.l||edAdd.t||!sameP(m.hut,MAP.hut)||!sameP(m.npc,MAP.npc)||!sameP(m.merchant,MAP.merchant)||!sameP(m.stall,MAP.stall)||!sameP(m.pier,MAP.pier); }
+async function edSaveMap(m,reload){
+  if(!validMap(m)){ say("ed_bad_map"); return; }
+  const v=Date.now(); edSaving=true; MAP_V=v; Object.assign(MAP,m);
   try{ localStorage.setItem(mapKey(),JSON.stringify({v,m})); }catch(e){}
   if(NET.db){
     await NET.db.doc("world/map").set({v,m:JSON.stringify(m)}).catch(()=>{});
@@ -2676,16 +2728,66 @@ async function edSave(){
     for(const id of fireDocs) NET.db.doc("fires/"+id).delete().catch(()=>{});
   }
   edUndo.length=0; edSaving=false;
-  if(reload){ say("ed_saved_reload"); try{ lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
+  if(reload){ say("ed_saved_reload"); try{ sessionStorage.setItem("island_reedit","1"); lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
   else { say("ed_saved","ed_saved_sub"); edRender(); }
 }
+function edSave(){ const m=edSerialize(); edSaveMap(m,edNeedsReload(m)); }
+let confirmReset=false;
 async function edReset(){
-  if(!confirmReset) { confirmReset=true; edRender(); setTimeout(()=>{confirmReset=false; edRender();},4000); return; }
-  try{ localStorage.removeItem(mapKey()); }catch(e){}
+  if(!confirmReset){ confirmReset=true; edRender(); setTimeout(()=>{confirmReset=false; edRender();},4000); return; }
+  try{ localStorage.removeItem(mapKey()); sessionStorage.setItem("island_reedit","1"); }catch(e){}
   if(NET.db) await NET.db.doc("world/map").delete().catch(()=>{});
   MAP_V=0; setTimeout(()=>location.reload(),400);
 }
-let confirmReset=false;
+// ---- генератор случайного острова ----
+function genIsland(w,d){
+  let seed=(Math.random()*1e9)|0; const rnd=()=>((seed=(seed*1664525+1013904223)|0)>>>0)/4294967296;
+  const noise=(cs)=>{ const gw=Math.ceil(w/cs)+2, gd=Math.ceil(d/cs)+2, g=[...Array(gd)].map(()=>[...Array(gw)].map(rnd));
+    return (x,y)=>{ const fx=x/cs, fy=y/cs, x0=Math.floor(fx), y0=Math.floor(fy), tx=fx-x0, ty=fy-y0, s=t=>t*t*(3-2*t);
+      const a=g[y0][x0], b=g[y0][x0+1], c=g[y0+1][x0], e=g[y0+1][x0+1];
+      return (a+(b-a)*s(tx))*(1-s(ty))+(c+(e-c)*s(tx))*s(ty); }; };
+  const n1=noise(Math.max(4,w/4)), n2=noise(3), n3=noise(5);
+  const H=[...Array(d)].map((_,y)=>[...Array(w)].map((_,x)=>{
+    const dx=(x-(w-1)/2)/(w/2), dy=(y-(d-1)/2)/(d/2), r=Math.sqrt(dx*dx+dy*dy);
+    const v=n1(x,y)*0.65+n2(x,y)*0.35-r*r*0.95+0.35; return v<0.12?0:Math.max(1,Math.min(5,1+Math.floor((v-0.12)*7))); }));
+  for(let it=0;it<6;it++) for(let y=0;y<d;y++) for(let x=0;x<w;x++){ if(!H[y][x]) continue;   // соседние клетки — не круче 1 уровня
+    for(const [a,b] of DIRS4){ const v=H[y+b]?.[x+a]; if(v&&H[y][x]>v+1) H[y][x]=v+1; } }
+  const T=[...Array(d)].map((_,y)=>[...Array(w)].map((_,x)=>{ if(!H[y][x]) return "."; const v=n3(x,y);
+    return v<0.3?"d":v<0.62?(rnd()<0.5?"g":"G"):v<0.8?"G":"e"; }));
+  // пруды: низкие ямки внутри острова
+  const inner=(x,y)=>DIRS4.every(([a,b])=>H[y+b]?.[x+a]>0)&&[[1,1],[-1,1],[1,-1],[-1,-1]].every(([a,b])=>H[y+b]?.[x+a]>0);
+  const ponds=Math.max(1,Math.round(w*d/350));
+  for(let p=0;p<ponds;p++){ for(let tries=0;tries<200;tries++){ const x=1+Math.floor(rnd()*(w-2)), y=1+Math.floor(rnd()*(d-2));
+      if(!H[y][x]||H[y][x]>2||!inner(x,y)) continue; const L=H[y][x], q=[[x,y]], set=[[x,y]], seen=new Set([x+","+y]); const size=4+Math.floor(rnd()*6);
+      while(q.length&&set.length<size){ const [cx,cy]=q.shift(); for(const [a,b] of DIRS4){ const nx=cx+a, ny=cy+b, k=nx+","+ny;
+        if(!seen.has(k)&&H[ny]?.[nx]===L&&inner(nx,ny)&&rnd()<0.8){ seen.add(k); q.push([nx,ny]); set.push([nx,ny]); } } }
+      if(set.length>=3){ for(const [a,b] of set) T[b][a]="w"; break; } } }
+  const land=(x,y)=>H[y]?.[x]>0&&T[y][x]!=="w", used=new Set(), mark=(x,y)=>used.add(x+","+y);
+  const cx=Math.floor(w/2), cy=Math.floor(d/2), near=(f)=>{ let best=null,bd=1e9; for(let y=0;y<d;y++)for(let x=0;x<w;x++){ if(!f(x,y)) continue; const dd=Math.hypot(x-cx,y-cy)+rnd()*0.5; if(dd<bd){bd=dd;best=[x,y];} } return best; };
+  const start=near((x,y)=>land(x,y)); mark(...start);
+  const hut=near((x,y)=>[[0,0],[1,0],[0,1],[1,1]].every(([a,b])=>land(x+a,y+b)&&H[y+b][x+a]===H[y][x]&&!used.has((x+a)+","+(y+b)))&&Math.hypot(x-start[0],y-start[1])>3);
+  if(hut) for(const [a,b] of [[0,0],[1,0],[0,1],[1,1],[2,0],[2,1],[0,2],[1,2]]) mark(hut[0]+a,hut[1]+b);
+  const npc=hut?near((x,y)=>land(x,y)&&!used.has(x+","+y)&&Math.abs(x-hut[0]-0.5)<=2.5&&Math.abs(y-hut[1]-0.5)<=2.5):null; if(npc) mark(...npc);
+  let merchant=null, stall=null, pier=null;
+  for(let y=0;y<d&&!merchant;y++) for(let x=0;x<w&&!merchant;x++){ if(!land(x,y)||used.has(x+","+y)) continue;
+    const wn=DIRS4.find(([a,b])=>T[y+b]?.[x+a]==="w"), ln=DIRS4.find(([a,b])=>land(x+a,y+b)&&!used.has((x+a)+","+(y+b))&&!(wn&&a===-wn[0]&&b===-wn[1]));
+    if(wn&&ln){ merchant=[x,y]; pier=[x+wn[0],y+wn[1],wn[0]?"pier_right":"pier_left"]; stall=[x+ln[0],y+ln[1],ln[0]?"stall_left":"stall_right"]; } }
+  if(!merchant){ merchant=near((x,y)=>land(x,y)&&!used.has(x+","+y)&&Math.hypot(x-start[0],y-start[1])>4); }
+  if(merchant) mark(...merchant); if(stall) mark(stall[0],stall[1]);
+  const props=[];
+  const keep=[start,npc,merchant,hut&&[hut[0]+0.5,hut[1]+0.5]].filter(Boolean);   // вокруг жилья и NPC — свободно
+  const nf=noise(4);   // деревья растут рощами, а не равномерно
+  for(let y=0;y<d;y++) for(let x=0;x<w;x++){ if(!land(x,y)||used.has(x+","+y)||keep.some(p=>Math.hypot(x-p[0],y-p[1])<2.3)) continue; const r=rnd(), t=T[y][x], grove=nf(x,y)>0.6;
+    if(t==="e"&&r<0.1) props.push([x,y,r<0.04?"rock_big":"rock_small"]);
+    else if(grove&&r<0.22) props.push([x,y,r<0.1?"tree_big":"tree_small"]);
+    else if(r<0.025) props.push([x,y,"tree_small"]);
+    else if(r<0.05) props.push([x,y,"bush"]); else if(r<0.07) props.push([x,y,"rock_small"]); else if(r<0.14) props.push([x,y,rnd()<0.5?"grass_tuft":"grass_tuft_2"]); }
+  return {levels:H.map(r=>r.join("")),tops:T.map(r=>r.join("")),stairs:{},props,start,hut,npc,merchant,stall,pier};
+}
+function edGenerate(){
+  if(!edGenPending){ edGenPending=true; edRender(); setTimeout(()=>{ edGenPending=null; edRender(); },4000); return; }
+  edGenPending=null; const m=genIsland(edW(),edD()); edSaveMap(m,true);
+}
 // ---- карта от других: перезагрузка ----
 function onMapDoc(s){
   if(EDIT||edSaving) return;
@@ -2714,31 +2816,40 @@ async function initAdmin(){
     if(!ok) say("admin_bad");
   } else if(!window.__islandWorld&&NET.user&&NET.user.isOwner){ try{ ok=!!(await NET.user.isOwner()); }catch(e){} }
   isAdmin=ok; const b=document.getElementById("editBtn"); if(b) b.hidden=!ok;
+  if(ok){ let re=null; try{ re=sessionStorage.getItem("island_reedit"); sessionStorage.removeItem("island_reedit"); }catch(e){} if(re) setTimeout(edEnter,300); }
 }
 // ---- режим редактора ----
+let edPrevGrid=false, edExitConfirm=false;
 function edEnter(){
   if(!isAdmin) return; EDIT=true; closeWin(); if(dialogOpen) closeDialog(); stopFishing(); stopChopping(); hero.path=[]; hero.target=null; marker=null;
-  edW=W; edD=D; edUndo.length=0;
+  edAdd={t:0,b:0,l:0,r:0}; edUndo.length=0;
   edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS};
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
 }
-let edPrevGrid=false;
 function edExit(){
   if(edUndo.length&&!edExitConfirm){ edExitConfirm=true; edRender(); setTimeout(()=>{edExitConfirm=false; edRender();},4000); return; }
   edExitConfirm=false; EDIT=false; showGrid=edPrevGrid; document.body.classList.remove("editing"); document.getElementById("edPanel").hidden=true;
   if(edUndo.length){ setTimeout(()=>location.reload(),300); return; }   // несохранённые правки — вернуть как было
   say("hint","hint_sub"); dirty=true;
 }
-let edExitConfirm=false;
 function edRender(){
   const p=document.getElementById("edPanel"); if(!p||p.hidden) return; p.textContent="";
-  const top=mkEl("div","edtop");
   const btn=(label,fn,cls,dis)=>{ const b=mkEl("button","btn"+(cls?" "+cls:""),label); b.type="button"; b.onclick=fn; b.disabled=!!dis; return b; };
+  const top=mkEl("div","edtop");
   top.appendChild(btn(tr("ed_undo"),edUndoLast,"",!edUndo.length));
   top.appendChild(btn(tr("ed_save"),edSave,"big"));
   top.appendChild(btn(tr(edExitConfirm?"ed_exit_confirm":"ed_exit"),edExit,edExitConfirm?"warn":""));
   p.appendChild(top);
+  // мини-карта и режим пальца
+  const mrow=mkEl("div","edmrow"), mc=mkEl("canvas","edmini"); mc.id="edMini"; mc.width=150; mc.height=150; mrow.appendChild(mc);
+  const side=mkEl("div","edside");
+  side.appendChild(btn(tr(edPaint?"ed_mode_paint":"ed_mode_move"),()=>{ edPaint=!edPaint; edRender(); },"on"));
+  side.appendChild(btn(tr("ed_brush",{n:edBrush==="fill"?tr("ed_fill"):edBrush+"×"+edBrush}),()=>{ edBrush=edBrush===1?3:edBrush===3?5:edBrush===5?"fill":1; edRender(); }));
+  side.appendChild(btn(tr("ed_dir"),()=>{ edDir=edDir==="left"?"right":"left"; edRender(); }));
+  side.appendChild(mkEl("small","muted",tr("ed_mini_hint")));
+  mrow.appendChild(side); p.appendChild(mrow);
+  mc.onclick=e=>{ const r=mc.getBoundingClientRect(); edMiniJump((e.clientX-r.left)*mc.width/r.width,(e.clientY-r.top)*mc.height/r.height); };
   const tools=mkEl("div","edtools");
   for(const [gk,items] of ED_GROUPS){ const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
     const row=mkEl("div","edrow");
@@ -2747,19 +2858,46 @@ function edRender(){
       if(name&&typeof SPRITES!=="undefined"&&SPRITES[name]){ const im=mkEl("img"); im.src=SPRITES[name]; im.alt=""; b.appendChild(im); }
       else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂"}[id]||"?"));
       b.appendChild(mkEl("small",null,tr("ed_t_"+id)));
-      b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,"ed_tap_sub"); }; row.appendChild(b); }
+      b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
     grp.appendChild(row); tools.appendChild(grp); }
   p.appendChild(tools);
+  // размер: добавить/убрать ряды с любой стороны
+  const sz=mkEl("div","edgrp"); sz.appendChild(mkEl("b",null,tr("ed_g_size",{w:edW(),d:edD()})));
+  const sg=mkEl("div","edsizegrid");
+  for(const k of ["t","b","l","r"]){ const r=mkEl("div","edsz"); r.appendChild(mkEl("span",null,tr("ed_side_"+k)+(edAdd[k]?` (${edAdd[k]>0?"+":""}${edAdd[k]})`:"")));
+    r.appendChild(btn("−",()=>{ const vert=k==="t"||k==="b"; if((vert?edD():edW())>ED_MIN){ edAdd[k]--; edRender(); edMini(); } }));
+    r.appendChild(btn("+",()=>{ const vert=k==="t"||k==="b"; if((vert?edD():edW())<ED_MAX){ edAdd[k]++; edRender(); edMini(); } }));
+    sg.appendChild(r); }
+  sz.appendChild(sg); if(edAdd.t||edAdd.b||edAdd.l||edAdd.r) sz.appendChild(mkEl("p","muted",tr("ed_size_note")));
+  p.appendChild(sz);
   const opt=mkEl("div","edopt");
-  opt.appendChild(btn(tr("ed_brush",{n:edBrush===1?"1×1":"3×3"}),()=>{ edBrush=edBrush===1?3:1; edRender(); }));
-  opt.appendChild(btn(tr("ed_dir"),()=>{ edDir=edDir==="left"?"right":"left"; edRender(); }));
-  const sz=mkEl("span","edsize",tr("ed_size",{w:edW,d:edD}));
-  opt.appendChild(btn("W−",()=>{ edW=Math.max(10,edW-1); edRender(); })); opt.appendChild(btn("W+",()=>{ edW=Math.min(40,edW+1); edRender(); }));
-  opt.appendChild(sz);
-  opt.appendChild(btn("H−",()=>{ edD=Math.max(10,edD-1); edRender(); })); opt.appendChild(btn("H+",()=>{ edD=Math.min(40,edD+1); edRender(); }));
+  opt.appendChild(btn(tr(edGenPending?"ed_gen_confirm":"ed_gen",{w:edW(),d:edD()}),edGenerate,edGenPending?"warn":""));
   opt.appendChild(btn(tr(confirmReset?"ed_reset_confirm":"ed_reset"),edReset,confirmReset?"warn":""));
   p.appendChild(opt);
-  if(edW!==W||edD!==D) p.appendChild(mkEl("p","muted",tr("ed_size_note")));
+  edMini();
+}
+// ---- мини-карта: весь остров сверху, тап — перейти туда ----
+let edMiniGeom=null;
+function edMini(){
+  const mc=document.getElementById("edMini"); if(!mc) return; const g=mc.getContext("2d");
+  const w=edW(), d=edD(), ox=edAdd.l, oy=edAdd.t, k=Math.min(mc.width/w,mc.height/d), offX=(mc.width-w*k)/2, offY=(mc.height-d*k)/2;
+  edMiniGeom={k,offX,offY,ox,oy};
+  g.fillStyle="#2a6aa8"; g.fillRect(0,0,mc.width,mc.height);
+  g.fillStyle="rgba(255,255,255,.08)"; g.fillRect(offX,offY,w*k,d*k);
+  const COL={g:[110,180,70],G:[96,168,60],d:[60,120,48],s:[170,166,150],e:[150,104,64],w:[80,150,220]};
+  for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(x<0||y<0||x>=w||y>=d) continue;
+    const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
+    g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
+    if(c.props.some(n=>n.startsWith("tree"))){ g.fillStyle="#1f4a1a"; g.fillRect(offX+(x+0.25)*k,offY+(y+0.25)*k,Math.max(1,k*0.5),Math.max(1,k*0.5)); } }
+  const dot=(p,col)=>{ if(!p) return; g.fillStyle=col; g.fillRect(offX+(p[0]+ox)*k-1,offY+(p[1]+oy)*k-1,Math.max(3,k+2),Math.max(3,k+2)); };
+  if(edDraft){ dot(edDraft.hut,"#d84a2a"); dot(edDraft.npc,"#ffd66b"); dot(edDraft.merchant,"#ff9a3a"); dot(edDraft.start,"#ffffff"); }
+  g.strokeStyle="#1b1528"; g.lineWidth=1; g.strokeRect(offX+0.5,offY+0.5,w*k-1,d*k-1);
+}
+function edMiniJump(px,py){
+  if(!edMiniGeom) return; const {k,offX,offY,ox,oy}=edMiniGeom;
+  const x=Math.max(0,Math.min(W-1,Math.round((px-offX)/k-0.5-ox))), y=Math.max(0,Math.min(D-1,Math.round((py-offY)/k-0.5-oy)));
+  const c=cellAt(x,y), [fx,fy]=proj(x-MX,y-MY,c?c.L:1), r=cv.getBoundingClientRect();
+  panX=r.width*0.62-fx*scale; panY=r.height*0.42-fy*scale; dirty=true;
 }
 // метки мест (старт, хижина, NPC…) в режиме редактора
 function edDrawMarks(){
@@ -2770,7 +2908,6 @@ function edDrawMarks(){
     ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
     ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
 }
-
 
 // ================= Мультиплеер =================
 // room — кто сейчас в игре (позиции, чат, звери от «хозяина»); db — общий мир (деревья, костры, время)
@@ -3487,6 +3624,7 @@ cv.addEventListener("pointerdown",e=>{
     const [a,b]=[...pointers.values()];
     pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1, k:zoomK, mx:(a.x+b.x)/2, my:(a.y+b.y)/2, px:panX, py:panY};
     if(drag) drag.moved=true;   // второй палец — это уже не тап
+    if(EDIT) edStrokeEnd();
     stopFollow();
   }
 });
@@ -3503,6 +3641,9 @@ cv.addEventListener("pointermove",e=>{
   if(drag&&pointers.size===1){
     const dx=x-drag.x, dy=y-drag.y;
     if(!drag.moved&&Math.hypot(dx,dy)>TAP_SLOP()){drag.moved=true;cv.classList.add("drag");stopFollow()}
+    if(drag.moved&&EDIT&&edPaint){   // редактор: один палец рисует, двумя — двигаем карту
+      if(!drag.stroke) drag.stroke=edStrokeStart(drag.x,drag.y)?1:-1;
+      if(drag.stroke===1){ edStrokeMove(x,y); dirty=true; return; } }
     if(drag.moved){panX=drag.px+dx;panY=drag.py+dy;dirty=true;return}
   }
   // подсветка клетки — только для мыши (на телефоне «наведения» нет)
@@ -3518,8 +3659,8 @@ function endPointer(e){
     else goTo((!placing&&pickWolf(x,y))||pickEntity(x,y)||pickTree(x,y)||pick(x,y));
   }
   if(pointers.size<2) pinch=null;
-  if(pointers.size===1){ const p=[...pointers.values()][0]; drag={x:p.x,y:p.y,px:panX,py:panY,moved:true}; }
-  if(pointers.size===0){ drag=null; cv.classList.remove("drag"); }
+  if(pointers.size===1){ const p=[...pointers.values()][0]; drag={x:p.x,y:p.y,px:panX,py:panY,moved:true,stroke:-1}; }
+  if(pointers.size===0){ drag=null; cv.classList.remove("drag"); if(EDIT) edStrokeEnd(); }
 }
 cv.addEventListener("pointerup",endPointer);
 cv.addEventListener("pointercancel",endPointer);
