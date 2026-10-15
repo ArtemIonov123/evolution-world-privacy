@@ -767,7 +767,21 @@ const walkZ=c=> wet(c) ? c.L-0.3 : c.st ? c.L+0.5 : c.L;  // вода чуть �
 let rot=0, rotTarget=0, anim=null, ca=1, sa=0;
 const SKY=getComputedStyle(document.documentElement).getPropertyValue("--sky").trim()||"#a99ad6";
 let scale=2, panX=0, panY=0, follow=true, showGrid=false, hover=null;
-function setRot(r){rot=r; const a=r*Math.PI/2; ca=Math.cos(a); sa=Math.sin(a);}
+let rotQPrev=0;
+function setRot(r){rot=r; const a=r*Math.PI/2; ca=Math.cos(a); sa=Math.sin(a);
+  // при повороте камеры на четверть все «экранные» направления пересчитываем, чтобы в мире они не менялись
+  const q=((Math.round(r)%4)+4)%4; if(q!==rotQPrev){ const from=rotQPrev; rotQPrev=q; if(typeof remapFacings==="function") remapFacings(from,q); } }
+// направление спрайта (se/sw/ne/nw — на экране) <-> направление в мире; q — четверть поворота камеры
+const QCS=[[1,0],[0,1],[-1,0],[0,-1]];
+function faceToWorldQ(f,q){ const sx=f[1]==="e"?1:-1, sy=f[0]==="s"?1:-1, u=(sx+sy)/2, v=(sy-sx)/2, [c,s]=QCS[q]; return [u*c+v*s,-u*s+v*c]; }
+function worldToFaceQ(dx,dy,q){ const [c,s]=QCS[q], u=dx*c-dy*s, v=dx*s+dy*c, sx=u-v, sy=u+v; return (sy>=0?"s":"n")+(sx>=0?"e":"w"); }
+const convF=(f,from,to)=>typeof f==="string"&&f.length===2&&from!==to?worldToFaceQ(...faceToWorldQ(f,from),to):f;
+function remapFacings(from,to){
+  const fix=o=>{ if(o&&typeof o.facing==="string") o.facing=convF(o.facing,from,to); };
+  fix(hero); if(typeof npc!=="undefined") fix(npc); if(typeof merch!=="undefined") fix(merch);
+  if(typeof animals!=="undefined") for(const a of animals) fix(a);
+  if(typeof remotes!=="undefined") for(const r of remotes.values()) if(r.f) r.f=convF(r.f,from,to);
+}
 // точка карты (X,Y от центра в клетках, Z в уровнях) -> мировые пиксели
 const proj=(X,Y,Z)=>{const u=X*ca-Y*sa, v=X*sa+Y*ca; return [(u-v)*HW, (u+v)*HH-(Z-1)*LH]};
 const depthOf=(X,Y)=>{const u=X*ca-Y*sa, v=X*sa+Y*ca; return u+v};
@@ -3437,11 +3451,11 @@ function myAct(){
 }
 function sendPresence(now){
   if(!NET.room||now-lastSent<100) return; lastSent=now;
-  const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:hero.facing,m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
+  const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:convF(hero.facing,quarter(),0),m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
     id:NET.myId,n:myNick,act:myAct(),chat:myChat,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
     p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:a.kind==="wolf"?"w":a.kind==="bat"?"b":"h",fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
-      f:a.facing,m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
+      f:convF(a.facing,quarter(),0),m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
     p.bt=bites.slice(-6); p.kl=kills.length?kills.slice(-6):null;
   }
   const j=JSON.stringify(p); if(j===lastPresJSON) return; lastPresJSON=j;
@@ -3459,7 +3473,7 @@ function onPeersChange(change){
     let r=remotes.get(p.peer);
     const x=num(pr.x,-1,W,MX), y=num(pr.y,-1,D,MY);
     if(!r){ r={kind:"player",peer:p.peer,x,y,z:num(pr.z,0,12,1),phase:0,chatSeen:null,chatAt:0,isNew:true}; remotes.set(p.peer,r); if(NET.myPeer) say("player_joined"); }
-    r.tx=x; r.ty=y; r.tz=num(pr.z,0,12,r.z); r.f=FACINGS.includes(pr.f)?pr.f:"se"; r.m=pr.m===1; r.c=num(pr.c|0,0,PLAYER_HUES.length-1,0)|0;
+    r.tx=x; r.ty=y; r.tz=num(pr.z,0,12,r.z); r.f=FACINGS.includes(pr.f)?convF(pr.f,0,quarter()):"se"; r.m=pr.m===1; r.c=num(pr.c|0,0,PLAYER_HUES.length-1,0)|0;
     r.hp=num(pr.hp,0,HP_MAX,HP_MAX); r.hurt=num(pr.hurt,0,1e15,0); r.nick=nickOf(pr.n);
     r.by=p.by||(typeof pr.id==="string"&&pr.id.length<80?pr.id:null);
     r.act=pr.act&&typeof pr.act==="object"?{k:pr.act.k==="f"?"f":pr.act.k==="c"?"c":null,bx:num(pr.act.bx,-1,W,0),by:num(pr.act.by,-1,D,0),tx:num(pr.act.tx,0,W,0)|0,ty:num(pr.act.ty,0,D,0)|0}:null;
@@ -3501,7 +3515,7 @@ function mirrorAnimals(h,dt){
     let a=animals.find(x=>x.nid===id);
     const kind=e.k==="w"?"wolf":e.k==="b"?"bat":"hare";
     if(!a){ a={kind,nid:id,x:num(e.x,-1,W,0),y:num(e.y,-1,D,0),z:num(e.z,0,12,1),path:[],speed:1.5,facing:"se",phase:0,think:1,alpha:0,leaving:false,state:"",attackT:1,lunge:0,howlT:0,fleeing:0}; animals.push(a); }
-    a.tx=num(e.x,-1,W,a.x); a.ty=num(e.y,-1,D,a.y); a.tz=num(e.z,0,12,a.z); a.facing=FACINGS.includes(e.f)?e.f:a.facing; a.moving=e.m===1;
+    a.tx=num(e.x,-1,W,a.x); a.ty=num(e.y,-1,D,a.y); a.tz=num(e.z,0,12,a.z); a.facing=FACINGS.includes(e.f)?convF(e.f,0,quarter()):a.facing; a.moving=e.m===1;
     a.alpha+=(num(e.a,0,1,1)-a.alpha)*Math.min(1,dt*6); a.leaving=e.lv===1;
     if(e.l===1&&a.lunge<=0){ a.lunge=0.25; }
     if(e.h===1) a.howlT=Math.max(a.howlT,0.5);
