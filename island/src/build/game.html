@@ -221,6 +221,17 @@ canvas.drag{cursor:grabbing}
 .eddrh small:last-child{width:28px}
 .eddrf small:last-child{width:64px}
 .edpct{width:36px;text-align:right;color:var(--muted);font-size:11px}
+.edcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.edcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;background:var(--panel-2);border:2px solid var(--edge);color:var(--ink);cursor:pointer;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.3)}
+.edcard img{height:48px;max-width:72px;object-fit:contain;image-rendering:pixelated}
+.edcard b{font-size:13px}
+.edcard small{font-size:10px;color:var(--muted);text-align:center;line-height:1.25}
+.edcard:hover{background:#4b3e6b}
+.edcard:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.edchead{display:flex;align-items:center;gap:8px}
+.edchead img{height:36px;max-width:48px;object-fit:contain;image-rendering:pixelated}
+.edchead b{font-size:15px}
 .ednum{width:64px;font:14px var(--f-body);padding:4px 6px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
 .edpanel .sub{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:11px;letter-spacing:.04em;margin-top:4px}
 .edmini{width:150px;height:150px;image-rendering:pixelated;border:2px solid var(--edge);cursor:pointer;flex:none}
@@ -486,6 +497,9 @@ const I18N={
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
+    ed_drop_pick:"Wybierz, co chcesz ustawić:", ed_back:"← Wróć", ed_drop_loot:"Łup", ed_drop_reward:"Nagroda", ed_src_wolf:"Wilk",
+    ed_src_mob_sub:"{n} przedm. · {xp} XP", ed_src_trees_sub:"{a} / {b} polan", ed_src_fish_sub:"{n} rodzajów", ed_src_quest_sub:"{xp} XP za zadanie",
+    ed_src_fisher:"Rybak", ed_src_fisher_sub:"ceny skupu",
     ed_tab_drop:"Drop", ed_drop_mob_wolf:"Wilk — łup", ed_drop_item:"Przedmiot", ed_drop_ch:"Szansa %", ed_drop_min:"Min", ed_drop_max:"Max", ed_drop_add:"+ dodaj przedmiot",
     ed_xp_kill:"XP za pokonanie", ed_drop_trees:"Drzewa", ed_logs_big:"Polana z dużego drzewa", ed_logs_small:"Polana z małego drzewa", ed_xp_tree:"XP za drzewo",
     ed_drop_fish:"Ryby", ed_fish_hint:"Waga = jak często bierze (więcej = częściej). Obok — wychodzący procent przy zwykłej wędce.", ed_fish_w:"Waga",
@@ -595,6 +609,9 @@ const I18N={
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
+    ed_drop_pick:"Выбери, что настроить:", ed_back:"← Назад", ed_drop_loot:"Добыча", ed_drop_reward:"Награда", ed_src_wolf:"Волк",
+    ed_src_mob_sub:"{n} предм. · {xp} XP", ed_src_trees_sub:"{a} / {b} полен.", ed_src_fish_sub:"{n} видов", ed_src_quest_sub:"{xp} XP за задание",
+    ed_src_fisher:"Рыбак", ed_src_fisher_sub:"цены скупки",
     ed_tab_drop:"Дроп", ed_drop_mob_wolf:"Волк — добыча", ed_drop_item:"Предмет", ed_drop_ch:"Шанс %", ed_drop_min:"Мин", ed_drop_max:"Макс", ed_drop_add:"+ добавить предмет",
     ed_xp_kill:"XP за победу", ed_drop_trees:"Деревья", ed_logs_big:"Поленьев с большого дерева", ed_logs_small:"Поленьев с малого дерева", ed_xp_tree:"XP за дерево",
     ed_drop_fish:"Рыба", ed_fish_hint:"Вес = как часто клюёт (больше — чаще). Рядом — итоговый процент с обычной удочкой.", ed_fish_w:"Вес",
@@ -2830,14 +2847,36 @@ function renderTextsTab(p){
     head.appendChild(rs); box.appendChild(head); box.appendChild(ta); p.appendChild(box);
   }
 }
+let edDropSel=null;
+// карточки «источников» дропа; новые мобы и боссы добавляются в MOBS и появятся здесь сами
+function dropCards(){
+  const n=k=>dropTable(k).length;
+  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"],label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})})),
+    {key:"trees",img:SPRITES.tree_small,label:tr("ed_drop_trees"),sub:tr("ed_src_trees_sub",{a:edCfg.logs.tree_big??LOGS.tree_big,b:edCfg.logs.tree_small??LOGS.tree_small})},
+    {key:"fish",img:iconURL("karas"),label:tr("ed_drop_fish"),sub:tr("ed_src_fish_sub",{n:FISH.length})},
+    {key:"quests",img:SPRITES.ui_quests||iconURL("coin"),label:tr("ed_drop_quests"),sub:tr("ed_src_quest_sub",{xp:edCfg.xp.quest??XP_DEF.quest})},
+    {key:"fisher",img:SPRITES.npc_se_0,label:tr("ed_src_fisher"),sub:tr("ed_src_fisher_sub")}];
+}
 function renderDropTab(p){
-  const sec=k=>p.appendChild(mkEl("b","sub",tr(k)));
   const row=(label,...els)=>{ const r=mkEl("div","edshop"); if(typeof label==="string") r.appendChild(mkEl("span",null,label)); else r.appendChild(label); for(const e of els) r.appendChild(e); p.appendChild(r); return r; };
   const itemLabel=id=>{ const w=mkEl("span","edil"); const im=mkEl("img"); im.src=iconURL(id); im.alt=""; w.appendChild(im); w.appendChild(document.createTextNode(tr("fish_"+id))); return w; };
-  for(const mob of MOBS){
-    sec("ed_drop_mob_"+mob);
+  if(!edDropSel){
+    p.appendChild(mkEl("p","muted",tr("ed_drop_pick")));
+    const grid=mkEl("div","edcards");
+    for(const c of dropCards()){ const b=mkEl("button","edcard"); b.type="button";
+      const im=mkEl("img"); if(c.img) im.src=c.img; im.alt=""; b.appendChild(im);
+      b.appendChild(mkEl("b",null,c.label)); b.appendChild(mkEl("small",null,c.sub));
+      b.onclick=()=>{ edDropSel=c.key; edRender(); }; grid.appendChild(b); }
+    p.appendChild(grid); return;
+  }
+  const card=dropCards().find(c=>c.key===edDropSel); if(!card){ edDropSel=null; return renderDropTab(p); }
+  const head=mkEl("div","edchead"), back=mkEl("button","btn mini",tr("ed_back")); back.type="button"; back.onclick=()=>{ edDropSel=null; edRender(); };
+  const im=mkEl("img"); if(card.img) im.src=card.img; im.alt=""; head.append(back,im,mkEl("b",null,card.label)); p.appendChild(head);
+  if(edDropSel.startsWith("mob:")){
+    const mob=edDropSel.slice(4);
     if(!edCfg.drops[mob]) edCfg.drops[mob]=JSON.parse(JSON.stringify(DROP_DEF[mob]||[]));
     const list=edCfg.drops[mob];
+    p.appendChild(mkEl("b","sub",tr("ed_drop_loot")));
     const hdr=mkEl("div","eddrh"); for(const k of ["ed_drop_item","ed_drop_ch","ed_drop_min","ed_drop_max",""]) hdr.appendChild(mkEl("small",null,k?tr(k):"")); p.appendChild(hdr);
     list.forEach((r,i)=>{
       const sel=mkEl("select","edsel"); for(const it of ITEMS){ const o=mkEl("option",null,tr("fish_"+it.id)); o.value=it.id; o.selected=it.id===r.id; sel.appendChild(o); }
@@ -2848,20 +2887,23 @@ function renderDropTab(p){
       row(wrap,valInput(r,"ch",0,100),valInput(r,"a",0,99),valInput(r,"b",0,99),del).classList.add("eddr");
     });
     const add=mkEl("button","btn mini",tr("ed_drop_add")); add.type="button"; add.onclick=()=>{ list.push({id:"coin",ch:100,a:1,b:3}); cfgDirty=true; edRender(); }; p.appendChild(add);
+    p.appendChild(mkEl("b","sub",tr("ed_drop_reward")));
     row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
+  } else if(edDropSel==="trees"){
+    row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
+    row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
+  } else if(edDropSel==="fish"){
+    p.appendChild(mkEl("p","muted",tr("ed_fish_hint")));
+    const tot=FISH.reduce((a,f)=>a+(edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w),0)||1;
+    const hf=mkEl("div","eddrh eddrf"); for(const k of ["ed_drop_item","ed_fish_w","","XP"]) hf.appendChild(mkEl("small",null,k&&k!=="XP"?tr(k):k)); p.appendChild(hf);
+    for(const f of FISH){ const w=edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w;
+      row(itemLabel(f.id),numInput(edCfg.fishW,f.id,f.w,true),mkEl("small","edpct",Math.round(w/tot*100)+"%"),numInput(edCfg.xpFish,f.id,XP_FISH_DEF[f.id]??2)); }
+  } else if(edDropSel==="quests"){
+    row(tr("ed_xp_quest"),numInput(edCfg.xp,"quest",XP_DEF.quest));
+  } else if(edDropSel==="fisher"){
+    p.appendChild(mkEl("p","muted",tr("ed_fisher_buy")));
+    for(const id of FISHER_EDIT) row(itemLabel(id),numInput(edCfg.fisher,id,PRICE[id]??LOOT_PRICE[id]??(id==="wood"?1:0)));
   }
-  sec("ed_drop_trees");
-  row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
-  row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
-  sec("ed_drop_fish"); p.appendChild(mkEl("p","muted",tr("ed_fish_hint")));
-  const tot=FISH.reduce((a,f)=>a+(edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w),0)||1;
-  const hf=mkEl("div","eddrh eddrf"); for(const k of ["ed_drop_item","ed_fish_w","",
-    "XP"]) hf.appendChild(mkEl("small",null,k&&k!=="XP"?tr(k):k)); p.appendChild(hf);
-  for(const f of FISH){ const w=edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w;
-    row(itemLabel(f.id),numInput(edCfg.fishW,f.id,f.w,true),mkEl("small","edpct",Math.round(w/tot*100)+"%"),numInput(edCfg.xpFish,f.id,XP_FISH_DEF[f.id]??2)); }
-  sec("ed_drop_quests"); row(tr("ed_xp_quest"),numInput(edCfg.xp,"quest",XP_DEF.quest));
-  sec("ed_fisher_buy");
-  for(const id of FISHER_EDIT) row(itemLabel(id),numInput(edCfg.fisher,id,PRICE[id]??LOOT_PRICE[id]??(id==="wood"?1:0)));
 }
 function valInput(obj,key,lo,hi){
   const i=mkEl("input","ednum"); i.type="number"; i.min=String(lo); i.max=String(hi); i.step="1"; i.inputMode="numeric"; i.value=String(obj[key]);
@@ -3012,7 +3054,7 @@ function edEnter(){
   edAdd={t:0,b:0,l:0,r:0}; edUndo.length=0;
   const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
   edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,zones:{hare:zk("hare"),wolf:zk("wolf")}};
-  edTab="map"; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG;
+  edTab="map"; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG; edDropSel=null;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
 }

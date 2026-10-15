@@ -6,7 +6,7 @@ const pg=async(who,url,uid)=>{const p=await ctx.newPage(); p.on('pageerror',e=>e
 const WK='DropsTestWorldKey123';
 const A=await pg('A',`http://localhost:8765/index.html#world=${WK}&admin=z`,'uAAAAAAAAAAAAAA');
 const B=await pg('B',`http://localhost:8765/index.html#world=${WK}`,'uBBBBBBBBBBBBBB');
-await A.evaluate(()=>{ edEnter(); edTab="drop"; edRender(); });
+await A.evaluate(()=>{ edEnter(); edTab="drop"; edRender(); }); await A.screenshot({path:"drop_cards.png"}); await A.evaluate(()=>{ edDropSel="mob:wolf"; edRender(); });
 // UI edits: add drop row (coin), set pelt chance 0, wolf xp 50, big tree logs 10, gold weight 1000, fisher karas 9
 await A.evaluate(()=>{ [...document.querySelectorAll('.edpanel button')].find(b=>b.textContent.includes('dodaj')).click(); });
 await A.evaluate(()=>{ const rows=[...document.querySelectorAll('.eddr')]; const set=(el,v)=>{el.value=String(v); el.dispatchEvent(new Event('input'));};
