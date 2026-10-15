@@ -1,0 +1,15 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext(); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')}); const errs=[];
+const pg=async(who,nick,uid)=>{const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(who+':'+e.message));
+  await p.addInitScript(([n,u])=>{ if(!sessionStorage.getItem('i')){ sessionStorage.setItem('i',1); localStorage.setItem('island_nick',n); localStorage.setItem('island_uid',u);} },[nick,uid]);
+  await p.goto('http://localhost:8765/index.html#world=AfkTestWorldKey12345'); await p.waitForTimeout(1800); return p;};
+const A=await pg('A','Artem','uAAAAAAAAAAAAAA'), B=await pg('B','Kolega','uBBBBBBBBBBBBBB'); await A.waitForTimeout(1500);
+const view=()=>A.evaluate(()=>({remotes:[...remotes.values()].map(r=>r.nick),list:document.getElementById('players').innerText.replace(/\n/g,' | ')}));
+console.log('both online',JSON.stringify(await view()));
+await B.evaluate(()=>{ lastInput=Date.now()-11*60*1000; lastPresJSON=""; }); await A.waitForTimeout(1500);
+console.log('B idle 11min',JSON.stringify(await view()));
+await B.evaluate(()=>{ document.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); }); await A.waitForTimeout(1500);
+console.log('B back',JSON.stringify(await view()));
+await B.close({runBeforeUnload:true}); await A.waitForTimeout(3000);
+console.log('B left',JSON.stringify(await view()));
+console.log('errors',errs); await b.close();})();

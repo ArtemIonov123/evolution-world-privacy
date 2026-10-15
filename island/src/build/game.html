@@ -2842,6 +2842,11 @@ const nickOf=v=>typeof v==="string"?cleanNick(v):"";
 
 // ---- моё присутствие: что видят другие ----
 let lastSent=0, lastPresJSON="", myChat=null, biteSeq=0; const bites=[];
+// АФК: вкладка свёрнута или 10 минут без касаний — другие игроки нас не видят
+const AFK_MS=10*60*1000; let lastInput=Date.now();
+for(const ev of ["pointerdown","keydown","wheel"]) addEventListener(ev,()=>{ lastInput=Date.now(); },{passive:true,capture:true});
+const isAfk=()=>document.hidden||Date.now()-lastInput>AFK_MS;
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) lastInput=Date.now(); lastSent=0; lastPresJSON=""; try{ sendPresence(performance.now()); }catch(e){} });
 function myAct(){
   if(fishing) return {k:"f",bx:+fishing.bx.toFixed(2),by:+fishing.by.toFixed(2)};
   if(chopping) return {k:"c",tx:chopping.tree.x,ty:chopping.tree.y};
@@ -2850,7 +2855,7 @@ function myAct(){
 function sendPresence(now){
   if(!NET.room||now-lastSent<100) return; lastSent=now;
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:hero.facing,m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
-    id:NET.myId,n:myNick,act:myAct(),chat:myChat,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel()};
+    id:NET.myId,n:myNick,act:myAct(),chat:myChat,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
     p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:a.kind==="wolf"?"w":"h",x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
       f:a.facing,m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??WOLF_HP,hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
@@ -2866,7 +2871,7 @@ function onPeersChange(change){
   const seen=new Set();
   for(const p of change.peers){
     if(p.sameTab||p.kind!=="viewer") continue;
-    const pr=p.presence||{}; if(pr.v!==1) continue;
+    const pr=p.presence||{}; if(pr.v!==1||pr.afk===1) continue;   // АФК (свернул игру или долго бездействует) — как будто нет
     seen.add(p.peer);
     let r=remotes.get(p.peer);
     const x=num(pr.x,-1,W,MX), y=num(pr.y,-1,D,MY);
@@ -2963,7 +2968,7 @@ function renderPlayers(){
   const el=document.getElementById("players"); if(!el) return;
   if(!NET.room&&!NET.db){ el.hidden=true; return; }
   el.hidden=false;
-  const sl=typeof activeSleepers==="function"?activeSleepers():[];
+  const sl=[];   // в списке — только те, кто сейчас в игре
   el.textContent="";
   const head=document.createElement("b"); head.textContent=tr("players_title")+" · "+(remotes.size+1); el.appendChild(head);
   const row=(color,text,off)=>{ const d=document.createElement("div"); d.className="prow"+(off?" off":""); const i=document.createElement("i"); i.style.background=color; const sp=document.createElement("span"); sp.textContent=text; d.append(i,sp); el.appendChild(d); };
