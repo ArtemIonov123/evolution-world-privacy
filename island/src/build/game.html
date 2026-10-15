@@ -481,7 +481,7 @@ const I18N={
     q_hi:"Cześć!", q_come:"Chodź tu!", q_wolves:"Wilki!", q_thanks:"Dzięki!",
     nick_title:"Jak masz na imię?", nick_text:"Ten nick zobaczą inni gracze nad twoim bohaterem.", nick_ph:"Twój nick",
     nick_ok:"Graj", nick_err:"Wpisz co najmniej 2 znaki", nick_change:"Zmień nick", nick_hi:"Witaj, {n}!", invite:"Zaproś znajomego", invite_ok:"Link skopiowany", invite_sub:"Wyślij go znajomemu — trafi na tę samą wyspę", fs_on:"Pełny ekran", fs_off:"Wyjdź z pełnego ekranu", upd_text:"Nowa wersja gry!", upd_btn:"Odśwież",
-    ago_min:"{n} min temu", ago_h:"{n} h temu", ago_d:"{n} dni temu", sleeping:"śpi",
+    ago_min:"{n} min temu", ago_h:"{n} h temu", ago_d:"{n} dni temu", sleeping:"offline",
     unread:"Nowe wiadomości: {n}", unread_sub:"otwórz czat", chat_empty:"Brak wiadomości. Napisz coś!",
     catch_title:"TORBA", catch_empty:"Pusto. Łów ryby lub rąb drzewa",
     hook_btn:"ZATNIJ!", reel_btn:"Zwiń wędkę",
@@ -575,7 +575,7 @@ const I18N={
     q_hi:"Привет!", q_come:"Иди сюда!", q_wolves:"Волки!", q_thanks:"Спасибо!",
     nick_title:"Как тебя зовут?", nick_text:"Этот ник увидят другие игроки над твоим героем.", nick_ph:"Твой ник",
     nick_ok:"Играть", nick_err:"Введи хотя бы 2 символа", nick_change:"Сменить ник", nick_hi:"Привет, {n}!", invite:"Пригласить друга", invite_ok:"Ссылка скопирована", invite_sub:"Отправь её другу — он попадёт на этот же остров", fs_on:"Во весь экран", fs_off:"Выйти из полного экрана", upd_text:"Вышло обновление игры!", upd_btn:"Обновить",
-    ago_min:"{n} мин назад", ago_h:"{n} ч назад", ago_d:"{n} дн. назад", sleeping:"спит",
+    ago_min:"{n} мин назад", ago_h:"{n} ч назад", ago_d:"{n} дн. назад", sleeping:"не в сети",
     unread:"Новых сообщений: {n}", unread_sub:"открой чат", chat_empty:"Сообщений пока нет. Напиши что-нибудь!",
     catch_title:"СУМКА", catch_empty:"Пусто. Лови рыбу или руби деревья",
     hook_btn:"ПОДСЕЧЬ!", reel_btn:"Смотать удочку",
@@ -2418,7 +2418,7 @@ function updateAnimals(dt){
 // к какой клетке «привязан» зверь в порядке отрисовки
 function assignEnts(){
   for(const c of cells) c.ents=null;
-  for(const a of [...animals,...remotes.values(),...activeSleepers()]){
+  for(const a of [...animals,...remotes.values()]){   // офлайн-игроков на карте не показываем
     let anchor=null;
     for(const [ox,oy] of [[0,0],[.4,0],[-.4,0],[0,.4],[0,-.4]]){ const c=cellAt(Math.round(a.x+ox),Math.round(a.y+oy));
       if(c&&(!anchor||c.depth>anchor.depth)&&Math.abs(walkZ(c)-a.z)<1.2) anchor=c; }
@@ -2993,7 +2993,7 @@ function updateTags(){
   };
   place("me",hero.x,hero.y,hero.z,myNick?"["+heroLevel()+"] "+myNick:"",hueCss(myHueIdx),myChat,myChatAt,true);
   for(const r of remotes.values()) place(r.peer,r.x,r.y,r.z,(r.lv?"["+r.lv+"] ":"")+playerName(r),hueCss(r.c),r.chatSeen,r.chatAt,false);
-  const sl=activeSleepers(), slIds=new Set(sl.map(p=>p.by));
+  const sl=[], slIds=new Set();   // офлайн-игроки — только в списке «На острове»
   for(const p of sl) place("s-"+p.by,p.x,p.y,p.z-2.6,(p.nick||(names[p.by])||tr("someone"))+" · "+tr("sleeping"),hueCss(p.c),null,0,false);
   for(const p of sleepers.values()) if(!slIds.has(p.by)){ const el=document.getElementById("tag-s-"+p.by); if(el) el.style.display="none"; }
 }
