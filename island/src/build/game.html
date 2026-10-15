@@ -147,7 +147,7 @@ canvas.drag{cursor:grabbing}
 .wbody .muted{color:var(--muted);font-size:13px;margin:0}
 .wbody .center{text-align:center}
 .wbody .sub{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:12px;margin-top:4px;letter-spacing:.04em}
-.doll{display:grid;grid-template-columns:1fr 96px 1fr;grid-template-areas:"head hero neck" "body hero weapon" "feet hero .";gap:6px 10px;align-items:center;justify-items:center}
+.doll{display:grid;grid-template-columns:1fr 96px 1fr;grid-template-areas:"head hero neck" "body hero weapon" "feet hero rod";gap:6px 10px;align-items:center;justify-items:center}
 .eslot{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .eslot small{font-size:11px;color:var(--muted);text-align:center;line-height:1.2}
 .heroPrev{width:96px;height:144px;image-rendering:pixelated}
@@ -500,6 +500,13 @@ const I18N={
     ed_drop_pick:"Wybierz, co chcesz ustawić:", ed_back:"← Wróć", ed_drop_loot:"Łup", ed_drop_reward:"Nagroda", ed_src_wolf:"Wilk",
     ed_src_mob_sub:"{n} przedm. · {xp} XP", ed_src_trees_sub:"{a} / {b} polan", ed_src_fish_sub:"{n} rodzajów", ed_src_quest_sub:"{xp} XP za zadanie",
     ed_src_fisher:"Rybak", ed_src_fisher_sub:"ceny skupu",
+    fish_rod_wood:"Drewniana wędka", fish_rod_bamboo:"Bambusowa wędka", fish_rod_steel:"Mistrzowska wędka", fish_bat_wing:"Skrzydło nietoperza", slot_rod:"Wędka",
+    d_rod:"Wędka · starczy na {d} ryb · bierze szybciej o {s}% · rzadkie ryby {r}%", d_wing:"Sprzedaj kupcowi · {c} monet",
+    need_rod:"Nie masz wędki!", need_rod_sub:"kup u kupca albo zrób u rybaka z 2 polan", rod_broke:"Wędka się złamała!", rod_broke_sub:"{r} — koniec",
+    rod_next:"Bierzesz zapasową: {r}", rod_wear:"Wędka: zostało {n}", rod_broke_f:"TRZASK!", bat_killed:"Nietoperz pokonany!", bat_killed_sub:"łup w torbie",
+    s_bats:"Pokonane nietoperze", ed_t_zone_bat:"Nietoperze", ed_src_bat:"Nietoperz", ed_mob_hp:"Życie (HP)", ed_src_rods:"Wędki", ed_src_rods_sub:"wytrzymałość i siła",
+    ed_rod_dur:"Wytrzymałość (ile ryb)", ed_rod_sp:"Czas brania %", ed_rod_rare:"Rzadkie ryby %",
+    ed_rod_hint:"Czas brania: 100% = normalnie, mniej = szybciej. Rzadkie ryby: 100% = normalnie, więcej = częściej szczupak i złota rybka.",
     ed_tab_drop:"Drop", ed_drop_mob_wolf:"Wilk — łup", ed_drop_item:"Przedmiot", ed_drop_ch:"Szansa %", ed_drop_min:"Min", ed_drop_max:"Max", ed_drop_add:"+ dodaj przedmiot",
     ed_xp_kill:"XP za pokonanie", ed_drop_trees:"Drzewa", ed_logs_big:"Polana z dużego drzewa", ed_logs_small:"Polana z małego drzewa", ed_xp_tree:"XP za drzewo",
     ed_drop_fish:"Ryby", ed_fish_hint:"Waga = jak często bierze (więcej = częściej). Obok — wychodzący procent przy zwykłej wędce.", ed_fish_w:"Waga",
@@ -612,6 +619,13 @@ const I18N={
     ed_drop_pick:"Выбери, что настроить:", ed_back:"← Назад", ed_drop_loot:"Добыча", ed_drop_reward:"Награда", ed_src_wolf:"Волк",
     ed_src_mob_sub:"{n} предм. · {xp} XP", ed_src_trees_sub:"{a} / {b} полен.", ed_src_fish_sub:"{n} видов", ed_src_quest_sub:"{xp} XP за задание",
     ed_src_fisher:"Рыбак", ed_src_fisher_sub:"цены скупки",
+    fish_rod_wood:"Деревянная удочка", fish_rod_bamboo:"Бамбуковая удочка", fish_rod_steel:"Мастерская удочка", fish_bat_wing:"Крыло летучей мыши", slot_rod:"Удочка",
+    d_rod:"Удочка · хватит на {d} рыб · клюёт быстрее на {s}% · редкая рыба {r}%", d_wing:"Продай купцу · {c} монет",
+    need_rod:"Нет удочки!", need_rod_sub:"купи у купца или сделай у рыбака из 2 поленьев", rod_broke:"Удочка сломалась!", rod_broke_sub:"{r} — всё",
+    rod_next:"Берёшь запасную: {r}", rod_wear:"Удочка: осталось {n}", rod_broke_f:"ХРУСЬ!", bat_killed:"Летучая мышь повержена!", bat_killed_sub:"добыча в сумке",
+    s_bats:"Побеждено летучих мышей", ed_t_zone_bat:"Мыши", ed_src_bat:"Летучая мышь", ed_mob_hp:"Здоровье (HP)", ed_src_rods:"Удочки", ed_src_rods_sub:"прочность и сила",
+    ed_rod_dur:"Прочность (сколько рыб)", ed_rod_sp:"Время поклёвки %", ed_rod_rare:"Редкая рыба %",
+    ed_rod_hint:"Время поклёвки: 100% = обычно, меньше = быстрее. Редкая рыба: 100% = обычно, больше = чаще щука и золотая рыбка.",
     ed_tab_drop:"Дроп", ed_drop_mob_wolf:"Волк — добыча", ed_drop_item:"Предмет", ed_drop_ch:"Шанс %", ed_drop_min:"Мин", ed_drop_max:"Макс", ed_drop_add:"+ добавить предмет",
     ed_xp_kill:"XP за победу", ed_drop_trees:"Деревья", ed_logs_big:"Поленьев с большого дерева", ed_logs_small:"Поленьев с малого дерева", ed_xp_tree:"XP за дерево",
     ed_drop_fish:"Рыба", ed_fish_hint:"Вес = как часто клюёт (больше — чаще). Рядом — итоговый процент с обычной удочкой.", ed_fish_w:"Вес",
@@ -670,7 +684,7 @@ try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v;
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
 // тексты и цены, которые админ поменял в редакторе (world/config)
-const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{}};
+const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{},mobHp:{},rods:{}};
 function tr(k,p){
   const ck=CFG.texts[LANG]&&CFG.texts[LANG][k];
   if(TOUCH&&I18N.pl[k+"_t"]) k=k+"_t";   // на телефоне — подсказки для пальцев вместо клавиш
@@ -812,7 +826,7 @@ function goTo(c){
   if(!c) return;
   stopFishing(); stopChopping(); closeDialog(); hero.pendingTalk=false; hero.pendingAction=null; building=null; hero.target=null;
   if(fainting) return;
-  if(typeof c==="object"&&c.kind==="wolf"){ if(placing) return; attackWolf(c); return; }
+  if(typeof c==="object"&&isMob(c)){ if(placing) return; attackWolf(c); return; }
   if(placing){ if(c&&typeof c==="object") placeFireAt(c); return; }
   if(typeof c==="object"&&c.fire){ goAdjacent(c,()=>openFireMenu(c.fire),"go_fire"); return; }
   if(c==="merchant"||c.merchHere||c.stall){ goTrade(); return; }
@@ -1095,6 +1109,14 @@ const ICON_FALLBACK={
       if(y>=23&&y<=26&&x>=bx&&x<=bx+9) return y===26?"#3a2414":"#6a3e1c"; return null; }; return boot(5)||boot(17); },
   amulet_fang:(x,y)=>{ const r=Math.hypot(x-16,(y-10)*1.3); if(Math.abs(r-9)<0.8&&y<17) return "#7a4a24";
     if(y>=17&&y<=28){ const w=(28-y)*0.3+0.6; if(Math.abs(x-16)<=w) return x<16?"#fffdf4":"#d8d0c0"; } return null; },
+  rod_wood:(x,y)=>{ const al=((x-4)-(28-y))/Math.SQRT2, dd=Math.abs((x-4)+(y-28))/Math.SQRT2; if(al>=0&&al<=32&&dd<=1) return al<6?"#5a3418":"#b08050";
+    if(x===27&&y>=5&&y<=14) return "#e8e8f0"; if(y>=15&&y<=17&&x>=26&&x<=28) return y===15?"#e8402c":"#fff"; return null; },
+  rod_bamboo:(x,y)=>{ const al=((x-4)-(28-y))/Math.SQRT2, dd=Math.abs((x-4)+(y-28))/Math.SQRT2; if(al>=0&&al<=32&&dd<=1.2) return Math.round(al)%6===0?"#6a8a20":"#c8c060";
+    if((x-9)**2+(y-23)**2<=5) return "#8a5a2e"; if(x===27&&y>=5&&y<=14) return "#e8e8f0"; return null; },
+  rod_steel:(x,y)=>{ const al=((x-4)-(28-y))/Math.SQRT2, dd=Math.abs((x-4)+(y-28))/Math.SQRT2; if(al>=0&&al<=32&&dd<=1.2) return Math.round(al)%7===0?"#d0d8e0":"#2a3a6a";
+    if((x-9)**2+(y-23)**2<=6) return "#a8b0bc"; if(x===27&&y>=5&&y<=14) return "#e8e8f0"; return null; },
+  bat_wing:(x,y)=>{ if(y<6||y>26) return null; const top=6+Math.abs(x-16)*0.4, bot=26-((x%6)<3?4:0)-Math.abs(x-16)*0.5; if(x<4||x>28||y<top||y>bot) return null;
+    return (x%6===0)?"#2a1f38":(y<top+2?"#5c4870":"#4a3a5c"); },
   potion_big:(x,y)=>{ if(y>=2&&y<=5&&x>=13&&x<=19) return "#e8b030"; if(y>=6&&y<=10&&x>=13&&x<=19) return "#d8e8f0";
     const e=((x-16)/11)**2+((y-20)/9.5)**2; if(e>1) return null; if(y<14) return "#d8e8f0"; return (x===9&&y<22)?"#ffb0b0":"#e8302c"; },
   bait:(x,y)=>{ if(y>=8&&y<=10&&x>=8&&x<=24) return "#5a3418"; if((y===7&&(x===11||x===12||x===19))||(y===6&&(x===12||x===13||x===18||x===19))) return "#ff9aa8";
@@ -1162,8 +1184,8 @@ function makeIcon(f){
     g.fillStyle="rgba(255,255,255,.55)"; g.fillRect(16,16-(f.slim?3:4),3,1); }
   return cv2;
 }
-const WOOD={id:"wood"}, ITEMS=[{id:"coin"},{id:"club"},{id:"sword_wood"},{id:"cap_leather"},{id:"armor_leather"},{id:"boots_leather"},{id:"amulet_fang"},{id:"sword_iron"},{id:"helm_iron"},{id:"potion"},{id:"potion_big"},{id:"bait"},...FISH,{id:"cooked"},{id:"meat_raw"},{id:"meat_cooked"},WOOD,{id:"pelt"},{id:"fang"}];
-for(const k of ["club","pelt","fang","meat_raw","meat_cooked","potion","sword_wood","cap_leather","armor_leather","boots_leather","amulet_fang","sword_iron","helm_iron","potion_big","bait"]) ICON_SPRITE[k]="item_"+k;
+const WOOD={id:"wood"}, ITEMS=[{id:"coin"},{id:"club"},{id:"sword_wood"},{id:"cap_leather"},{id:"armor_leather"},{id:"boots_leather"},{id:"amulet_fang"},{id:"sword_iron"},{id:"helm_iron"},{id:"rod_wood"},{id:"rod_bamboo"},{id:"rod_steel"},{id:"potion"},{id:"potion_big"},{id:"bait"},...FISH,{id:"cooked"},{id:"meat_raw"},{id:"meat_cooked"},WOOD,{id:"pelt"},{id:"fang"},{id:"bat_wing"}];
+for(const k of ["club","pelt","fang","meat_raw","meat_cooked","potion","sword_wood","cap_leather","armor_leather","boots_leather","amulet_fang","sword_iron","helm_iron","potion_big","bait","rod_wood","rod_bamboo","rod_steel","bat_wing"]) ICON_SPRITE[k]="item_"+k;
 ICON_SPRITE.cooked="fish_cooked"; ICON_SPRITE.campfire="item_campfire";
 ICON_SPRITE.coin="item_coin";
 ICON_SPRITE.wood="item_wood";
@@ -1172,12 +1194,13 @@ const inv={};
 // ================= RPG: уровень, навыки, снаряжение, ремесло и окна =================
 const GEAR={club:{slot:"weapon",atk:1}, sword_wood:{slot:"weapon",atk:2}, cap_leather:{slot:"head",def:1},
   armor_leather:{slot:"body",def:2}, boots_leather:{slot:"feet",def:1}, amulet_fang:{slot:"neck",hp:1},
-  sword_iron:{slot:"weapon",atk:3}, helm_iron:{slot:"head",def:2}};
-const SLOTS=["head","neck","body","weapon","feet"];
-const RECIPES=[{id:"sword_wood",need:{wood:4},coin:10},{id:"cap_leather",need:{pelt:1},coin:5},{id:"boots_leather",need:{pelt:2},coin:5},
+  sword_iron:{slot:"weapon",atk:3}, helm_iron:{slot:"head",def:2},
+  rod_wood:{slot:"rod",rod:1}, rod_bamboo:{slot:"rod",rod:2}, rod_steel:{slot:"rod",rod:3}};
+const SLOTS=["head","neck","body","weapon","feet","rod"];
+const RECIPES=[{id:"rod_wood",need:{wood:2},coin:0},{id:"sword_wood",need:{wood:4},coin:10},{id:"cap_leather",need:{pelt:1},coin:5},{id:"boots_leather",need:{pelt:2},coin:5},
   {id:"armor_leather",need:{pelt:3},coin:10},{id:"amulet_fang",need:{fang:3},coin:10}];
-const equip={weapon:null,head:null,body:null,feet:null,neck:null};
-const prog={xp:0, sk:{fight:0,fish:0,chop:0}, st:{wolves:0,fish:0,trees:0,fires:0,faints:0,time:0}};
+const equip={weapon:null,head:null,body:null,feet:null,neck:null,rod:null};
+const prog={xp:0, ri:0, sk:{fight:0,fish:0,chop:0}, st:{wolves:0,bats:0,fish:0,trees:0,fires:0,faints:0,time:0}};
 function lvlInfo(xp){ let l=1,need=20; while(xp>=need&&l<60){ xp-=need; l++; need=20*l; } return {l,into:xp,need}; }
 const heroLevel=()=>lvlInfo(prog.xp).l;
 const skillLvl=k=>1+Math.floor(Math.sqrt((prog.sk[k]||0)/8));
@@ -1205,9 +1228,10 @@ function equipItem(id){
   const g=GEAR[id]; if(!g||!inv[id]) return;
   const old=equip[g.slot]; inv[id]--; if(!inv[id]) delete inv[id];
   if(old) inv[old]=(inv[old]||0)+1;
+  if(g.slot==="rod"){ if(old) rodWear[old]=rodDur; rodDur=rodWear[id]??rodMax(id); delete rodWear[id]; }
   equip[g.slot]=id; recalcHP(); renderInv(); lastSaveJSON="";
 }
-function unequip(slot){ const id=equip[slot]; if(!id) return; equip[slot]=null; inv[id]=(inv[id]||0)+1; recalcHP(); renderInv(); lastSaveJSON=""; }
+function unequip(slot){ const id=equip[slot]; if(!id) return; equip[slot]=null; if(slot==="rod"){ rodWear[id]=rodDur; rodDur=0; } inv[id]=(inv[id]||0)+1; recalcHP(); renderInv(); lastSaveJSON=""; }
 // ---- ремесло у рыбака ----
 const canCraft=r=>(inv.coin||0)>=r.coin&&Object.entries(r.need).every(([k,n])=>(inv[k]||0)>=n);
 const costText=r=>Object.entries(r.need).map(([k,n])=>`${n}× ${tr("fish_"+k).toLowerCase()}`).concat(r.coin?[`${r.coin} ${tr("coins")}`]:[]).join(", ");
@@ -1224,6 +1248,8 @@ function itemDesc(id){
   const g=GEAR[id];
   if(g) return g.atk?tr("d_weapon",{n:g.atk}):g.def?tr("d_armor",{slot:"#slot_"+g.slot,n:g.def}):tr("d_amulet");
   if(id==="boot") return tr("d_boot");
+  if(GEAR[id]&&GEAR[id].rod) return tr("d_rod",{d:rodMax(id),s:Math.max(0,100-rodCfg(id,"sp")),r:rodCfg(id,"rare")});
+  if(id==="bat_wing") return tr("d_wing",{c:sellPrice(id)});
   if(id==="bait") return tr("d_bait");
   if(PRICE[id]) return tr("d_fish",{c:PRICE[id]});
   if(id==="pelt"||id==="fang") return tr("d_mat",{c:sellPrice(id)});
@@ -1281,7 +1307,7 @@ function renderEquip(body){
     const b=mkEl("button","slot"+(id?"":" empty")); b.type="button";
     if(id){ const im=mkEl("img"); im.src=iconURL(id); im.alt=tr("fish_"+id); b.appendChild(im); b.title=tr("act_unequip")+": "+tr("fish_"+id); b.onclick=()=>{ unequip(s); renderWin(); }; }
     else { b.disabled=true; b.title=tr("slot_"+s); }
-    w.appendChild(b); w.appendChild(mkEl("small",null,id?tr("fish_"+id):tr("slot_"+s))); return w; };
+    w.appendChild(b); w.appendChild(mkEl("small",null,id?tr("fish_"+id)+(s==="rod"?" · "+rodDur+"/"+rodMax(id):""):tr("slot_"+s))); return w; };
   for(const s of SLOTS) doll.appendChild(slot(s));
   const cvs=mkEl("canvas","heroPrev"); cvs.width=96; cvs.height=144; cvs.style.gridArea="hero"; doll.appendChild(cvs);
   const g=cvs.getContext("2d"); g.imageSmoothingEnabled=false; const sp=heroSprite("hero_se_0",myHueIdx);
@@ -1312,7 +1338,7 @@ function renderHero(body){
   body.appendChild(mkEl("b","sub",tr("stats")));
   const tb=mkEl("div","statlist");
   const t=Math.round(prog.st.time/60);
-  for(const [k,v] of [["s_wolves",prog.st.wolves],["s_fish",prog.st.fish],["s_trees",prog.st.trees],["s_fires",prog.st.fires],["s_faints",prog.st.faints],["s_time",t<60?t+" min":Math.floor(t/60)+" h "+(t%60)+" min"]]){
+  for(const [k,v] of [["s_wolves",prog.st.wolves],["s_bats",prog.st.bats||0],["s_fish",prog.st.fish],["s_trees",prog.st.trees],["s_fires",prog.st.fires],["s_faints",prog.st.faints],["s_time",t<60?t+" min":Math.floor(t/60)+" h "+(t%60)+" min"]]){
     const r=mkEl("div"); r.appendChild(mkEl("span",null,tr(k))); r.appendChild(mkEl("b",null,String(v))); tb.appendChild(r); }
   body.appendChild(tb);
 }
@@ -1350,8 +1376,8 @@ const merch=MERCHC?{x:MERCHC.x,y:MERCHC.y,z:walkZ(MERCHC),facing:"sw",t:0,turnT:
 if(MERCHC){ MERCHC.merchHere=true; MERCHC.props=[]; MERCHC.blocked=true; }
 { const s=STALL_POS&&cellAt(STALL_POS[0],STALL_POS[1]); if(s&&!s.water&&!s.merchHere){ s.props=[STALL_POS[2]]; s.stall=true; s.blocked=true; } }
 { const p=PIER_POS&&cellAt(PIER_POS[0],PIER_POS[1]); if(p&&p.water) p.pier=PIER_POS[2]; }
-const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
-const SELL_P={club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
+const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"rod_wood",p:6},{id:"rod_bamboo",p:25},{id:"rod_steel",p:70},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
+const SELL_P={rod_wood:2,rod_bamboo:10,rod_steel:30,bat_wing:3,club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
   pelt:4,fang:3,meat_raw:2,meat_cooked:5};
 const sellPrice=id=>CFG.sell[id]!=null?CFG.sell[id]:(SELL_P[id]??PRICE[id]??0);
 let shopTab="buy", shopMsg=null;
@@ -1470,9 +1496,9 @@ function renderInv(){
     if(EDIBLE[f.id]) return `<div class="slot edible" data-id="${f.id}" role="button" tabindex="0" title="${n}: ${tr(f.id==="potion"?"drink_hint":"eat_hint")}">`+`<img alt="${n}" src="${ICONS[f.id].toDataURL()}"><span>${inv[f.id]}</span></div>`;
     return `<div class="slot" title="${n}"><img alt="${n}" src="${ICONS[f.id].toDataURL()}"><span>${inv[f.id]}</span></div>`}).join("")+'</div>';
 }
-const waitTime=()=>(rodLevel>=2?1.2+Math.random()*2.3:2+Math.random()*4)*fishSpeed()*((inv.bait||0)>0?0.6:1);
+const waitTime=()=>(2+Math.random()*4)*rodSpeed()*fishSpeed()*((inv.bait||0)>0?0.6:1);
 function pickFish(){
-  const wf=f=>fishW(f)*(rodLevel>=2?({shchuka:2.2,gold:2.5,boot:0.4}[f.id]||1):1)*((inv.bait||0)>0?({shchuka:1.6,gold:2,boot:0.5}[f.id]||1):1);
+  const wf=f=>fishW(f)*({shchuka:rodRare(),gold:rodRare()*1.1,boot:1/rodRare()}[f.id]||1)*((inv.bait||0)>0?({shchuka:1.6,gold:2,boot:0.5}[f.id]||1):1);
   let r=Math.random()*FISH.reduce((a,f)=>a+wf(f),0);
   for(const f of FISH){ if((r-=wf(f))<=0) return f; } return FISH[0];
 }
@@ -1482,6 +1508,7 @@ const ripples=[], floats=[];
 function stopFishing(){ fishing=null; hero.pendingFish=null; }
 // клик по воде: идём к ближайшему берегу рядом с этой клеткой
 function goFish(w){
+  if(!equip.rod){ say("need_rod","need_rod_sub"); marker={x:w.x,y:w.y,t:0,ok:false}; return; }
   const shore=[];
   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
     const n=cellAt(w.x+dx,w.y+dy); if(n&&!n.blocked) shore.push(n);
@@ -1543,7 +1570,7 @@ function updateFishing(dt){
     if(f.fish.id!=="boot") prog.st.fish++; addXP(xpFish(f.fish.id),"fish");
     floats.push({key:"plus",p:{n:1,fish:"#fish_"+f.fish.id},col:f.fish.id==="gold"?"#ffd66b":f.fish.id==="boot"?"#d8c0a8":"#ffffff",t:0});
     say("caught","caught_sub",{fish:"#fish_"+f.fish.id});
-    f.state="pause"; f.t=0;
+    f.state="pause"; f.t=0; wearRod();
   } else if(f.state==="pause"&&f.t>=0.9){
     startFishing(f.water);
   }
@@ -2077,7 +2104,7 @@ function renderDialog(){
     if(quest2==="none") opts.push(["opt_wolfq",null,()=>{dlgNode="wolfq";renderDialog();}]);
     if(quest2==="active"&&(inv.pelt||0)>=2) opts.push(["opt_give_pelts",null,givePelts]);
     const lv=lootValue(); if(lv>0) opts.push(["opt_sell_loot",{c:lv},sellLoot]);
-    if(quest2!=="none") opts.push(["opt_craft",null,()=>{dlgNode="craft";renderDialog();}]);
+    opts.push(["opt_craft",null,()=>{dlgNode="craft";renderDialog();}]);
     opts.push(["opt_who",null,()=>{dlgNode="who";renderDialog();}]);
     opts.push(["opt_bye",null,closeDialog]);
   } else if(dlgNode==="craft"){
@@ -2118,7 +2145,7 @@ function givePelts(){ inv.pelt-=2; if(!inv.pelt) delete inv.pelt; quest2="done";
   floats.push({key:"plus",p:{n:2,fish:"#fish_potion"},col:"#ff9a9a",t:-0.3}); renderInv(); dlgNode="reward2"; renderDialog(); }
 function giveWood(){
   inv.wood-=5; if(!inv.wood) delete inv.wood;
-  quest="done"; rodLevel=2; addCoins(10); addXP(xpOf("quest"));
+  quest="done"; rodLevel=2; giveItem("rod_bamboo"); addCoins(10); addXP(xpOf("quest"));
   floats.push({key:"rod_new",col:"#9fe0ff",t:-0.4});
   renderInv(); dlgNode="reward"; renderDialog();
 }
@@ -2457,6 +2484,10 @@ function updateAnimals(dt){
       if(wolves.length<want){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>6), c=z!==undefined?z:randomCell(c=>freeCell(c)&&edgeCell(c)&&farFromAll(c,8)&&nearestFire(c.x,c.y)[1]>6);
         if(c){ spawnAnimal("wolf",c); const w=animals[animals.length-1]; w.howlT=1.6; if(!wolves.length) say("wolf_near","night_sub"); } }
     } else for(const a of wolves){ if(a.calm||a.aggro) continue; a.leaving=true; setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; }
+    const bats=animals.filter(a=>a.kind==="bat"&&!a.leaving&&!(a.dying>0));
+    if(night){ const wantB=(hourNow()>=23||hourNow()<4)?3:2;
+      if(bats.length<wantB&&Math.random()<0.35){ const c=batSpawnCell(farFromAll); if(c){ spawnAnimal("bat",c); const b=animals[animals.length-1]; b.fly=2.2; b.home={x:c.x,y:c.y}; b.phase=Math.random(); b.attackT=1.5; } } }
+    else for(const b of bats){ b.leaving=true; b.path=[]; }
   }
   let anyChase=false;
   for(let i=animals.length-1;i>=0;i--){
@@ -2496,6 +2527,7 @@ function updateAnimals(dt){
           if(freeCell(c)) setPath(a,c); a.speed=1.6; if(Math.random()<0.12) a.howlT=1.5; }
       } else if(a.state!=="wander"||(a.think<=0&&!a.path.length)){ a.state="wander"; a.think=3+Math.random()*3; setPath(a,fleeCell(a,a.x,a.y,2,4)); a.speed=1.3; }
     }
+    if(a.kind==="bat"){ if(a.aggro&&(!tp||dh>8)) a.aggro=false; updateBat(a,dt,tp,dh); continue; }
     moveAnimal(a,dt);
   }
   if(!anyChase) wolfWarned=false;
@@ -2529,6 +2561,7 @@ function drawWolfP(g,frame,moving,night){
   R(10,-15,1,1,night?"#fff070":"#2a2a30");
 }
 function drawAnimal(a){
+  if(a.kind==="bat") return drawBat(a);
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
   let [fx,fy]=proj(a.x-MX,a.y-MY,a.z);
@@ -2549,7 +2582,7 @@ function drawAnimal(a){
   if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+2); }
   else { if(a.facing[1]==="w") ctx.scale(-1,1); a.kind==="hare"?drawHareP(ctx,frame,a.moving):drawWolfP(ctx,frame,a.moving,darkness()>0.4); }
   ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
-  if(a.kind==="wolf") drawWolfHP(a,fx,fy);
+  if(a.kind==="wolf") drawMobHP(a,fx,fy);
   if(a.howlT>0&&a.kind==="wolf"){
     ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
     const y=Math.round(fy-26-(1.6-a.howlT)*6); ctx.globalAlpha=Math.min(1,a.howlT);
@@ -2561,9 +2594,10 @@ function drawAnimal(a){
 const WOLF_HP=4, ATK_TIME=0.36, ATK_HIT=0.14, ATK_CD=0.75, ATK_RANGE=1.15;
 const LOOT_PRICE={pelt:4, fang:3, meat_raw:2, meat_cooked:5};
 // ---- дроп, опыт и цены рыбака (настраиваются во вкладке «Дроп») ----
-const DROP_DEF={wolf:[{id:"pelt",ch:100,a:1,b:1},{id:"meat_raw",ch:100,a:1,b:1},{id:"fang",ch:50,a:1,b:1}]};
-const MOBS=["wolf"];                       // сюда добавятся новые мобы и боссы
-const XP_DEF={wolf:10,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
+const DROP_DEF={wolf:[{id:"pelt",ch:100,a:1,b:1},{id:"meat_raw",ch:100,a:1,b:1},{id:"fang",ch:50,a:1,b:1}],
+  bat:[{id:"bat_wing",ch:100,a:1,b:1},{id:"coin",ch:40,a:1,b:2}]};
+const MOBS=["wolf","bat"];                       // сюда добавятся новые мобы и боссы
+const XP_DEF={wolf:10,bat:6,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
 const FISHER_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
 const dropTable=m=>CFG.drops[m]||DROP_DEF[m]||[];
 const xpOf=k=>CFG.xp[k]!=null?CFG.xp[k]:XP_DEF[k];
@@ -2586,7 +2620,7 @@ const hasWeapon=()=>!!equip.weapon;
 // клик по волку: по картинке, а не по клетке
 function pickWolf(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale; let best=null, bd=1e9;
-  for(const a of animals){ if(a.kind!=="wolf"||a.dying>0||a.alpha<0.3||!a.drawn) continue;
+  for(const a of animals){ if(!isMob(a)||a.dying>0||a.alpha<0.3||!a.drawn) continue;
     const dx=wx-a.drawn.x, dy=wy-(a.drawn.y-12);
     if(Math.abs(dx)<=20&&dy>=-22&&dy<=14){ const d=Math.hypot(dx,dy); if(d<bd){bd=d;best=a;} } }
   return best;
@@ -2624,19 +2658,21 @@ function landHit(a){
 // урон зверю — считает только хозяин зверей (или одиночная игра)
 function applyHit(a,peer,fromX,fromY,dmg=1,crit=false){
   if(a.dying>0) return;
-  a.hp=(a.hp??WOLF_HP)-dmg; a.hurtT=0.3; a.lunge=0;
+  a.hp=(a.hp??mobHp(a.kind))-dmg; a.hurtT=0.3; a.lunge=0;
   hitFx.push({x:a.x,y:a.y,z:a.z,t:0,txt:"-"+dmg+(crit?"!":""),col:crit?"#ff8a2a":"#ffd66b"});
   const dx=a.x-fromX, dy=a.y-fromY, dd=Math.hypot(dx,dy)||1, nx=a.x+dx/dd*0.4, ny=a.y+dy/dd*0.4, c=cellAt(Math.round(nx),Math.round(ny));
   if(c&&!c.blocked&&Math.abs(walkZ(c)-a.z)<1.2){ a.x=nx; a.y=ny; }
   a.path=[]; a.state="chase"; a.aggro=true; a.aggroT=0; a.attackT=Math.max(a.attackT,0.25); a.think=0.2;
   if(a.hp<=0){ a.dying=2.4; a.path=[]; a.howlT=0;
     if(!NET.room||peer===NET.myPeer) giveLoot(a);
-    else { kills.push({i:a.nid,p:peer,s:++killSeq}); if(kills.length>6) kills.shift(); } }
+    else { kills.push({i:a.nid,p:peer,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); } }
 }
 function giveLoot(a){
   const got=rollDrops(a&&a.kind?a.kind:"wolf");
   for(const [id,n] of got){ inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:id==="coin"?"#ffd66b":"#f0e0c0",t:-0.25*floats.length}); }
-  renderInv(); say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; addXP(xpOf("wolf"),"fight");
+  const kind=a&&a.kind||"wolf"; renderInv();
+  if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; } else { say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; }
+  addXP(xpOf(kind),"fight");
   if(quest2==="active"&&(inv.pelt||0)>=2) setTimeout(()=>say("pelts_ready","pelts_ready_sub"),1600);
 }
 // хозяин: удары от других игроков и награды за убийства
@@ -2644,11 +2680,11 @@ function processRemoteHits(){
   for(const r of remotes.values()){ if(!Array.isArray(r.ht)) continue;
     for(const h of r.ht){ if(!h||typeof h!=="object") continue; const s=num(h.s,0,1e9,0);
       if(s<=(lastHitFrom[r.peer]||0)) continue; lastHitFrom[r.peer]=s;
-      const a=animals.find(x=>x.nid===String(h.i)); if(a&&a.kind==="wolf"&&Math.hypot(a.x-r.tx,a.y-r.ty)<ATK_RANGE+1) applyHit(a,r.peer,r.tx,r.ty,num(h.d|0,1,4,1)); } }
+      const a=animals.find(x=>x.nid===String(h.i)); if(isMob(a)&&Math.hypot(a.x-r.tx,a.y-r.ty)<ATK_RANGE+1) applyHit(a,r.peer,r.tx,r.ty,num(h.d|0,1,4,1)); } }
 }
 function checkMyKills(h){
   for(const k of h.kl||[]){ if(!k||k.p!==NET.myPeer) continue; const s=num(k.s,0,1e9,0);
-    if(s>(lastKill[NET.hostPeer]||0)){ lastKill[NET.hostPeer]=s; giveLoot({}); } }
+    if(s>(lastKill[NET.hostPeer]||0)){ lastKill[NET.hostPeer]=s; giveLoot({kind:k.k==="bat"?"bat":"wolf"}); } }
 }
 function updateHitFx(dt){ for(let i=hitFx.length-1;i>=0;i--){ hitFx[i].t+=dt; if(hitFx[i].t>0.9) hitFx.splice(i,1); } }
 function drawHitFx(){
@@ -2659,11 +2695,11 @@ function drawHitFx(){
     ctx.fillStyle=f.col; ctx.fillText(f.txt,Math.round(x),yy); ctx.globalAlpha=1; }
 }
 // полоска здоровья над раненым волком
-function drawWolfHP(a,fx,fy){
-  const hp=a.hp??WOLF_HP; if(hp>=WOLF_HP||a.dying>0) return;
+function drawMobHP(a,fx,fy){
+  const mx=mobHp(a.kind), hp=a.hp??mx; if(hp>=mx||a.dying>0) return;
   const w=22, x=Math.round(fx-w/2), y=Math.round(fy-38);
   ctx.fillStyle="#1b1528"; ctx.fillRect(x-1,y-1,w+2,5); ctx.fillStyle="#3d3257"; ctx.fillRect(x,y,w,3);
-  ctx.fillStyle=hp>1?"#e8402c":"#ff8a2a"; ctx.fillRect(x,y,Math.round(w*hp/WOLF_HP),3);
+  ctx.fillStyle=hp>1?"#e8402c":"#ff8a2a"; ctx.fillRect(x,y,Math.round(w*hp/mx),3);
 }
 // дубинка кодом (пока нет спрайтов атаки): взмах от плеча
 function drawClubSwing(fx,fy,dir,t){
@@ -2706,7 +2742,7 @@ const ED_GROUPS=[
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"]]],
   ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["erase",null]]],
   ["ed_g_places",[["start",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]]],
-  ["ed_g_zones",[["zone_hare","hare_se_0"],["zone_wolf","wolf_se_0"],["zone_erase",null]]],
+  ["ed_g_zones",[["zone_hare","hare_se_0"],["zone_wolf","wolf_se_0"],["zone_bat","bat_se_0"],["zone_erase",null]]],
 ];
 const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
@@ -2741,7 +2777,7 @@ function edApplyCell(x,y,stroke){
   const k=x+","+y; if(stroke.seen.has(k)) return; stroke.seen.add(k);
   if(x<0||y<0||x>=W||y>=D) return;
   if(edTool.startsWith("zone_")){ const c=cellAt(x,y); if(!c||c.water) return;
-    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
+    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; delete edDraft.zones.bat[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
   const c=cellAt(x,y); if(isSpecial(c)) return;
   const before=snapCell(c), s=edNewState(edTool,before);
   if(s===undefined||JSON.stringify(before)===JSON.stringify(s)) return;
@@ -2801,7 +2837,7 @@ function edUndoLast(){
 const NPC_KEYS=["npc_name","npc_hello","npc_hello_active","npc_hello_done","npc_who","npc_quest","npc_accepted","npc_reward","npc_wolfq","npc_wolf_acc","npc_reward2","npc_craft"];
 const MERCH_KEYS=["merch_name","shop_hello","shop_bought","shop_sold","shop_no_money","shop_nothing"];
 const TEXT_KEYS=[...NPC_KEYS,...MERCH_KEYS];
-const SELL_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood","potion","potion_big","club","sword_wood","sword_iron","cap_leather","helm_iron","armor_leather","boots_leather","amulet_fang"];
+const SELL_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood","potion","potion_big","club","sword_wood","sword_iron","cap_leather","helm_iron","armor_leather","boots_leather","amulet_fang","rod_wood","rod_bamboo","rod_steel","bat_wing"];
 let edTab="map", edCfg=null, cfgDirty=false, edTxtLang=null, edTxtWho="npc";
 function applyConfig(d){
   const t=d&&d.texts&&typeof d.texts==="object"?d.texts:{};
@@ -2811,6 +2847,7 @@ function applyConfig(d){
     for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) CFG[f][k]=Math.min(9999,Math.round(v)); }
   CFG.off={}; const off=d&&d.off&&typeof d.off==="object"?d.off:{}; for(const [k,v] of Object.entries(off)) if(v===true) CFG.off[k]=true;
   const ids=new Set(ITEMS.map(i=>i.id)), nmap=(src,hi)=>{ const o={}; if(src&&typeof src==="object") for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) o[k]=Math.min(hi,Math.round(v)); return o; };
+  CFG.mobHp=nmap(d&&d.mobHp,999); CFG.rods={}; if(d&&d.rods&&typeof d.rods==='object') for(const id of RODS){ const o=nmap(d.rods[id],1000); if(o.dur===0) delete o.dur; if(Object.keys(o).length) CFG.rods[id]=o; }
   CFG.xp=nmap(d&&d.xp,5000); CFG.xpFish=nmap(d&&d.xpFish,5000); CFG.fishW=nmap(d&&d.fishW,1000); CFG.logs=nmap(d&&d.logs,20); CFG.fisher=nmap(d&&d.fisher,9999);
   CFG.drops={}; const dr=d&&d.drops&&typeof d.drops==="object"?d.drops:{};
   for(const [m,list] of Object.entries(dr)) if(Array.isArray(list)) CFG.drops[m]=list.filter(r=>r&&ids.has(r.id)).slice(0,12).map(r=>{
@@ -2825,7 +2862,7 @@ function zonePick(kind,filter){
   return null;
 }
 function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off},
-  drops:JSON.parse(JSON.stringify(CFG.drops)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
+  drops:JSON.parse(JSON.stringify(CFG.drops)),mobHp:{...CFG.mobHp},rods:JSON.parse(JSON.stringify(CFG.rods)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
 async function saveConfig(){
   if(!NET.db||!edCfg) return; const d=JSON.parse(JSON.stringify(edCfg));
   await NET.db.doc("world/config").set(d).catch(()=>{});
@@ -2851,10 +2888,11 @@ let edDropSel=null;
 // карточки «источников» дропа; новые мобы и боссы добавляются в MOBS и появятся здесь сами
 function dropCards(){
   const n=k=>dropTable(k).length;
-  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"],label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})})),
+  return [...MOBS.map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL(m==="bat"?"bat_wing":"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})})),
     {key:"trees",img:SPRITES.tree_small,label:tr("ed_drop_trees"),sub:tr("ed_src_trees_sub",{a:edCfg.logs.tree_big??LOGS.tree_big,b:edCfg.logs.tree_small??LOGS.tree_small})},
     {key:"fish",img:iconURL("karas"),label:tr("ed_drop_fish"),sub:tr("ed_src_fish_sub",{n:FISH.length})},
     {key:"quests",img:SPRITES.ui_quests||iconURL("coin"),label:tr("ed_drop_quests"),sub:tr("ed_src_quest_sub",{xp:edCfg.xp.quest??XP_DEF.quest})},
+    {key:"rods",img:iconURL("rod_bamboo"),label:tr("ed_src_rods"),sub:tr("ed_src_rods_sub")},
     {key:"fisher",img:SPRITES.npc_se_0,label:tr("ed_src_fisher"),sub:tr("ed_src_fisher_sub")}];
 }
 function renderDropTab(p){
@@ -2889,6 +2927,7 @@ function renderDropTab(p){
     const add=mkEl("button","btn mini",tr("ed_drop_add")); add.type="button"; add.onclick=()=>{ list.push({id:"coin",ch:100,a:1,b:3}); cfgDirty=true; edRender(); }; p.appendChild(add);
     p.appendChild(mkEl("b","sub",tr("ed_drop_reward")));
     row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
+    row(tr("ed_mob_hp"),numInput(edCfg.mobHp,mob,MOB_HP[mob]??3));
   } else if(edDropSel==="trees"){
     row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
     row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
@@ -2898,6 +2937,11 @@ function renderDropTab(p){
     const hf=mkEl("div","eddrh eddrf"); for(const k of ["ed_drop_item","ed_fish_w","","XP"]) hf.appendChild(mkEl("small",null,k&&k!=="XP"?tr(k):k)); p.appendChild(hf);
     for(const f of FISH){ const w=edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w;
       row(itemLabel(f.id),numInput(edCfg.fishW,f.id,f.w,true),mkEl("small","edpct",Math.round(w/tot*100)+"%"),numInput(edCfg.xpFish,f.id,XP_FISH_DEF[f.id]??2)); }
+  } else if(edDropSel==="rods"){
+    p.appendChild(mkEl("p","muted",tr("ed_rod_hint")));
+    for(const id of RODS){ const o=edCfg.rods[id]||(edCfg.rods[id]={});
+      p.appendChild(mkEl("b","sub",tr("fish_"+id)));
+      row(tr("ed_rod_dur"),numInput(o,"dur",ROD_DEF[id].dur)); row(tr("ed_rod_sp"),numInput(o,"sp",ROD_DEF[id].sp)); row(tr("ed_rod_rare"),numInput(o,"rare",ROD_DEF[id].rare)); }
   } else if(edDropSel==="quests"){
     row(tr("ed_xp_quest"),numInput(edCfg.xp,"quest",XP_DEF.quest));
   } else if(edDropSel==="fisher"){
@@ -2941,7 +2985,7 @@ function edSerialize(){
   for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(!inb(x,y)) continue; if(c.st) stairs[x+","+y]=c.st;
     for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([x,y,n]); }
   const mv=p=>p&&inb(p[0]+ox,p[1]+oy)?[p[0]+ox,p[1]+oy,...p.slice(2)]:null;
-  const zones={}; for(const z of ["hare","wolf"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
+  const zones={}; for(const z of ["hare","wolf","bat"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
   return {zones,levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
     merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier)};
 }
@@ -3053,7 +3097,7 @@ function edEnter(){
   if(!isAdmin) return; EDIT=true; closeWin(); if(dialogOpen) closeDialog(); stopFishing(); stopChopping(); hero.path=[]; hero.target=null; marker=null;
   edAdd={t:0,b:0,l:0,r:0}; edUndo.length=0;
   const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
-  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,zones:{hare:zk("hare"),wolf:zk("wolf")}};
+  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,zones:{hare:zk("hare"),wolf:zk("wolf"),bat:zk("bat")}};
   edTab="map"; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG; edDropSel=null;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
@@ -3127,7 +3171,7 @@ function edMini(){
     const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
     g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
     if(c.props.some(n=>n.startsWith("tree"))){ g.fillStyle="#1f4a1a"; g.fillRect(offX+(x+0.25)*k,offY+(y+0.25)*k,Math.max(1,k*0.5),Math.max(1,k*0.5)); } }
-  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"]]) for(const kk of Object.keys(edDraft.zones[z])){
+  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"],["bat","rgba(170,110,255,.8)"]]) for(const kk of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=kk.split(",").map(Number); g.fillStyle=col; g.fillRect(offX+(x+ox)*k+k*0.2,offY+(y+oy)*k+k*0.2,Math.max(1,k*0.6),Math.max(1,k*0.6)); }
   const dot=(p,col)=>{ if(!p) return; g.fillStyle=col; g.fillRect(offX+(p[0]+ox)*k-1,offY+(p[1]+oy)*k-1,Math.max(3,k+2),Math.max(3,k+2)); };
   if(edDraft){ dot(edDraft.hut,"#d84a2a"); dot(edDraft.npc,"#ffd66b"); dot(edDraft.merchant,"#ff9a3a"); dot(edDraft.start,"#ffffff"); }
@@ -3142,7 +3186,7 @@ function edMiniJump(px,py){
 // метки мест (старт, хижина, NPC…) в режиме редактора
 function edDrawMarks(){
   if(!EDIT||!edDraft) return; worldTransform();
-  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"]]) for(const k of Object.keys(edDraft.zones[z])){
+  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"],["bat","rgba(170,110,255,.42)"]]) for(const k of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=k.split(",").map(Number), c=cellAt(x,y); if(!c) continue; const q=cellQuad(c);
     ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
   ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
@@ -3151,6 +3195,77 @@ function edDrawMarks(){
     ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
     ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
 }
+// ================= Летучие мыши и удочки =================
+const MOB_HP={wolf:4,bat:2};
+const mobHp=k=>CFG.mobHp&&CFG.mobHp[k]!=null?CFG.mobHp[k]:(MOB_HP[k]??3);
+const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat");
+// ---- летучая мышь: ночью кружит у деревьев, пикирует на игрока и кусает ----
+function batSpawnCell(farFromAll){
+  const z=zonePick("bat",c=>!c.water&&farFromAll(c,6)); if(z!==undefined) return z;
+  return randomCell(c=>!c.water&&farFromAll(c,6)&&TREES.some(t=>Math.hypot(t.c.x-c.x,t.c.y-c.y)<2.5));
+}
+function updateBat(a,dt,tp,dh){
+  a.flap=(a.flap||0)+dt;
+  const home=a.home||(a.home={x:a.x,y:a.y});
+  let tx,ty,sp;
+  if(a.leaving){ a.fly=(a.fly||1.6)+dt*1.5; return; }
+  if(a.retreatT>0){ a.retreatT-=dt; tx=a.rx; ty=a.ry; sp=2.8; }
+  else if(tp&&(a.aggro||dh<4.5)){ tx=tp.x+Math.sin(a.flap*3)*0.3; ty=tp.y+Math.cos(a.flap*2.6)*0.3; sp=2.6;
+    if(dh<0.8&&!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=2.2; a.lunge=0.25; a.lungeTo=[tp.x,tp.y]; biteTarget(tp,a);
+      const ang=Math.random()*Math.PI*2; a.rx=tp.x+Math.cos(ang)*2.5; a.ry=tp.y+Math.sin(ang)*2.5; a.retreatT=0.9; } } }
+  else { if(!a.wp||a.think<=0||Math.hypot(a.wp[0]-a.x,a.wp[1]-a.y)<0.3){ a.think=2+Math.random()*2; const an=Math.random()*Math.PI*2, r=Math.random()*3; a.wp=[home.x+Math.cos(an)*r,home.y+Math.sin(an)*r]; }
+    [tx,ty]=a.wp; sp=1.3; }
+  const dx=tx-a.x, dy=ty-a.y, d=Math.hypot(dx,dy);
+  if(d>0.05){ const st=Math.min(d,sp*dt); a.x+=dx/d*st+Math.sin(a.flap*7)*0.004; a.y+=dy/d*st; const u=dx*ca-dy*sa, v=dx*sa+dy*ca; a.facing=((u+v)>=0?"s":"n")+((u-v)>=0?"e":"w"); }
+  a.x=Math.max(0,Math.min(W-1,a.x)); a.y=Math.max(0,Math.min(D-1,a.y));
+  const c=cellAt(Math.round(a.x),Math.round(a.y)); if(c) a.z+=(walkZ(c)-a.z)*Math.min(1,dt*4);
+  const target=(tp&&dh<1.6&&!(a.retreatT>0))?0.8:1.5+Math.sin(a.flap*1.7)*0.25; a.fly=(a.fly??target)+(target-(a.fly??target))*Math.min(1,dt*3);
+  a.moving=true;
+}
+function drawBatP(g,frame){
+  const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)}, O="#1b1528", up=[-5,-2,2,-1][frame%4];
+  R(-3,-5,7,7,O); R(-2,-4,5,5,"#4a3a5c"); R(-2,-7,2,3,O); R(2,-7,2,3,O); R(-1,-3,1,1,"#ff4040"); R(1,-3,1,1,"#ff4040");
+  for(const s of [-1,1]){ R(s<0?-11:4,-3+up,8,3,O); R(s<0?-10:5,-2+up,6,1,"#5c4870"); }
+}
+function drawBat(a){
+  if(a.alpha<=0.01) return;
+  worldTransform(); ctx.imageSmoothingEnabled=false;
+  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z);
+  if(a.lunge>0&&a.lungeTo){ const [hx,hy]=proj(a.lungeTo[0]-MX,a.lungeTo[1]-MY,a.z), dx=hx-fx, dy=hy-fy, dd=Math.hypot(dx,dy)||1, k=Math.sin(a.lunge/0.25*Math.PI)*6; fx+=dx/dd*k; fy+=dy/dd*k; }
+  if(a.dying>0) a.fly=Math.max(0,(a.fly||0)-0.08);
+  const h=Math.round((a.fly??1.5)*LH*1.6);
+  ctx.globalAlpha=a.alpha*0.8; ctx.fillStyle="rgba(20,10,40,.25)"; ctx.beginPath(); ctx.ellipse(fx,fy,6,2.5,0,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=a.alpha;
+  const frame=Math.floor((T+(a.phase||0))*12)%4, mirror=a.facing[1]==="w";
+  let sp=a.dying>0?img.bat_dead:a.hurtT>0?img.bat_hurt:img["bat_se_"+frame]; if(!sp&&!(a.dying>0)) sp=null;
+  const cx=Math.round(fx), cy=Math.round(fy-h);
+  ctx.save(); ctx.translate(cx,cy); if(mirror) ctx.scale(-1,1);
+  if(a.hurtT>0&&!img.bat_hurt) ctx.filter="brightness(2.4)";
+  if(sp) ctx.drawImage(sp,-Math.round(sp.width/2),-Math.round(sp.height/2));
+  else { if(a.dying>0) ctx.scale(1,-0.7); drawBatP(ctx,frame); }
+  ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
+  a.drawn={x:cx,y:cy+12,sp:null,name:null,mirror};
+  drawMobHP(a,fx,fy-h+14);
+}
+// ---- удочки: три вида, изнашиваются от каждой пойманной рыбы ----
+const ROD_DEF={rod_wood:{dur:25,sp:100,rare:100},rod_bamboo:{dur:50,sp:75,rare:160},rod_steel:{dur:100,sp:55,rare:250}};
+const RODS=Object.keys(ROD_DEF);
+const rodCfg=(id,k)=>CFG.rods&&CFG.rods[id]&&CFG.rods[id][k]!=null?CFG.rods[id][k]:ROD_DEF[id][k];
+let rodDur=0; const rodWear={};
+const rodMax=id=>Math.max(1,rodCfg(id,"dur"));
+const rodSpeed=()=>equip.rod?rodCfg(equip.rod,"sp")/100:1;
+const rodRare=()=>equip.rod?rodCfg(equip.rod,"rare")/100:1;
+function wearRod(){
+  if(!equip.rod) return; rodDur--;
+  if(rodDur<=0){ const id=equip.rod; equip.rod=null; rodDur=0; floats.push({key:"rod_broke_f",col:"#ff8a6a",t:-0.3}); say("rod_broke","rod_broke_sub",{r:"#fish_"+id});
+    stopFishing(); const next=RODS.slice().reverse().find(k=>inv[k]); if(next){ equipItem(next); setTimeout(()=>say("rod_next","",{r:"#fish_"+next}),1400); } renderInv(); }
+  else if(rodDur<=5) floats.push({key:"rod_wear",p:{n:rodDur},col:"#ffb070",t:-0.3});
+  lastSaveJSON="";
+}
+function ensureStarterRod(){
+  if(prog.ri) return; prog.ri=1;
+  if(!equip.rod&&!RODS.some(k=>inv[k])) giveItem(rodLevel>=2?"rod_bamboo":"rod_wood");
+}
+
 
 // ================= Мультиплеер =================
 // room — кто сейчас в игре (позиции, чат, звери от «хозяина»); db — общий мир (деревья, костры, время)
@@ -3237,8 +3352,8 @@ function sendPresence(now){
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:hero.facing,m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
     id:NET.myId,n:myNick,act:myAct(),chat:myChat,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
-    p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:a.kind==="wolf"?"w":"h",x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
-      f:a.facing,m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??WOLF_HP,hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
+    p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:a.kind==="wolf"?"w":a.kind==="bat"?"b":"h",fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
+      f:a.facing,m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
     p.bt=bites.slice(-6); p.kl=kills.length?kills.slice(-6):null;
   }
   const j=JSON.stringify(p); if(j===lastPresJSON) return; lastPresJSON=j;
@@ -3296,13 +3411,13 @@ function mirrorAnimals(h,dt){
     if(!e||typeof e!=="object") continue;
     const id=String(e.i).slice(0,20); ids.add(id);
     let a=animals.find(x=>x.nid===id);
-    const kind=e.k==="w"?"wolf":"hare";
+    const kind=e.k==="w"?"wolf":e.k==="b"?"bat":"hare";
     if(!a){ a={kind,nid:id,x:num(e.x,-1,W,0),y:num(e.y,-1,D,0),z:num(e.z,0,12,1),path:[],speed:1.5,facing:"se",phase:0,think:1,alpha:0,leaving:false,state:"",attackT:1,lunge:0,howlT:0,fleeing:0}; animals.push(a); }
     a.tx=num(e.x,-1,W,a.x); a.ty=num(e.y,-1,D,a.y); a.tz=num(e.z,0,12,a.z); a.facing=FACINGS.includes(e.f)?e.f:a.facing; a.moving=e.m===1;
     a.alpha+=(num(e.a,0,1,1)-a.alpha)*Math.min(1,dt*6); a.leaving=e.lv===1;
     if(e.l===1&&a.lunge<=0){ a.lunge=0.25; }
     if(e.h===1) a.howlT=Math.max(a.howlT,0.5);
-    a.hp=num(e.hp,0,WOLF_HP,WOLF_HP); if(e.hu===1) a.hurtT=Math.max(a.hurtT||0,0.12);
+    a.hp=num(e.hp,0,999,mobHp(a.kind)); if(a.kind==="bat") a.fly=num(e.fy,0,6,1.5); if(e.hu===1) a.hurtT=Math.max(a.hurtT||0,0.12);
     if(e.dy===1){ if(!(a.dying>0)) a.dying=2.4; } else a.dying=0;
   }
   for(let i=animals.length-1;i>=0;i--){ const a=animals[i]; if(!ids.has(a.nid)) animals.splice(i,1); }
@@ -3318,7 +3433,7 @@ function mirrorAnimals(h,dt){
   for(const b of h.bt||[]){
     if(!b||b.p!==NET.myPeer) continue; const s=num(b.s,0,1e9,0);
     if(s>(lastBite[NET.hostPeer]||0)){ lastBite[NET.hostPeer]=s;
-      const w=animals.filter(a=>a.kind==="wolf").sort((p,q)=>Math.hypot(p.x-hero.x,p.y-hero.y)-Math.hypot(q.x-hero.x,q.y-hero.y))[0];
+      const w=animals.filter(isMob).sort((p,q)=>Math.hypot(p.x-hero.x,p.y-hero.y)-Math.hypot(q.x-hero.x,q.y-hero.y))[0];
       hurtHero(1,w||null); }
   }
   hero.hurtT=Math.max(0,hero.hurtT-dt);
@@ -3476,7 +3591,9 @@ async function loadSave(){
     if(d.eq&&typeof d.eq==="object") for(const sl of SLOTS){ const id=d.eq[sl]; equip[sl]=typeof id==="string"&&GEAR[id]&&GEAR[id].slot===sl?id:null; }
     if(d.pg&&typeof d.pg==="object"){ prog.xp=num(d.pg.xp,0,1e7,0)|0;
       for(const k of Object.keys(prog.sk)) prog.sk[k]=num(d.pg.sk&&d.pg.sk[k],0,1e7,0)|0;
-      for(const k of Object.keys(prog.st)) prog.st[k]=num(d.pg.st&&d.pg.st[k],0,1e9,0); }
+      for(const k of Object.keys(prog.st)) prog.st[k]=num(d.pg.st&&d.pg.st[k],0,1e9,0); prog.ri=d.pg.ri?1:0; }
+    if(d.rd&&typeof d.rd==="object"){ rodDur=num(d.rd.d,0,9999,0)|0; if(d.rd.w&&typeof d.rd.w==="object") for(const k of RODS) if(typeof d.rd.w[k]==="number") rodWear[k]=Math.max(1,d.rd.w[k]|0); }
+    if(equip.rod&&rodDur<=0) rodDur=rodMax(equip.rod);
     if(!equip.weapon&&inv.club){ equip.weapon="club"; inv.club--; if(!inv.club) delete inv.club; }
     recalcHP(); hero.hp=num(d.hp,1,HP_MAX,HP_MAX)|0;
     if(!myNick&&typeof d.nick==="string"&&cleanNick(d.nick).length>=2){ setNick(d.nick); const w=document.getElementById("nickWrap"); if(w) w.hidden=true; }
@@ -3488,7 +3605,7 @@ async function loadSave(){
 function tickSave(dt){
   if(!NET.db||!NET.myId||saving) return;
   saveT-=dt; if(saveT>0) return; saveT=4;
-  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rod:rodLevel,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
+  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
   const j=JSON.stringify(s); if(j===lastSaveJSON) return;
   saving=true; lastSaveJSON=j;
   NET.db.doc(`data/users/${NET.myId}/save`).set(s).catch(()=>{lastSaveJSON="";}).finally(()=>{saving=false;});
@@ -3496,7 +3613,7 @@ function tickSave(dt){
 
 // ---- запуск ----
 async function initNet(){
-  if(!window.claude||typeof window.claude.use!=="function") return;
+  if(!window.claude||typeof window.claude.use!=="function"){ ensureStarterRod(); return; }
   const safe=p=>Promise.resolve(p).catch(()=>null);
   const [room,db,user]=await Promise.all([safe(claude.use("room")),safe(claude.use("db")),safe(claude.use("user"))]);
   NET.user=user;
@@ -3525,6 +3642,7 @@ async function initNet(){
     renderPlayers();
   }
   if(db) initAdmin();
+  ensureStarterRod();
 }
 
 
