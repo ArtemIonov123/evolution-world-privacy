@@ -3497,14 +3497,16 @@ function drawBeast(a){
   if(a.lunge>0){ const lt=a.lungeTo||[hero.x,hero.y], [hx,hy]=proj(lt[0]-MX,lt[1]-MY,a.z), dx=hx-fx, dy=hy-fy, dd=Math.hypot(dx,dy)||1, k=Math.sin(a.lunge/0.25*Math.PI)*(big?4:5); fx+=dx/dd*k; fy+=dy/dd*k; }
   ctx.globalAlpha=a.dying>0?Math.min(1,a.dying/1.2)*a.alpha:a.alpha;
   ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(fx,fy,big?20:10,big?7:4,0,0,Math.PI*2); ctx.fill();
-  const frame=a.moving?Math.floor(a.phase)%4:0;
+  const nf=img[a.kind+"_se_2"]?4:img[a.kind+"_se_1"]?2:4, frame=a.moving?Math.floor(a.phase*(nf===2?0.5:1))%nf:0;
   let sp=img[`${a.kind}_${a.facing}_${frame}`], mirror=false;
   if(!sp&&a.facing[1]==="w"){ sp=img[`${a.kind}_${a.facing[0]}e_${frame}`]; mirror=true; }
   if(a.dying>0&&img[a.kind+"_dead"]){ sp=img[a.kind+"_dead"]; mirror=a.facing[1]==="w"; }
+  if(big&&a.slamT>0) fx+=Math.round(Math.sin(T*60)*(1-a.slamT/GOLEM_SLAM_T)*2);   // дрожит перед ударом
   a.drawn={x:Math.round(fx),y:Math.round(fy),sp,name:null,mirror};
   ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)+(a.dying>0&&!img[a.kind+"_dead"]?Math.round((3-a.dying)*3):0));
   if(a.hurtT>0) ctx.filter="brightness(2.2)";
-  if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+2); }
+  else if(big&&a.slamT>0&&sp) ctx.filter=`sepia(1) saturate(${2+3*(1-a.slamT/GOLEM_SLAM_T)}) hue-rotate(-35deg)`;
+  if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+(big?4:3)); }
   else { if(a.facing[1]==="w") ctx.scale(-1,1);
     if(big) drawGolemP(ctx,frame,a.moving,a.slamT>0,a.slamT>0?"#ff6a4a":"#7ae0ff"); else drawSpiderP(ctx,frame,a.moving); }
   ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
