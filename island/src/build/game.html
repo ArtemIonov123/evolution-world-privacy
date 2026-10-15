@@ -489,7 +489,7 @@ const I18N={
     npc_crafted:"Gotowe! {item} — trzymaj. Załóż w oknie Ekwipunek.", coins:"monet",
     xp:"+{n} XP", lvl_float:"POZIOM {n}!", lvl_up:"Nowy poziom: {n}!", lvl_up_sub:"zdrowie odnowione", blocked_bite:"Unik!",
     ed_open:"Edytor mapy", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
-    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", ed_g_water:"Woda", ed_t_prop_lily_pad:"Lilie wodne", ed_t_prop_reeds:"Trzcina", ed_t_prop_rock_water:"Kamień w wodzie", ed_cat_land:"Ziemia", ed_cat_water:"Woda", ed_cat_decor:"Dekor", ed_cat_places:"Miejsca", ed_t_up:"Wyżej", ed_t_down:"Niżej", ed_t_stairs:"Schody",
+    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", ed_fence_sub:"stuknij płot, aby go obrócić; przeciągnij palcem — ułoży się wzdłuż linii", ed_g_water:"Woda", ed_t_prop_lily_pad:"Lilie wodne", ed_t_prop_reeds:"Trzcina", ed_t_prop_rock_water:"Kamień w wodzie", ed_cat_land:"Ziemia", ed_cat_water:"Woda", ed_cat_decor:"Dekor", ed_cat_places:"Miejsca", ed_t_up:"Wyżej", ed_t_down:"Niżej", ed_t_stairs:"Schody",
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
@@ -609,7 +609,7 @@ const I18N={
     npc_crafted:"Готово! {item} — держи. Надень в окне Снаряжение.", coins:"монет",
     xp:"+{n} XP", lvl_float:"УРОВЕНЬ {n}!", lvl_up:"Новый уровень: {n}!", lvl_up_sub:"здоровье восстановлено", blocked_bite:"Увернулся!",
     ed_open:"Редактор карты", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
-    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", ed_g_water:"Вода", ed_t_prop_lily_pad:"Кувшинки", ed_t_prop_reeds:"Камыш", ed_t_prop_rock_water:"Камень в воде", ed_cat_land:"Земля", ed_cat_water:"Вода", ed_cat_decor:"Декор", ed_cat_places:"Места", ed_t_up:"Выше", ed_t_down:"Ниже", ed_t_stairs:"Лестница",
+    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", ed_fence_sub:"тапни по забору — повернётся; веди пальцем — ляжет вдоль линии", ed_g_water:"Вода", ed_t_prop_lily_pad:"Кувшинки", ed_t_prop_reeds:"Камыш", ed_t_prop_rock_water:"Камень в воде", ed_cat_land:"Земля", ed_cat_water:"Вода", ed_cat_decor:"Декор", ed_cat_places:"Места", ed_t_up:"Выше", ed_t_down:"Ниже", ed_t_stairs:"Лестница",
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
@@ -2832,6 +2832,13 @@ function edApplyCell(x,y,stroke){
 }
 function edApplyAt(mx,my,stroke){
   const g=gridUnder(mx,my); if(!g) return;
+  // забор, проведённый пальцем, сам ложится вдоль линии
+  if(edTool==="fence"&&edBrush===1){ const pv=stroke.fprev;
+    if(pv&&(pv[0]!==g.x||pv[1]!==g.y)){ const d=pv[0]!==g.x?"right":"left";
+      if(d!==edDir){ edDir=d; edRender(); }
+      const c=cellAt(pv[0],pv[1]); if(c&&stroke.changes.some(ch=>ch[0]===pv[0]&&ch[1]===pv[1])){ const f=c.props.find(n=>n.startsWith("fence_"));
+        if(f&&f!=="fence_"+d) setCellState(pv[0],pv[1],{...snapCell(c),props:["fence_"+d]}); } }
+    stroke.fprev=[g.x,g.y]; }
   if(edBrush==="fill"&&edTool.length===1&&"gGdsewv".includes(edTool)) return edFill(g.x,g.y,stroke);
   const r=edTool==="stairs"?0:edBrush===5?2:edBrush===3?1:0;
   for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++) edApplyCell(g.x+dx,g.y+dy,stroke);
@@ -2854,6 +2861,10 @@ function edTap(mx,my){
   const draftBefore=JSON.stringify(edDraft);
   if(PLACE_TOOLS.includes(edTool)){ if(!edPlace(edTool,g.x,g.y)){ say("ed_bad_place"); return; }
     edCommit({changes:[]},draftBefore); dirty=true; say("ed_placed","ed_placed_sub"); return; }
+  // тап забором по забору — повернуть его на 90°
+  if(edTool==="fence"){ const c=cellAt(g.x,g.y), f=c&&c.props.find(n=>n.startsWith("fence_"));
+    if(f&&!isSpecial(c)){ const before=snapCell(c), st={...before,props:before.props.map(n=>n===f?(f==="fence_left"?"fence_right":"fence_left"):n)};
+      setCellState(g.x,g.y,st); edCommit({changes:[[g.x,g.y,before]]},draftBefore); dirty=true; return; } }
   const stroke={changes:[],seen:new Set()}; edApplyAt(mx,my,stroke); edCommit(stroke,draftBefore);
 }
 // рисование проведением пальца
@@ -3203,7 +3214,7 @@ function edRender(){
         b.appendChild(cv2); }
       else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫"}[id]||"?"));
       b.appendChild(mkEl("small",null,edLabel(id)));
-      b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
+      b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,id==="fence"?"ed_fence_sub":PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
     grp.appendChild(row); if(gk==="ed_g_zones") grp.appendChild(mkEl("p","muted",tr("ed_zone_note"))); tools.appendChild(grp); }
   p.appendChild(tools);
   // размер: добавить/убрать ряды с любой стороны
