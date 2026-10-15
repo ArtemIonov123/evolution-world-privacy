@@ -54,9 +54,11 @@ canvas.drag{cursor:grabbing}
 .zoom{font-family:var(--f-display);font-size:11px;color:var(--panel);background:rgba(255,255,255,.55);padding:1px 5px}
 .ctrl .gap{height:6px}
 
-.info{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
-  padding:8px 12px;font-size:14px;line-height:1.45;max-width:min(460px,calc(100% - 32px))}
-.info span{color:var(--muted)}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:4;
+  padding:6px 12px;font-size:14px;line-height:1.4;max-width:min(460px,calc(100% - 24px));text-align:center;pointer-events:none;
+  opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.toast span{color:var(--muted)}
 .inv{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
   padding:8px 10px;max-width:calc(100% - 32px)}
 .inv .empty{font-size:13px;color:var(--muted);margin-top:2px}
@@ -115,7 +117,7 @@ canvas.drag{cursor:grabbing}
 .players .prow.off{opacity:.65}
 .quick .btn{font-family:var(--f-body);font-weight:700;font-size:13px;letter-spacing:0}
 /* кнопки окон и окна персонажа */
-.hotbar{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:52px;display:flex;gap:6px;z-index:3}
+.hotbar{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:3}
 .hb{position:relative;width:44px;height:44px;display:grid;place-items:center;padding:0;background:var(--panel);border:2px solid var(--edge);
   box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);cursor:pointer;color:var(--ink)}
 .hb img{width:32px;height:32px;image-rendering:pixelated}
@@ -276,8 +278,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
     background:var(--panel);border:2px solid var(--edge);padding:8px;gap:8px;min-width:200px}
   .menu:not(.open){display:none}
   .menu .btn{min-height:44px;font-size:13px;text-align:left}
-  .info{left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));
-    max-width:none;font-size:13px;padding:6px 10px}
+  .toast{bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:13px;padding:5px 10px}
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:52px;padding:6px 8px}
   .hp{left:max(10px,env(safe-area-inset-left,0px));top:10px}
   .clock{font-size:11px;padding:2px 5px}
@@ -286,13 +287,12 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .chatbar{top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)}
   .inv .slot{width:38px;height:38px}
   .inv .slot img{width:28px;height:28px}
-  .ctrl{right:max(10px,env(safe-area-inset-right,0px));top:auto;transform:none;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
-  .hotbar{left:max(10px,env(safe-area-inset-left,0px));top:46px}
+  .ctrl{right:max(10px,env(safe-area-inset-right,0px));top:auto;transform:none;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .hotbar{left:max(10px,env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}
   .edpanel{top:auto;left:10px;right:10px;width:auto;max-height:48%;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
-  body.editing .info{display:none}
   .edb{width:56px} .edb img{width:38px;height:28px}
   body.editing .ctrl{bottom:calc(48% + 24px)}
-  .win{top:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:74%;width:calc(100% - 20px)}
+  .win{top:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:min(74%,calc(100% - 130px));width:calc(100% - 20px)}
   .fishbar{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   .fishbar .hook{font-size:24px;min-width:220px;padding:18px 30px 22px}
   .dialog{width:auto;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));transform:none;
@@ -315,9 +315,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:44px;padding:5px 7px}
   .inv .slot{width:34px;height:34px} .inv .slot img{width:26px;height:26px}
   .players{right:max(10px,env(safe-area-inset-right,0px));top:8px;max-width:150px;font-size:11px;padding:4px 7px}
-  .info{left:max(10px,env(safe-area-inset-left,0px));right:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));
-    max-width:calc(100% - 300px);font-size:12px;line-height:1.35;padding:5px 9px}
-  .info b{font-size:10px}
+  .toast{bottom:calc(56px + env(safe-area-inset-bottom,0px));font-size:12px;padding:4px 9px}
   .ctrl{top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));right:max(10px,env(safe-area-inset-right,0px));transform:none;flex-direction:row;gap:6px}
   .ctrl .gap,.zoom{display:none}
   .round{width:42px;height:42px}
@@ -332,14 +330,13 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .dlg-opts{flex-direction:row;flex-wrap:wrap} .dlg-opts .btn{min-height:34px;font-size:13px}
   .nickdlg{padding:12px;gap:7px}
   .upd{top:6px}
-  .hotbar{top:38px;left:max(10px,env(safe-area-inset-left,0px))}
+  .hotbar{top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));left:max(10px,env(safe-area-inset-left,0px))}
   .hb{width:38px;height:38px} .hb img{width:28px;height:28px}
-  .win{top:50%;bottom:auto;transform:translate(-50%,-50%);max-height:calc(100% - 12px);width:min(520px,calc(100% - 20px))}
+  .win{top:6px;bottom:calc(54px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:none;width:min(520px,calc(100% - 20px))}
   .doll{grid-template-columns:1fr 72px 1fr} .heroPrev{width:72px;height:108px}
   .edpanel{top:6px;bottom:6px;left:max(10px,env(safe-area-inset-left,0px));right:auto;width:min(290px,45%);max-height:none}
-  body.editing .info{display:none} body.editing .ctrl{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  body.editing .ctrl{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 }
-@media (max-height:500px) and (max-width:640px){ .info{max-width:none;right:max(10px,env(safe-area-inset-right,0px));bottom:60px} }
 /* обновление */
 .upd{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:9;display:flex;align-items:center;gap:10px;padding:7px 8px 7px 12px;
   max-width:calc(100% - 20px);box-shadow:0 4px 0 rgba(0,0,0,.25);animation:updIn .35s ease-out}
@@ -370,10 +367,6 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 <div class="stage">
   <canvas id="cv"></canvas>
   <div class="ctrl">
-    <button class="round" id="zIn" data-i18n-label="zoom_in" aria-label="Przybliż"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M12 5v14M5 12h14"/></svg></button>
-    <span class="zoom" id="zVal">2x</span>
-    <button class="round" id="zOut" data-i18n-label="zoom_out" aria-label="Oddal"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M5 12h14"/></svg></button>
-    <span class="gap"></span>
     <button class="round" id="rotL" data-i18n-label="rot_l" aria-label="Obróć w lewo (Q)"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M8 7a7 7 0 1 1-3 7"/><path d="M3 4v5h5" stroke-linecap="butt"/></svg></button>
     <button class="round" id="chatBtn" hidden data-i18n-label="chat" aria-label="Czat"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 5h16v11H10l-5 4v-4H4z" stroke-linejoin="round"/></svg><span class="dot" id="chatDot" hidden></span></button>
     <button class="round" id="rotR" data-i18n-label="rot_r" aria-label="Obróć w prawo (E)"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M16 7a7 7 0 1 0 3 7"/><path d="M21 4v5h-5" stroke-linecap="butt"/></svg></button>
@@ -421,7 +414,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
       <button class="btn big" data-i18n="nick_ok">Graj</button>
     </form>
   </div>
-  <div class="info panel" id="info"><b>BOHATER</b><br>Kliknij pole, aby iść, a wodę, aby łowić</div>
+  <div class="toast panel" id="toast" role="status" aria-live="polite"></div>
 </div>
 
 <script>
@@ -696,9 +689,16 @@ function tr(k,p){
   return p?s.replace(/\{(\w+)\}/g,(_,n)=>{const v=p[n]; return typeof v==="string"&&v[0]==="#"?tr(v.slice(1)):(v??"")}):s;
 }
 let lastStatus=["hint","hint_sub",null];
-function say(main,sub,p){
+// короткая всплывашка над панелью кнопок; рутинные статусы (иду, пришёл…) не показываем
+const QUIET_SAY=new Set(["hint","going","arrived","waiting","go_talk","go_fish","go_chop","go_attack","go_trade","chopping","casting","building","growing","ed_hint","loaded"]);
+let toastT=0;
+function say(main,sub,p,force){
+  const same=lastStatus[0]===main&&lastStatus[1]===sub;
   lastStatus=[main,sub,p||null];
-  document.getElementById("info").innerHTML=`<b>${tr("hero")}</b><br>${tr(main,p)}${sub?` <span>· ${tr(sub,p)}</span>`:""}`;
+  if(force===false||QUIET_SAY.has(main)) return;
+  const el=document.getElementById("toast"); if(!el) return;
+  el.innerHTML=`${tr(main,p)}${sub?` <span>· ${tr(sub,p)}</span>`:""}`;
+  el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),same?2200:3200);
 }
 function applyLang(){
   document.documentElement.lang=LANG;
@@ -709,7 +709,7 @@ function applyLang(){
   if(typeof renderChatLog==="function"&&document.getElementById("chatLog")) renderChatLog();
   document.querySelectorAll("[data-i18n-label]").forEach(el=>{const t=tr(el.dataset.i18nLabel);el.setAttribute("aria-label",t);el.title=t;});
   document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===LANG));
-  say(...lastStatus);
+  say(lastStatus[0],lastStatus[1],lastStatus[2],false);
   if(typeof renderInv==="function"&&ICONS.karas) renderInv();
   if(typeof renderWin==="function"&&ICONS.karas) renderWin();
   if(typeof renderDialog==="function") renderDialog();
@@ -2084,13 +2084,13 @@ let dialogOpen=false, dlgNode="main", dlgParams={};
 const fishValue=()=>FISH.reduce((a,f)=>a+(inv[f.id]||0)*fisherPrice(f.id),0)+(inv.cooked||0)*fisherPrice("cooked");
 function openDialog(){
   dialogOpen=true; dlgKind="npc"; dlgNode="main"; faceTo(npc.x,npc.y); closeWin();
-  document.getElementById("dialog").hidden=false; document.getElementById("info").hidden=true; document.querySelector(".ctrl").hidden=true;
+  document.getElementById("dialog").hidden=false; document.getElementById("hotbar").hidden=true; document.querySelector(".ctrl").hidden=true;
   drawPortrait(); renderDialog();
   setTimeout(()=>{const b=document.querySelector("#dlgOpts button"); if(b&&matchMedia("(pointer: fine)").matches) b.focus();},0);
 }
 function closeDialog(){
   if(!dialogOpen) return;
-  dialogOpen=false; document.getElementById("dialog").hidden=true; document.getElementById("info").hidden=false; document.querySelector(".ctrl").hidden=false;
+  dialogOpen=false; document.getElementById("dialog").hidden=true; document.getElementById("hotbar").hidden=false; document.querySelector(".ctrl").hidden=false;
   say(dlgKind==="fire"?"fire_left":"arrived_npc"); dlgKind="npc";
 }
 function renderDialog(){
@@ -2405,7 +2405,7 @@ const COOKABLE=["karas","okun","shchuka"];
 const rawCount=()=>COOKABLE.reduce((a,id)=>a+(inv[id]||0),0)+(inv.meat_raw||0);
 function openFireMenu(f){
   dialogOpen=true; dlgKind="fire"; fireOpen=f; fireMsg=null;
-  document.getElementById("dialog").hidden=false; document.getElementById("info").hidden=true; document.querySelector(".ctrl").hidden=true;
+  document.getElementById("dialog").hidden=false; document.getElementById("hotbar").hidden=true; document.querySelector(".ctrl").hidden=true;
   const g=document.getElementById("portrait").getContext("2d");
   g.setTransform(1,0,0,1,0,0); g.fillStyle="#3d3257"; g.fillRect(0,0,64,64);
   const ic=img.item_campfire||ICONS.campfire; if(ic){ g.imageSmoothingEnabled=false; g.drawImage(ic,0,0,64,64); }
@@ -3990,7 +3990,7 @@ function setZoomK(k,cx,cy){
   k=Math.max(kMin(),Math.min(kMax(),k)); if(k===zoomK&&scale===k/dprNow()) return;
   const ns=k/dprNow();
   panX=cx-(cx-panX)*ns/scale; panY=cy-(cy-panY)*ns/scale; scale=ns; zoomK=k;
-  document.getElementById("zVal").textContent=(Math.round(scale*10)/10)+"x"; dirty=true;
+  dirty=true;
 }
 function zoom(d,cx,cy){
   // одна ступень ≈ +50% на компьютере, на телефоне — +1 физ. пиксель
@@ -4021,9 +4021,7 @@ cv.addEventListener("pointermove",e=>{
   if(pointers.has(e.pointerId)){ const p=pointers.get(e.pointerId); p.x=x; p.y=y; }
   if(pinch&&pointers.size>=2){
     const [a,b]=[...pointers.values()], d=Math.hypot(a.x-b.x,a.y-b.y)||1, mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
-    panX=pinch.px+(mx-pinch.mx); panY=pinch.py+(my-pinch.my);
-    const k=Math.round(pinch.k*d/pinch.d);
-    if(k!==zoomK){ setZoomK(k,mx,my); pinch.px=panX-(mx-pinch.mx); pinch.py=panY-(my-pinch.my); }
+    panX=pinch.px+(mx-pinch.mx); panY=pinch.py+(my-pinch.my);   // масштаб зафиксирован: двумя пальцами только двигаем
     dirty=true; return;
   }
   if(drag&&pointers.size===1){
@@ -4054,9 +4052,7 @@ cv.addEventListener("pointerup",endPointer);
 cv.addEventListener("pointercancel",endPointer);
 cv.addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse"){hover=null;dirty=true} });
 cv.addEventListener("contextmenu",e=>e.preventDefault());   // долгое нажатие на телефоне не открывает меню
-cv.addEventListener("wheel",e=>{e.preventDefault();const [x,y]=local(e);zoom(e.deltaY<0?1:-1,x,y)},{passive:false});
-document.getElementById("zIn").onclick=()=>zoom(1);
-document.getElementById("zOut").onclick=()=>zoom(-1);
+cv.addEventListener("wheel",e=>e.preventDefault(),{passive:false});   // зум колесом выключен
 document.getElementById("rotL").onclick=()=>rotate(-1);
 document.getElementById("rotR").onclick=()=>rotate(1);
 const menuEl=document.getElementById("menu"), menuBtn=document.getElementById("menuBtn");
@@ -4120,7 +4116,6 @@ loadAll.then(()=>{
   const r=cv.getBoundingClientRect(), [hx,hy]=proj(hero.x-MX,hero.y-MY,hero.z);
   // телефон: ~1.3x, компьютер: 2x — в ровных физических пикселях
   zoomK=Math.max(kMin(),Math.round((Math.min(r.width,r.height)<560?1.34:2)*dprNow())); scale=zoomK/dprNow();
-  document.getElementById("zVal").textContent=(Math.round(scale*10)/10)+"x";
   panX=r.width/2-hx*scale; panY=r.height/2-(hy-14)*scale;
   requestAnimationFrame(frame);
 });
