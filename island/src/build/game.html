@@ -179,7 +179,7 @@ canvas.drag{cursor:grabbing}
 .wbody .slot em{position:absolute;left:2px;top:0;font:700 10px/12px var(--f-body);font-style:normal;color:#ffd66b;text-shadow:1px 1px 0 var(--edge)}
 .acts .btn:disabled{opacity:.45;cursor:default}
 /* редактор карты */
-.edpanel{position:absolute;z-index:6;left:max(10px,env(safe-area-inset-left,0px));top:10px;bottom:10px;width:min(300px,calc(100% - 20px));
+.edpanel{position:absolute;z-index:6;left:max(10px,env(safe-area-inset-left,0px));top:10px;bottom:10px;width:min(340px,calc(100% - 20px));
   overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
 .edtop{display:flex;gap:6px}
 .edtop .btn,.edopt .btn{font-family:var(--f-body);font-weight:700;letter-spacing:0}
@@ -210,6 +210,17 @@ canvas.drag{cursor:grabbing}
 .edshop img{width:28px;height:28px;image-rendering:pixelated;flex:none}
 .edshop span{flex:1;min-width:0}
 .edchk{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
+.edil{display:flex;align-items:center;gap:5px;flex:1;min-width:0;font-size:13px}
+.edil img,.edicon{width:24px;height:24px;image-rendering:pixelated;flex:none}
+.edsel{flex:1;min-width:0;font:13px var(--f-body);padding:4px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
+.eddr .ednum{width:50px;padding:4px 3px;font-size:13px;text-align:center}
+.eddr{gap:4px}
+.eddrh{display:flex;gap:6px;font-size:10px;color:var(--muted);padding:0 2px}
+.eddrh small:first-child{flex:1}
+.eddrh small:not(:first-child){width:52px;text-align:center}
+.eddrh small:last-child{width:28px}
+.eddrf small:last-child{width:64px}
+.edpct{width:36px;text-align:right;color:var(--muted);font-size:11px}
 .ednum{width:64px;font:14px var(--f-body);padding:4px 6px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
 .edpanel .sub{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:11px;letter-spacing:.04em;margin-top:4px}
 .edmini{width:150px;height:150px;image-rendering:pixelated;border:2px solid var(--edge);cursor:pointer;flex:none}
@@ -475,6 +486,10 @@ const I18N={
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
+    ed_tab_drop:"Drop", ed_drop_mob_wolf:"Wilk — łup", ed_drop_item:"Przedmiot", ed_drop_ch:"Szansa %", ed_drop_min:"Min", ed_drop_max:"Max", ed_drop_add:"+ dodaj przedmiot",
+    ed_xp_kill:"XP za pokonanie", ed_drop_trees:"Drzewa", ed_logs_big:"Polana z dużego drzewa", ed_logs_small:"Polana z małego drzewa", ed_xp_tree:"XP za drzewo",
+    ed_drop_fish:"Ryby", ed_fish_hint:"Waga = jak często bierze (więcej = częściej). Obok — wychodzący procent przy zwykłej wędce.", ed_fish_w:"Waga",
+    ed_drop_quests:"Zadania", ed_xp_quest:"XP za zadanie", ed_fisher_buy:"Rybak skupuje (cena za sztukę)",
     ed_g_zones:"Strefy zwierząt", ed_t_zone_hare:"Zające", ed_t_zone_wolf:"Wilki", ed_t_zone_erase:"Usuń strefę",
     ed_zone_note:"Bez stref zwierzęta pojawiają się na całej wyspie.", ed_tab_map:"Mapa", ed_tab_texts:"Teksty", ed_tab_shop:"Sklep",
     ed_txt_npc:"Rybak", ed_txt_merch:"Kupiec", ed_txt_hint:"Słowa w nawiasach {n}, {c}, {item} zostaw — gra wstawia tam liczby i nazwy.", ed_txt_reset:"↺ domyślny",
@@ -580,6 +595,10 @@ const I18N={
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
+    ed_tab_drop:"Дроп", ed_drop_mob_wolf:"Волк — добыча", ed_drop_item:"Предмет", ed_drop_ch:"Шанс %", ed_drop_min:"Мин", ed_drop_max:"Макс", ed_drop_add:"+ добавить предмет",
+    ed_xp_kill:"XP за победу", ed_drop_trees:"Деревья", ed_logs_big:"Поленьев с большого дерева", ed_logs_small:"Поленьев с малого дерева", ed_xp_tree:"XP за дерево",
+    ed_drop_fish:"Рыба", ed_fish_hint:"Вес = как часто клюёт (больше — чаще). Рядом — итоговый процент с обычной удочкой.", ed_fish_w:"Вес",
+    ed_drop_quests:"Задания", ed_xp_quest:"XP за задание", ed_fisher_buy:"Рыбак скупает (цена за штуку)",
     ed_g_zones:"Зоны зверей", ed_t_zone_hare:"Зайцы", ed_t_zone_wolf:"Волки", ed_t_zone_erase:"Убрать зону",
     ed_zone_note:"Без зон звери появляются по всему острову.", ed_tab_map:"Карта", ed_tab_texts:"Тексты", ed_tab_shop:"Лавка",
     ed_txt_npc:"Рыбак", ed_txt_merch:"Купец", ed_txt_hint:"Слова в скобках {n}, {c}, {item} не трогай — туда игра подставляет числа и названия.", ed_txt_reset:"↺ по умолчанию",
@@ -634,7 +653,7 @@ try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v;
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
 // тексты и цены, которые админ поменял в редакторе (world/config)
-const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{}};
+const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{}};
 function tr(k,p){
   const ck=CFG.texts[LANG]&&CFG.texts[LANG][k];
   if(TOUCH&&I18N.pl[k+"_t"]) k=k+"_t";   // на телефоне — подсказки для пальцев вместо клавиш
@@ -1190,7 +1209,7 @@ function itemDesc(id){
   if(id==="boot") return tr("d_boot");
   if(id==="bait") return tr("d_bait");
   if(PRICE[id]) return tr("d_fish",{c:PRICE[id]});
-  if(id==="pelt"||id==="fang") return tr("d_mat",{c:LOOT_PRICE[id]});
+  if(id==="pelt"||id==="fang") return tr("d_mat",{c:sellPrice(id)});
   if(id==="meat_raw") return tr("d_meat");
   if(id==="wood") return tr("d_wood");
   if(id==="coin") return tr("d_coin");
@@ -1436,7 +1455,7 @@ function renderInv(){
 }
 const waitTime=()=>(rodLevel>=2?1.2+Math.random()*2.3:2+Math.random()*4)*fishSpeed()*((inv.bait||0)>0?0.6:1);
 function pickFish(){
-  const wf=f=>f.w*(rodLevel>=2?({shchuka:2.2,gold:2.5,boot:0.4}[f.id]||1):1)*((inv.bait||0)>0?({shchuka:1.6,gold:2,boot:0.5}[f.id]||1):1);
+  const wf=f=>fishW(f)*(rodLevel>=2?({shchuka:2.2,gold:2.5,boot:0.4}[f.id]||1):1)*((inv.bait||0)>0?({shchuka:1.6,gold:2,boot:0.5}[f.id]||1):1);
   let r=Math.random()*FISH.reduce((a,f)=>a+wf(f),0);
   for(const f of FISH){ if((r-=wf(f))<=0) return f; } return FISH[0];
 }
@@ -1504,7 +1523,7 @@ function updateFishing(dt){
     f.state="wait"; f.t=0; f.timer=waitTime(); say("lost_st");
   } else if(f.state==="reel"&&f.t>=0.75){
     inv[f.fish.id]=(inv[f.fish.id]||0)+1; if(inv.bait){ inv.bait--; if(!inv.bait) delete inv.bait; } renderInv();
-    if(f.fish.id!=="boot") prog.st.fish++; addXP(f.fish.id==="gold"?10:f.fish.id==="boot"?1:f.fish.id==="shchuka"?4:2,"fish");
+    if(f.fish.id!=="boot") prog.st.fish++; addXP(xpFish(f.fish.id),"fish");
     floats.push({key:"plus",p:{n:1,fish:"#fish_"+f.fish.id},col:f.fish.id==="gold"?"#ffd66b":f.fish.id==="boot"?"#d8c0a8":"#ffffff",t:0});
     say("caught","caught_sub",{fish:"#fish_"+f.fish.id});
     f.state="pause"; f.t=0;
@@ -1653,8 +1672,8 @@ function hitTree(t){
   if(ch.hits>=HITS[name]){
     t.falling={t:0,dx:t.x-hero.x,dy:t.y-hero.y,name}; netTreeGone(t);
     chopping=null;
-    const n=LOGS[name]+(Math.random()<extraLogChance()?1:0); inv.wood=(inv.wood||0)+n; renderInv();
-    prog.st.trees++; addXP(3,"chop");
+    const n=logsOf(name)+(Math.random()<extraLogChance()?1:0); if(n>0) inv.wood=(inv.wood||0)+n; renderInv();
+    prog.st.trees++; addXP(xpOf("tree"),"chop");
     floats.push({key:"plus",p:{n,fish:"#fish_wood"},col:"#f0c890",t:0});
     say("felled");
   }
@@ -2014,7 +2033,7 @@ function goTalk(){
 
 // ---- Диалог ----
 let dialogOpen=false, dlgNode="main", dlgParams={};
-const fishValue=()=>FISH.reduce((a,f)=>a+(inv[f.id]||0)*(PRICE[f.id]||0),0)+(inv.cooked||0)*PRICE.cooked;
+const fishValue=()=>FISH.reduce((a,f)=>a+(inv[f.id]||0)*fisherPrice(f.id),0)+(inv.cooked||0)*fisherPrice("cooked");
 function openDialog(){
   dialogOpen=true; dlgKind="npc"; dlgNode="main"; faceTo(npc.x,npc.y); closeWin();
   document.getElementById("dialog").hidden=false; document.getElementById("info").hidden=true; document.querySelector(".ctrl").hidden=true;
@@ -2037,7 +2056,7 @@ function renderDialog(){
     const fv=fishValue(); if(fv>0) opts.push(["opt_sell_fish",{c:fv},sellFish]);
     if(quest==="none") opts.push(["opt_quest",null,()=>{dlgNode="quest";renderDialog();}]);
     if(quest==="active"&&wood>=5) opts.push(["opt_give_wood",null,giveWood]);
-    if(quest==="done"&&wood>0) opts.push(["opt_sell_wood",{c:wood},sellWood]);
+    if(quest==="done"&&wood>0) opts.push(["opt_sell_wood",{c:wood*fisherPrice("wood")},sellWood]);
     if(quest2==="none") opts.push(["opt_wolfq",null,()=>{dlgNode="wolfq";renderDialog();}]);
     if(quest2==="active"&&(inv.pelt||0)>=2) opts.push(["opt_give_pelts",null,givePelts]);
     const lv=lootValue(); if(lv>0) opts.push(["opt_sell_loot",{c:lv},sellLoot]);
@@ -2072,17 +2091,17 @@ function sellFish(){
   addCoins(c); renderInv(); dlgParams={c}; dlgNode="sold"; renderDialog();
 }
 function sellWood(){
-  const c=inv.wood||0; delete inv.wood; addCoins(c); renderInv(); dlgParams={c}; dlgNode="wood_sold"; renderDialog();
+  const c=(inv.wood||0)*fisherPrice("wood"); delete inv.wood; addCoins(c); renderInv(); dlgParams={c}; dlgNode="wood_sold"; renderDialog();
 }
 // шкуры для задания не продаём, пока оно не выполнено
-const lootValue=()=>Object.entries(LOOT_PRICE).reduce((a,[k,p])=>a+(k==="pelt"&&quest2!=="done"?0:(inv[k]||0)*p),0);
+const lootValue=()=>Object.keys(LOOT_PRICE).reduce((a,k)=>a+(k==="pelt"&&quest2!=="done"?0:(inv[k]||0)*fisherPrice(k)),0);
 function sellLoot(){ const c=lootValue(); for(const k of Object.keys(LOOT_PRICE)) if(!(k==="pelt"&&quest2!=="done")) delete inv[k];
   addCoins(c); renderInv(); dlgParams={c}; dlgNode="loot_sold"; renderDialog(); }
-function givePelts(){ inv.pelt-=2; if(!inv.pelt) delete inv.pelt; quest2="done"; addCoins(15); addXP(20); inv.potion=(inv.potion||0)+2;
+function givePelts(){ inv.pelt-=2; if(!inv.pelt) delete inv.pelt; quest2="done"; addCoins(15); addXP(xpOf("quest")); inv.potion=(inv.potion||0)+2;
   floats.push({key:"plus",p:{n:2,fish:"#fish_potion"},col:"#ff9a9a",t:-0.3}); renderInv(); dlgNode="reward2"; renderDialog(); }
 function giveWood(){
   inv.wood-=5; if(!inv.wood) delete inv.wood;
-  quest="done"; rodLevel=2; addCoins(10); addXP(20);
+  quest="done"; rodLevel=2; addCoins(10); addXP(xpOf("quest"));
   floats.push({key:"rod_new",col:"#9fe0ff",t:-0.4});
   renderInv(); dlgNode="reward"; renderDialog();
 }
@@ -2524,6 +2543,23 @@ function drawAnimal(a){
 // ================= Бой: дубинка, волки с HP, добыча =================
 const WOLF_HP=4, ATK_TIME=0.36, ATK_HIT=0.14, ATK_CD=0.75, ATK_RANGE=1.15;
 const LOOT_PRICE={pelt:4, fang:3, meat_raw:2, meat_cooked:5};
+// ---- дроп, опыт и цены рыбака (настраиваются во вкладке «Дроп») ----
+const DROP_DEF={wolf:[{id:"pelt",ch:100,a:1,b:1},{id:"meat_raw",ch:100,a:1,b:1},{id:"fang",ch:50,a:1,b:1}]};
+const MOBS=["wolf"];                       // сюда добавятся новые мобы и боссы
+const XP_DEF={wolf:10,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
+const FISHER_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
+const dropTable=m=>CFG.drops[m]||DROP_DEF[m]||[];
+const xpOf=k=>CFG.xp[k]!=null?CFG.xp[k]:XP_DEF[k];
+const xpFish=id=>CFG.xpFish[id]!=null?CFG.xpFish[id]:(XP_FISH_DEF[id]??2);
+const fishW=f=>CFG.fishW[f.id]!=null?CFG.fishW[f.id]:f.w;
+const logsOf=name=>CFG.logs[name]!=null?CFG.logs[name]:LOGS[name];
+const fisherPrice=id=>CFG.fisher[id]!=null?CFG.fisher[id]:(PRICE[id]??LOOT_PRICE[id]??(id==="wood"?1:0));
+function rollDrops(mob){
+  const got=[];
+  for(const r of dropTable(mob)){ if(Math.random()*100>=r.ch) continue; const n=r.a+Math.floor(Math.random()*(r.b-r.a+1)); if(n>0) got.push([r.id,n]); }
+  return got;
+}
+
 const EDIBLE={cooked:2, meat_cooked:3, potion:3, potion_big:5};
 let quest2="none";                 // волчье задание рыбака: none → active → done
 let hitSeq=0, killSeq=0; const myHits=[], kills=[]; const lastHitFrom={}; let lastKill={};
@@ -2581,9 +2617,9 @@ function applyHit(a,peer,fromX,fromY,dmg=1,crit=false){
     else { kills.push({i:a.nid,p:peer,s:++killSeq}); if(kills.length>6) kills.shift(); } }
 }
 function giveLoot(a){
-  const got=[["pelt",1],["meat_raw",1]]; if(Math.random()<0.5) got.push(["fang",1]);
-  for(const [id,n] of got){ inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:"#f0e0c0",t:-0.25*floats.length}); }
-  renderInv(); say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; addXP(10,"fight");
+  const got=rollDrops(a&&a.kind?a.kind:"wolf");
+  for(const [id,n] of got){ inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:id==="coin"?"#ffd66b":"#f0e0c0",t:-0.25*floats.length}); }
+  renderInv(); say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; addXP(xpOf("wolf"),"fight");
   if(quest2==="active"&&(inv.pelt||0)>=2) setTimeout(()=>say("pelts_ready","pelts_ready_sub"),1600);
 }
 // хозяин: удары от других игроков и награды за убийства
@@ -2748,7 +2784,7 @@ function edUndoLast(){
 const NPC_KEYS=["npc_name","npc_hello","npc_hello_active","npc_hello_done","npc_who","npc_quest","npc_accepted","npc_reward","npc_wolfq","npc_wolf_acc","npc_reward2","npc_craft"];
 const MERCH_KEYS=["merch_name","shop_hello","shop_bought","shop_sold","shop_no_money","shop_nothing"];
 const TEXT_KEYS=[...NPC_KEYS,...MERCH_KEYS];
-const SELL_EDIT=["karas","okun","shchuka","gold","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
+const SELL_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood","potion","potion_big","club","sword_wood","sword_iron","cap_leather","helm_iron","armor_leather","boots_leather","amulet_fang"];
 let edTab="map", edCfg=null, cfgDirty=false, edTxtLang=null, edTxtWho="npc";
 function applyConfig(d){
   const t=d&&d.texts&&typeof d.texts==="object"?d.texts:{};
@@ -2757,6 +2793,12 @@ function applyConfig(d){
   for(const f of ["buy","sell"]){ CFG[f]={}; const src=d&&d[f]&&typeof d[f]==="object"?d[f]:{};
     for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) CFG[f][k]=Math.min(9999,Math.round(v)); }
   CFG.off={}; const off=d&&d.off&&typeof d.off==="object"?d.off:{}; for(const [k,v] of Object.entries(off)) if(v===true) CFG.off[k]=true;
+  const ids=new Set(ITEMS.map(i=>i.id)), nmap=(src,hi)=>{ const o={}; if(src&&typeof src==="object") for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) o[k]=Math.min(hi,Math.round(v)); return o; };
+  CFG.xp=nmap(d&&d.xp,5000); CFG.xpFish=nmap(d&&d.xpFish,5000); CFG.fishW=nmap(d&&d.fishW,1000); CFG.logs=nmap(d&&d.logs,20); CFG.fisher=nmap(d&&d.fisher,9999);
+  CFG.drops={}; const dr=d&&d.drops&&typeof d.drops==="object"?d.drops:{};
+  for(const [m,list] of Object.entries(dr)) if(Array.isArray(list)) CFG.drops[m]=list.filter(r=>r&&ids.has(r.id)).slice(0,12).map(r=>{
+    const a=Math.max(0,Math.min(99,Math.round(+r.a||0))), b=Math.max(a,Math.min(99,Math.round(+r.b||0)));
+    return {id:r.id,ch:Math.max(0,Math.min(100,Math.round(+r.ch||0))),a,b}; });
   if(winKind) renderWin(); if(dialogOpen) renderDialog(); if(EDIT&&edTab!=="map"&&!cfgDirty) edRender();
 }
 const shopList=()=>SHOP.filter(s=>!CFG.off[s.id]).map(s=>({...s,p:CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
@@ -2765,7 +2807,8 @@ function zonePick(kind,filter){
   for(let i=0;i<30;i++){ const p=z[(Math.random()*z.length)|0], c=Array.isArray(p)&&cellAt(p[0],p[1]); if(c&&filter(c)) return c; }
   return null;
 }
-function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off}}; }
+function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off},
+  drops:JSON.parse(JSON.stringify(CFG.drops)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
 async function saveConfig(){
   if(!NET.db||!edCfg) return; const d=JSON.parse(JSON.stringify(edCfg));
   await NET.db.doc("world/config").set(d).catch(()=>{});
@@ -2787,6 +2830,44 @@ function renderTextsTab(p){
     head.appendChild(rs); box.appendChild(head); box.appendChild(ta); p.appendChild(box);
   }
 }
+function renderDropTab(p){
+  const sec=k=>p.appendChild(mkEl("b","sub",tr(k)));
+  const row=(label,...els)=>{ const r=mkEl("div","edshop"); if(typeof label==="string") r.appendChild(mkEl("span",null,label)); else r.appendChild(label); for(const e of els) r.appendChild(e); p.appendChild(r); return r; };
+  const itemLabel=id=>{ const w=mkEl("span","edil"); const im=mkEl("img"); im.src=iconURL(id); im.alt=""; w.appendChild(im); w.appendChild(document.createTextNode(tr("fish_"+id))); return w; };
+  for(const mob of MOBS){
+    sec("ed_drop_mob_"+mob);
+    if(!edCfg.drops[mob]) edCfg.drops[mob]=JSON.parse(JSON.stringify(DROP_DEF[mob]||[]));
+    const list=edCfg.drops[mob];
+    const hdr=mkEl("div","eddrh"); for(const k of ["ed_drop_item","ed_drop_ch","ed_drop_min","ed_drop_max",""]) hdr.appendChild(mkEl("small",null,k?tr(k):"")); p.appendChild(hdr);
+    list.forEach((r,i)=>{
+      const sel=mkEl("select","edsel"); for(const it of ITEMS){ const o=mkEl("option",null,tr("fish_"+it.id)); o.value=it.id; o.selected=it.id===r.id; sel.appendChild(o); }
+      sel.onchange=()=>{ r.id=sel.value; cfgDirty=true; edRender(); };
+      const icon=mkEl("img","edicon"); icon.src=iconURL(r.id); icon.alt="";
+      const wrap=mkEl("span","edil"); wrap.appendChild(icon); wrap.appendChild(sel);
+      const del=mkEl("button","btn mini","✕"); del.type="button"; del.onclick=()=>{ list.splice(i,1); cfgDirty=true; edRender(); };
+      row(wrap,valInput(r,"ch",0,100),valInput(r,"a",0,99),valInput(r,"b",0,99),del).classList.add("eddr");
+    });
+    const add=mkEl("button","btn mini",tr("ed_drop_add")); add.type="button"; add.onclick=()=>{ list.push({id:"coin",ch:100,a:1,b:3}); cfgDirty=true; edRender(); }; p.appendChild(add);
+    row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
+  }
+  sec("ed_drop_trees");
+  row(tr("ed_logs_big"),numInput(edCfg.logs,"tree_big",LOGS.tree_big)); row(tr("ed_logs_small"),numInput(edCfg.logs,"tree_small",LOGS.tree_small));
+  row(tr("ed_xp_tree"),numInput(edCfg.xp,"tree",XP_DEF.tree));
+  sec("ed_drop_fish"); p.appendChild(mkEl("p","muted",tr("ed_fish_hint")));
+  const tot=FISH.reduce((a,f)=>a+(edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w),0)||1;
+  const hf=mkEl("div","eddrh eddrf"); for(const k of ["ed_drop_item","ed_fish_w","",
+    "XP"]) hf.appendChild(mkEl("small",null,k&&k!=="XP"?tr(k):k)); p.appendChild(hf);
+  for(const f of FISH){ const w=edCfg.fishW[f.id]!=null?edCfg.fishW[f.id]:f.w;
+    row(itemLabel(f.id),numInput(edCfg.fishW,f.id,f.w,true),mkEl("small","edpct",Math.round(w/tot*100)+"%"),numInput(edCfg.xpFish,f.id,XP_FISH_DEF[f.id]??2)); }
+  sec("ed_drop_quests"); row(tr("ed_xp_quest"),numInput(edCfg.xp,"quest",XP_DEF.quest));
+  sec("ed_fisher_buy");
+  for(const id of FISHER_EDIT) row(itemLabel(id),numInput(edCfg.fisher,id,PRICE[id]??LOOT_PRICE[id]??(id==="wood"?1:0)));
+}
+function valInput(obj,key,lo,hi){
+  const i=mkEl("input","ednum"); i.type="number"; i.min=String(lo); i.max=String(hi); i.step="1"; i.inputMode="numeric"; i.value=String(obj[key]);
+  i.oninput=()=>{ const v=Math.round(+i.value); if(isFinite(v)){ obj[key]=Math.max(lo,Math.min(hi,v)); cfgDirty=true; } };
+  return i;
+}
 function renderShopTab(p){
   p.appendChild(mkEl("b","sub",tr("ed_shop_buy")));
   for(const s of SHOP){
@@ -2803,10 +2884,11 @@ function renderShopTab(p){
     r.appendChild(mkEl("span",null,tr("fish_"+id))); r.appendChild(numInput(edCfg.sell,id,SELL_P[id]??PRICE[id]??0)); p.appendChild(r);
   }
 }
-function numInput(obj,id,def){
+function numInput(obj,id,def,noRedraw){
   const i=mkEl("input","ednum"); i.type="number"; i.min="0"; i.max="9999"; i.step="1"; i.inputMode="numeric";
   i.placeholder=String(def); i.value=obj[id]!=null?String(obj[id]):"";
   i.oninput=()=>{ const v=i.value.trim(); if(v===""||+v===def) delete obj[id]; else { const n=Math.max(0,Math.min(9999,Math.round(+v))); if(isFinite(n)) obj[id]=n; } cfgDirty=true; };
+  if(noRedraw) i.onchange=()=>edRender();   // пересчитать проценты
   return i;
 }
 // ---- сохранение ----
@@ -2950,10 +3032,11 @@ function edRender(){
   top.appendChild(btn(tr(edExitConfirm?"ed_exit_confirm":"ed_exit"),edExit,edExitConfirm?"warn":""));
   p.appendChild(top);
   const tabs=mkEl("div","edtabs");
-  for(const t of ["map","texts","shop"]){ const b=btn(tr("ed_tab_"+t),()=>{ edTab=t; edRender(); },edTab===t?"on":""); tabs.appendChild(b); }
+  for(const t of ["map","texts","shop","drop"]){ const b=btn(tr("ed_tab_"+t),()=>{ edTab=t; edRender(); },edTab===t?"on":""); tabs.appendChild(b); }
   p.appendChild(tabs);
   if(edTab==="texts"){ renderTextsTab(p); return; }
   if(edTab==="shop"){ renderShopTab(p); return; }
+  if(edTab==="drop"){ renderDropTab(p); return; }
   // мини-карта и режим пальца
   const mrow=mkEl("div","edmrow"), mc=mkEl("canvas","edmini"); mc.id="edMini"; mc.width=150; mc.height=150; mrow.appendChild(mc);
   const side=mkEl("div","edside");
