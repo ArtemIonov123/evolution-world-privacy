@@ -118,6 +118,22 @@ canvas.drag{cursor:grabbing}
 .quick .btn{font-family:var(--f-body);font-weight:700;font-size:13px;letter-spacing:0}
 /* кнопки окон и окна персонажа */
 .hotbar{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:3}
+.party{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:52px;z-index:3;padding:5px 8px;font-size:12px;min-width:150px;max-width:220px}
+.party b{display:block;font-family:var(--f-display);font-weight:400;font-size:11px;color:var(--accent);letter-spacing:.05em;margin-bottom:2px}
+.party .pm{display:flex;align-items:center;gap:6px;line-height:1.6;min-width:0}
+.party .pm i{width:9px;height:9px;flex:none;border:1px solid var(--edge)}
+.party .pm span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.party .hpb{display:block;flex:none;width:42px;height:6px;border:1px solid var(--edge);background:#3d3257}
+.party .hpb s{display:block;height:100%;background:#e8402c}
+.party .zn{min-height:20px;padding:0 5px;font-size:10px}
+.players .prow.pick{width:100%;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.players .prow.pick:hover span{text-decoration:underline}
+.players .pmenu{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 5px 15px}
+.players .pmenu .btn{min-height:28px;padding:2px 7px;font-size:11px}
+.upd.pask{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));flex-wrap:wrap;justify-content:center;max-width:min(520px,calc(100% - 20px))}
+.upd.pask span{white-space:normal;text-align:center}
+@media (max-width:720px){ .party{left:max(10px,env(safe-area-inset-left,0px));top:46px;font-size:11px;min-width:130px;max-width:170px} .upd.pask{bottom:calc(66px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)} }
+@media (max-height:500px){ .party{top:40px;padding:3px 6px} .upd.pask{bottom:calc(56px + env(safe-area-inset-bottom,0px))} }
 .bossbar{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;width:min(320px,calc(100% - 360px));min-width:200px;padding:5px 10px;text-align:center}
 .bossbar b{display:block;font-family:var(--f-display);font-weight:400;font-size:12px;color:#ff9a7a;letter-spacing:.05em}
 .bossbar i{display:block;height:10px;margin-top:4px;border:2px solid var(--edge);background:#3d3257}
@@ -386,6 +402,8 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
     <div class="quick"><button class="btn" data-q="q_hi">Cześć!</button><button class="btn" data-q="q_come">Chodź tu!</button><button class="btn" data-q="q_wolves">Wilki!</button><button class="btn" data-q="q_thanks">Dzięki!</button></div>
   </div>
   <div class="hp panel" id="hp" role="img" aria-label="Zdrowie"></div>
+  <div class="party panel" id="party" hidden></div>
+  <div class="upd panel pask" id="partyAsk" hidden role="alertdialog"><span id="partyAskText"></span><button class="btn big" id="partyYes" type="button"></button><button class="btn" id="partyNo" type="button"></button></div>
   <div class="bossbar panel" id="bossBar" hidden><b id="bossName"></b><i><s id="bossHp"></s></i><small id="bossNum"></small></div>
   <div class="inv panel" id="inv" hidden></div>
   <div class="hotbar" id="hotbar">
@@ -562,7 +580,11 @@ const I18N={
     heal:"+{n} zdrowia", minus_hp:"-{n}", ate:"Mniam! Zdrowie: {hp}/5", full_hp:"Nie jestem głodny",
     hurt:"Wilk gryzie!", hurt_sub:"uciekaj do ogniska", wolf_chase:"Wilk cię wyczuł!", wolf_near:"Słychać wycie wilków…",
     fainted:"Obudziłeś się rano przy chacie Bogdana. Zgubione monety: {c}.", hp_label:"Zdrowie",
-    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", players_title_cave:"W jaskini", hurt_cave:"Au! Ugryzienie!", hurt_golem:"Golem uderza!", hurt_cave_sub:"zjedz miksturę z torby albo uciekaj do wyjścia", title_h_cave:"Jaskinia", you:"ty", someone:"Gracz",
+    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", players_title_cave:"W jaskini", party_title:"DRUŻYNA", party_invite:"Zaproś do drużyny", party_kick:"Wyrzuć", party_leave:"Opuść drużynę", party_disband_btn:"Rozwiąż drużynę",
+    party_in:"w twojej drużynie", party_travel:"Idź do drużyny", party_ask:"{n} zaprasza cię do drużyny", party_yes:"Dołącz", party_no:"Nie", party_go:"Idź",
+    party_joined:"Jesteś w drużynie!", party_joined_sub:"doświadczenie za potwory w pobliżu dzielone", party_left:"Opuściłeś drużynę", party_kicked:"Wyrzucono cię z drużyny",
+    party_disband:"Drużyna rozwiązana", party_full:"W drużynie są już 4 osoby", party_invited:"Zaproszenie wysłane", party_follow:"{n} poszedł {w} — iść za nim?",
+    where_to_cave:"do jaskini", where_to_island:"na wyspę", hurt_cave:"Au! Ugryzienie!", hurt_golem:"Golem uderza!", hurt_cave_sub:"zjedz miksturę z torby albo uciekaj do wyjścia", title_h_cave:"Jaskinia", you:"ty", someone:"Gracz",
     player_joined:"Na wyspę przybył nowy gracz", loaded:"Wczytano zapisany postęp", chat:"Czat", chat_ph:"Napisz wiadomość…", send:"Wyślij",
     q_hi:"Cześć!", q_come:"Chodź tu!", q_wolves:"Wilki!", q_thanks:"Dzięki!",
     nick_title:"Jak masz na imię?", nick_text:"Ten nick zobaczą inni gracze nad twoim bohaterem.", nick_ph:"Twój nick",
@@ -687,7 +709,11 @@ const I18N={
     heal:"+{n} здоровья", minus_hp:"-{n}", ate:"Ням! Здоровье: {hp}/5", full_hp:"Я не голоден",
     hurt:"Волк кусает!", hurt_sub:"беги к костру", wolf_chase:"Волк тебя учуял!", wolf_near:"Слышен вой волков…",
     fainted:"Ты очнулся утром у хижины Богдана. Потеряно монет: {c}.", hp_label:"Здоровье",
-    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", players_title_cave:"В пещере", hurt_cave:"Ай! Укусили!", hurt_golem:"Голем бьёт!", hurt_cave_sub:"выпей зелье из сумки или беги к выходу", title_h_cave:"Пещера", you:"ты", someone:"Игрок",
+    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", players_title_cave:"В пещере", party_title:"ГРУППА", party_invite:"Пригласить в группу", party_kick:"Исключить", party_leave:"Покинуть группу", party_disband_btn:"Распустить группу",
+    party_in:"в твоей группе", party_travel:"К группе", party_ask:"{n} зовёт тебя в группу", party_yes:"Вступить", party_no:"Нет", party_go:"Пойти",
+    party_joined:"Ты в группе!", party_joined_sub:"опыт за мобов рядом делится", party_left:"Ты вышел из группы", party_kicked:"Тебя исключили из группы",
+    party_disband:"Группа распущена", party_full:"В группе уже 4 игрока", party_invited:"Приглашение отправлено", party_follow:"{n} ушёл {w} — пойти следом?",
+    where_to_cave:"в пещеру", where_to_island:"на остров", hurt_cave:"Ай! Укусили!", hurt_golem:"Голем бьёт!", hurt_cave_sub:"выпей зелье из сумки или беги к выходу", title_h_cave:"Пещера", you:"ты", someone:"Игрок",
     player_joined:"На остров пришёл новый игрок", loaded:"Загружен сохранённый прогресс", chat:"Чат", chat_ph:"Напиши сообщение…", send:"Отправить",
     q_hi:"Привет!", q_come:"Иди сюда!", q_wolves:"Волки!", q_thanks:"Спасибо!",
     nick_title:"Как тебя зовут?", nick_text:"Этот ник увидят другие игроки над твоим героем.", nick_ph:"Твой ник",
@@ -2842,7 +2868,8 @@ function applyHit(a,peer,fromX,fromY,dmg=1,crit=false){
     return; }
   if(a.hp<=0){ a.dying=2.4; a.path=[]; a.howlT=0;
     if(!NET.room||peer===NET.myPeer) giveLoot(a);
-    else { kills.push({i:a.nid,p:peer,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); } }
+    else { kills.push({i:a.nid,p:peer,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); }
+    shareXP(a.kind,peer,a.x,a.y); }
 }
 function giveLoot(a){
   const got=rollDrops(a&&a.kind?a.kind:"wolf");
@@ -3692,7 +3719,7 @@ function myAct(){
 function sendPresence(now){
   if(!NET.room||now-lastSent<100) return; lastSent=now;
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:convF(hero.facing,quarter(),0),m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
-    id:NET.myId,n:myNick,act:myAct(),chat:myChat,zn:ZONE,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
+    id:NET.myId,n:myNick,act:myAct(),chat:myChat,zn:ZONE,hm:HP_MAX,pj:partyLead,pk:myPartyKey(),pd:myDisband&&Date.now()-myDisband<60000?myDisband:0,kk:myKicks.length?myKicks.map(k=>k.u):null,inv:myInvite&&Date.now()-myInvite.ts<30000?myInvite:null,xs:NET.host&&xsList.length?xsList.slice(-8):null,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
     p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||"h",tg:a.slamT>0?+a.slamT.toFixed(2):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
       f:convF(a.facing,quarter(),0),m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
@@ -3706,11 +3733,15 @@ function sendPresence(now){
 const away=new Map();   // игроки в другой зоне (на острове / в пещере): только в списке
 function onPeersChange(change){
   const me=change.peers.find(p=>p.sameTab); if(me) NET.myPeer=me.peer;
-  const seen=new Set(); away.clear();
+  const seen=new Set(); away.clear(); online.clear();
   for(const p of change.peers){
     if(p.sameTab||p.kind!=="viewer") continue;
     const pr=p.presence||{}; if(pr.v!==1||pr.afk===1) continue;   // АФК (свернул игру или долго бездействует) — как будто нет
-    const zn=pr.zn==="cave"?"cave":"island";
+    const zn=pr.zn==="cave"?"cave":"island", uid=(typeof pr.id==="string"&&pr.id.length<80&&pr.id)||p.by||null;
+    if(uid&&uid!==NET.myId){ const str=v=>typeof v==="string"&&v.length<80?v:null;
+      online.set(uid,{uid,peer:p.peer,nick:nickOf(pr.n),c:num(pr.c|0,0,PLAYER_HUES.length-1,0)|0,hp:num(pr.hp,0,99,5)|0,hm:num(pr.hm,1,99,5)|0,zn,lv:num(pr.lv|0,1,99,1),
+        pj:str(pr.pj),pk:str(pr.pk),pd:num(pr.pd,0,1e15,0),kk:Array.isArray(pr.kk)?pr.kk.slice(0,6).map(String):[],
+        inv:pr.inv&&typeof pr.inv==="object"&&str(pr.inv.to)?{to:pr.inv.to,lead:str(pr.inv.lead),ts:num(pr.inv.ts,0,1e15,0)}:null}); }
     if(zn!==ZONE){ away.set(p.peer,{nick:nickOf(pr.n),c:num(pr.c|0,0,PLAYER_HUES.length-1,0)|0,zn,by:p.by||null}); continue; }
     seen.add(p.peer);
     let r=remotes.get(p.peer);
@@ -3723,6 +3754,7 @@ function onPeersChange(change){
     const ch=pr.chat&&typeof pr.chat==="object"&&typeof pr.chat.t==="string"?{t:pr.chat.t.slice(0,90),ts:num(pr.chat.ts,0,1e15,0)}:null;
     if(ch&&(!r.chatSeen||r.chatSeen.ts!==ch.ts)){ r.chatSeen=ch; r.chatAt=performance.now(); }
     r.an=Array.isArray(pr.an)?pr.an.slice(0,10):null; r.bt=Array.isArray(pr.bt)?pr.bt.slice(0,6):null;
+    r.pk=typeof pr.pk==="string"&&pr.pk.length<80?pr.pk:null; r.uid=uid;
     r.lv=num(pr.lv|0,1,99,1); r.ht=Array.isArray(pr.ht)?pr.ht.slice(0,6):null; r.kl=Array.isArray(pr.kl)?pr.kl.slice(0,6):null;
     if(pr.ak===1&&!r.ak) r.akT=0; r.ak=pr.ak===1;
   }
@@ -3734,7 +3766,7 @@ function onPeersChange(change){
   const cands=[NET.myPeer,...seen].filter(Boolean).sort();
   const wasHost=NET.host; NET.hostPeer=cands[0]||NET.myPeer; NET.host=!NET.hostPeer||NET.hostPeer===NET.myPeer;
   if(NET.host&&!wasHost) for(const a of animals){ a.path=[]; a.think=0; a.state=""; }
-  renderPlayers();
+  partyTick(); renderPlayers();
 }
 function updateRemotes(dt){
   const k=Math.min(1,dt*9);
@@ -3746,7 +3778,7 @@ function updateRemotes(dt){
   }
   // звери от хозяина и укусы по мне
   if(NET.room&&!NET.host){
-    const h=remotes.get(NET.hostPeer); if(h){ mirrorAnimals(h,dt); checkMyKills(h); }
+    const h=remotes.get(NET.hostPeer); if(h){ mirrorAnimals(h,dt); checkMyKills(h); checkXpShares(h); }
   }
 }
 let lastBite={};
@@ -3805,6 +3837,115 @@ async function resolveNames(){
   renderPlayers();
 }
 function playerName(r){ return r.nick||(r.by&&names[r.by])||tr("someone"); }
+// ================= Группа (пати) =================
+// лидер — тот, к кому присоединились (pj участников = id лидера); всё — через «присутствие», без базы
+const online=new Map();          // uid -> сведения о каждом игроке в сети (любая зона)
+const PARTY_MAX=4, partyKeyLS="island_party_"+(window.__islandWorld||"c")+"_"+(()=>{ try{ return localStorage.getItem("island_uid")||""; }catch(e){ return ""; } })();
+let partyPdSeen=null, partyLead=null, partyJoinTs=0, myInvite=null, myDisband=0, selPlayer=null, partyAsk=null, partyMissT=0, lastLeadZn=null;
+const myKicks=[], xsList=[]; let xsSeq=0; const lastXs={}; const answered=new Set(); const invSeen=new Map();
+try{ const o=JSON.parse(localStorage.getItem(partyKeyLS)||"null"); if(o&&typeof o.lead==="string"&&Date.now()-(o.j||0)<6*3600e3){ partyLead=o.lead; partyJoinTs=o.j; } }catch(e){}
+const savePartyLS=()=>{ try{ partyLead?localStorage.setItem(partyKeyLS,JSON.stringify({lead:partyLead,j:partyJoinTs})):localStorage.removeItem(partyKeyLS); }catch(e){} };
+const followersOf=L=>[...online.values()].filter(o=>o.pj===L);
+function myPartyKey(){ if(partyLead) return partyLead; return NET.myId&&followersOf(NET.myId).length?NET.myId:null; }
+function partyMembers(){   // [{uid,me,o}] — лидер первым
+  const L=myPartyKey(); if(!L) return [];
+  const out=[], add=uid=>{ if(out.some(m=>m.uid===uid)) return; out.push({uid,me:uid===NET.myId,o:online.get(uid)||null}); };
+  add(L); for(const o of followersOf(L)) add(o.uid); if(partyLead) add(NET.myId);
+  return out;
+}
+const inMyParty=uid=>!!uid&&!!myPartyKey()&&partyMembers().some(m=>m.uid===uid);
+function leaveParty(silent){
+  if(partyLead){ partyLead=null; partyJoinTs=0; savePartyLS(); if(!silent) say("party_left"); }
+  else if(myPartyKey()){ myDisband=Date.now(); if(!silent) say("party_disband"); }
+  selPlayer=null; lastPresJSON=""; renderPlayers(); renderParty();
+}
+function invitePlayer(uid){
+  const L=myPartyKey()||NET.myId; if(partyMembers().length>=PARTY_MAX){ say("party_full"); return; }
+  if(partyLead&&partyLead!==NET.myId){ /* участник зовёт в группу лидера */ }
+  for(let i=myKicks.length-1;i>=0;i--) if(myKicks[i].u===uid) myKicks.splice(i,1);
+  myInvite={to:uid,lead:L,ts:Date.now()}; myDisband=0; selPlayer=null; lastPresJSON=""; say("party_invited"); renderPlayers();
+}
+function kickPlayer(uid){ myKicks.push({u:uid,t:Date.now()}); while(myKicks.length>6) myKicks.shift(); selPlayer=null; lastPresJSON=""; renderPlayers(); }
+function acceptInvite(){
+  const a=partyAsk; if(!a) return; partyAsk=null; renderPartyAsk();
+  if(a.kind==="follow"){ travelZone(a.zn); return; }
+  answered.add(a.key);
+  const size=1+followersOf(a.lead).length; if(size>=PARTY_MAX){ say("party_full"); return; }
+  partyLead=a.lead; partyJoinTs=Date.now(); partyPdSeen=null; savePartyLS(); lastPresJSON=""; say("party_joined","party_joined_sub"); renderPlayers(); renderParty();
+}
+function declineInvite(){ if(partyAsk&&partyAsk.key) answered.add(partyAsk.key); partyAsk=null; renderPartyAsk(); }
+function travelZone(zn){
+  if(zn===ZONE||fainting) return; fainting=true; hero.path=[]; document.getElementById("fade").style.opacity="1"; say(zn==="cave"?"cave_enter":"cave_leave");
+  saveNow(); try{ sessionStorage.setItem("island_zone",zn); sessionStorage.setItem("island_spawn","portal"); }catch(e){}
+  setTimeout(()=>location.reload(),1100);
+}
+function partyTick(){
+  const now=Date.now();
+  while(myKicks.length&&now-myKicks[0].t>60000) myKicks.shift();
+  if(partyLead){
+    const L=online.get(partyLead);
+    if(!L){ if(!partyMissT) partyMissT=now; if(now-partyMissT>45000){ partyMissT=0; leaveParty(true); say("party_disband"); } }
+    else { partyMissT=0;
+      if(partyPdSeen===null) partyPdSeen=L.pd;
+      if(L.pd&&L.pd!==partyPdSeen){ partyLead=null; partyPdSeen=null; savePartyLS(); say("party_disband"); }
+      else if(L.kk.includes(NET.myId)&&now-partyJoinTs>3000){ partyLead=null; savePartyLS(); say("party_kicked"); }
+      else if(L.pj===NET.myId){ partyLead=null; savePartyLS(); }      // лидер сам вступил ко мне — разрываем петлю
+      else { if(lastLeadZn&&L.zn!==lastLeadZn&&L.zn!==ZONE&&!partyAsk) partyAsk={kind:"follow",zn:L.zn,nick:L.nick}; lastLeadZn=L.zn; } } }
+  // приглашения мне
+  if(!partyAsk&&!myPartyKey()) for(const o of online.values()){
+    if(!o.inv||o.inv.to!==NET.myId||!o.inv.lead) continue; const key=o.uid+":"+o.inv.ts; if(answered.has(key)) continue;
+    if(!invSeen.has(key)) invSeen.set(key,now); if(now-invSeen.get(key)>30000) continue;
+    partyAsk={kind:"invite",key,lead:o.inv.lead,nick:o.nick||tr("someone")}; break; }
+  if(partyAsk&&partyAsk.kind==="invite"&&now-(invSeen.get(partyAsk.key)||now)>30000) partyAsk=null;
+  if(myInvite&&now-myInvite.ts>30000) myInvite=null;
+  renderPartyAsk(); renderParty();
+}
+setInterval(()=>{ if(NET.room) partyTick(); },1000);
+function playerMenu(uid){
+  const box=mkEl("div","pmenu"), b=(k,fn)=>{ const x=mkEl("button","btn mini",tr(k)); x.type="button"; x.onclick=e=>{ e.stopPropagation(); fn(); }; box.appendChild(x); };
+  const me=uid==="me", o=online.get(uid), L=myPartyKey(), lead=L===NET.myId;
+  if(me){ if(L) b(lead?"party_disband_btn":"party_leave",()=>leaveParty()); }
+  else {
+    if(L&&lead&&o&&o.pj===NET.myId) b("party_kick",()=>kickPlayer(uid));
+    else if(o&&!o.pk&&!o.pj&&!inMyParty(uid)&&partyMembers().length<PARTY_MAX) b("party_invite",()=>invitePlayer(uid));
+    else if(inMyParty(uid)) box.appendChild(mkEl("small","muted",tr("party_in")));
+    if(o&&o.zn!==ZONE&&inMyParty(uid)) b("party_travel",()=>travelZone(o.zn)); }
+  b("close",()=>{ selPlayer=null; renderPlayers(); });
+  return box;
+}
+function renderParty(){
+  const el=document.getElementById("party"); if(!el) return;
+  const ms=partyMembers(); if(!ms.length){ if(!el.hidden){ el.hidden=true; el.textContent=""; } return; }
+  el.hidden=false; el.textContent="";
+  el.appendChild(mkEl("b",null,tr("party_title")+" · "+ms.length));
+  ms.forEach((m,i)=>{ const row=mkEl("div","pm"), o=m.o;
+    const hp=m.me?hero.hp:(o?o.hp:0), hm=m.me?HP_MAX:(o?o.hm:5), c=m.me?myHueIdx:(o?o.c:0);
+    const sw=mkEl("i"); sw.style.background=hueCss(c); row.appendChild(sw);
+    row.appendChild(mkEl("span",null,(i===0?"★ ":"")+(m.me?(myNick||tr("you")):(o?o.nick||tr("someone"):"…"))));
+    const bar=mkEl("em","hpb"), fill=mkEl("s"); fill.style.width=Math.round(100*Math.max(0,hp)/Math.max(1,hm))+"%"; bar.appendChild(fill); row.appendChild(bar);
+    if(!m.me&&o&&o.zn!==ZONE){ const t=mkEl("button","btn mini zn",tr(o.zn==="cave"?"where_cave":"where_island")); t.type="button"; t.title=tr("party_travel"); t.onclick=()=>travelZone(o.zn); row.appendChild(t); }
+    el.appendChild(row); });
+}
+function renderPartyAsk(){
+  const el=document.getElementById("partyAsk"); if(!el) return;
+  if(!partyAsk){ el.hidden=true; return; }
+  el.hidden=false;
+  document.getElementById("partyAskText").textContent=partyAsk.kind==="follow"?tr("party_follow",{n:partyAsk.nick||tr("someone"),w:"#"+(partyAsk.zn==="cave"?"where_to_cave":"where_to_island")}):tr("party_ask",{n:partyAsk.nick});
+  document.getElementById("partyYes").textContent=tr(partyAsk.kind==="follow"?"party_go":"party_yes");
+  document.getElementById("partyNo").textContent=tr("party_no");
+}
+// опыт группе: хозяин зверей раздаёт долю тем, кто в группе убившего и рядом
+function shareXP(kind,killer,x,y){
+  if(!NET.room) return;
+  const kpk=killer===NET.myPeer?myPartyKey():(remotes.get(killer)||{}).pk; if(!kpk) return;
+  const amt=Math.max(1,Math.round((xpOf(kind)||0)*0.6)); if(!amt) return;
+  if(killer!==NET.myPeer&&myPartyKey()===kpk&&Math.hypot(hero.x-x,hero.y-y)<12) addXP(amt,"fight");
+  for(const r of remotes.values()) if(r.peer!==killer&&r.pk===kpk&&Math.hypot(r.tx-x,r.ty-y)<12){ xsList.push({p:r.peer,s:++xsSeq,x:amt}); if(xsList.length>8) xsList.shift(); }
+}
+function checkXpShares(h){
+  for(const e of h.xs||[]){ if(!e||e.p!==NET.myPeer) continue; const s=num(e.s,0,1e9,0);
+    if(s>(lastXs[NET.hostPeer]||0)){ lastXs[NET.hostPeer]=s; addXP(num(e.x|0,1,500,1),"fight"); } }
+}
 function renderPlayers(){
   const el=document.getElementById("players"); if(!el) return;
   if(!NET.room&&!NET.db){ el.hidden=true; return; }
@@ -3812,10 +3953,12 @@ function renderPlayers(){
   const sl=[];   // в списке — только те, кто сейчас в игре
   el.textContent="";
   const head=document.createElement("b"); head.textContent=tr(CAVE?"players_title_cave":"players_title")+" · "+(remotes.size+1+away.size); el.appendChild(head);
-  const row=(color,text,off)=>{ const d=document.createElement("div"); d.className="prow"+(off?" off":""); const i=document.createElement("i"); i.style.background=color; const sp=document.createElement("span"); sp.textContent=text; d.append(i,sp); el.appendChild(d); };
-  row(hueCss(myHueIdx),myNick?myNick+" ("+tr("you")+")":tr("you"),false);
-  for(const r of remotes.values()) row(hueCss(r.c),playerName(r),false);
-  for(const a of away.values()) row(hueCss(a.c),(a.nick||(a.by&&names[a.by])||tr("someone"))+" · "+tr(a.zn==="cave"?"where_cave":"where_island"),true);
+  const row=(color,text,off,uid)=>{ const d=document.createElement(uid?"button":"div"); d.className="prow"+(off?" off":"")+(uid?" pick":""); if(uid){ d.type="button"; d.onclick=()=>{ selPlayer=selPlayer===uid?null:uid; renderPlayers(); }; }
+    const i=document.createElement("i"); i.style.background=color; const sp=document.createElement("span"); sp.textContent=(inMyParty(uid==="me"?NET.myId:uid)&&myPartyKey()?"◆ ":"")+text; d.append(i,sp); el.appendChild(d);
+    if(uid&&selPlayer===uid) el.appendChild(playerMenu(uid)); };
+  row(hueCss(myHueIdx),myNick?myNick+" ("+tr("you")+")":tr("you"),false,myPartyKey()?"me":null);
+  for(const r of remotes.values()) row(hueCss(r.c),playerName(r),false,r.uid||null);
+  for(const a of away.values()){ const uid=[...online.values()].find(o=>o.peer===a.peer)?.uid; row(hueCss(a.c),(a.nick||(a.by&&names[a.by])||tr("someone"))+" · "+tr(a.zn==="cave"?"where_cave":"where_island"),true,uid||null); }
   for(const p of sl.slice(0,5)) row(hueCss(p.c),(p.nick||(names[p.by])||tr("someone"))+" · "+tr("sleeping")+" "+agoText(p.last),true);
   if([...remotes.values(),...sl].some(r=>r.by&&!(r.by in names))) resolveNames();
 }
@@ -3839,7 +3982,7 @@ function updateTags(){
     b.hidden=!show; if(show&&b.textContent!==chat.t) b.textContent=chat.t;
   };
   place("me",hero.x,hero.y,hero.z,myNick?"["+heroLevel()+"] "+myNick:"",hueCss(myHueIdx),myChat,myChatAt,true);
-  for(const r of remotes.values()) place(r.peer,r.x,r.y,r.z,(r.lv?"["+r.lv+"] ":"")+playerName(r),hueCss(r.c),r.chatSeen,r.chatAt,false);
+  for(const r of remotes.values()) place(r.peer,r.x,r.y,r.z,(inMyParty(r.uid)?"◆ ":"")+(r.lv?"["+r.lv+"] ":"")+playerName(r),hueCss(r.c),r.chatSeen,r.chatAt,false);
   const sl=[], slIds=new Set();   // офлайн-игроки — только в списке «На острове»
   for(const p of sl) place("s-"+p.by,p.x,p.y,p.z-2.6,(p.nick||(names[p.by])||tr("someone"))+" · "+tr("sleeping"),hueCss(p.c),null,0,false);
   for(const p of sleepers.values()) if(!slIds.has(p.by)){ const el=document.getElementById("tag-s-"+p.by); if(el) el.style.display="none"; }
@@ -4429,6 +4572,7 @@ loadAll.then(()=>{
     if(TOUCH){ const once=e=>{ if(e.target.closest&&e.target.closest("#nickWrap,#fsBtn")) return; document.removeEventListener("pointerup",once,true); goFull(); };
       document.addEventListener("pointerup",once,true); } }
   initUpdates();
+  document.getElementById("partyYes").onclick=acceptInvite; document.getElementById("partyNo").onclick=declineInvite;
   const chatbar=document.getElementById("chatbar"), chatIn=document.getElementById("chatIn");
   const closeChat=()=>{ chatbar.hidden=true; chatIn.blur(); };
   document.getElementById("chatBtn").onclick=()=>{ chatbar.hidden=!chatbar.hidden; if(!chatbar.hidden){ renderChatLog(); markChatRead(); chatIn.focus(); } };

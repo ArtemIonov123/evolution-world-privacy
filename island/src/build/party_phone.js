@@ -1,0 +1,12 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:390,height:800},deviceScaleFactor:3,hasTouch:true,isMobile:true}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')}); const errs=[];
+const WK='PartyPhoneKey123456';
+const pg=async(who,uid,nick)=>{const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(who+':'+e.message));
+  await p.addInitScript(([u,n])=>{ const me=sessionStorage.getItem('myuid')||u; sessionStorage.setItem('myuid',me); localStorage.setItem('island_uid',me); localStorage.setItem('island_nick',sessionStorage.getItem('mynick')||n); sessionStorage.setItem('mynick',sessionStorage.getItem('mynick')||n); localStorage.setItem('island_lang','ru'); },[uid,nick]);
+  await p.goto(`http://localhost:8765/index.html#world=${WK}`); await p.waitForTimeout(1800); return p;};
+const A=await pg('A','uAAAAAAAAAAAAAA','Artem'), B=await pg('B','uBBBBBBBBBBBBBB','Bogdan');
+await A.waitForTimeout(1500);
+await A.evaluate(()=>invitePlayer("uBBBBBBBBBBBBBB")); await B.waitForTimeout(2500); await B.screenshot({path:'PP_ask.png'});
+await B.tap('#partyYes'); await A.waitForTimeout(2500);
+await A.evaluate(()=>{ selPlayer="uBBBBBBBBBBBBBB"; renderPlayers(); }); await A.waitForTimeout(300); await A.screenshot({path:'PP_A.png'});
+console.log('errs',errs); await b.close();})();
