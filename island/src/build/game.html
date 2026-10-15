@@ -1486,8 +1486,8 @@ function renderEquip(body){
     w.appendChild(b); w.appendChild(mkEl("small",null,id?tr("fish_"+id)+(s==="rod"?" · "+rodDur+"/"+rodMax(id):""):tr("slot_"+s))); return w; };
   for(const s of SLOTS) doll.appendChild(slot(s));
   const cvs=mkEl("canvas","heroPrev"); cvs.width=96; cvs.height=144; cvs.style.gridArea="hero"; doll.appendChild(cvs);
-  const g=cvs.getContext("2d"); g.imageSmoothingEnabled=false; const sp=heroSprite("hero_se_0",myHueIdx);
-  if(sp) g.drawImage(sp,0,0,sp.width*3,sp.height*3);
+  const g=cvs.getContext("2d"); g.imageSmoothingEnabled=false; const sp=heroSprite(heroClass==="druid"&&img.druid_se_0?"druid_se_0":"hero_se_0",myHueIdx);
+  if(sp) g.drawImage(sp,Math.round(48-sp.width*1.5),0,sp.width*3,sp.height*3);
   body.appendChild(doll);
   const st=mkEl("div","stats3");
   for(const [k,v] of [["st_atk",heroAtk()],["st_def",heroDef()],["st_hp",HP_MAX]]){ const c=mkEl("div"); c.appendChild(mkEl("b",null,String(v))); c.appendChild(mkEl("small",null,tr(k))); st.appendChild(c); }
@@ -4035,6 +4035,8 @@ function drawForm(fx,fy,f,facing,moving,phase,atk){
   const fr=moving?Math.floor(phase/Math.PI*2)%4:0, mirror=facing[1]==="w";
   ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)); ctx.imageSmoothingEnabled=false;
   ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(0,0,f==="bear"?14:11,5,0,0,Math.PI*2); ctx.fill();
+  { const gl=0.28+0.12*Math.sin(T*4); ctx.strokeStyle=`rgba(124,240,122,${gl+0.2})`; ctx.lineWidth=1; ctx.fillStyle=`rgba(124,240,122,${gl*0.5})`;
+    ctx.beginPath(); ctx.ellipse(0,0,f==="bear"?17:14,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke(); }   // зелёный круг — это оборотень-друид
   const key=f==="wolf"?(img.dwolf_se_0?"dwolf":"wolf"):f;
   let sp=key==="wolf"?img[`wolf_${facing[0]}e_${fr}`]:(img[`${key}_${facing}_${fr%2}`]||img[`${key}_${facing[0]}e_${fr%2}`]);
   if(key==="wolf"&&sp) ctx.filter="hue-rotate(70deg) saturate(1.4) brightness(1.15)";

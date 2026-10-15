@@ -1,0 +1,11 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:900,height:600},deviceScaleFactor:2}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')}); const errs=[];
+const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{ localStorage.setItem('island_nick','Artem'); localStorage.setItem('island_lang','ru'); });
+await p.goto('http://localhost:8765/index.html#world=FormsKey1234567890'); await p.waitForTimeout(2500);
+await p.evaluate(()=>{ [...document.querySelectorAll('.clcard')][1].click(); prog.xp=3000; recalcHP(); renderSkills(); });
+await p.evaluate(()=>openWin("equip")); await p.waitForTimeout(400); await p.screenshot({path:'F_equip.png'});
+await p.evaluate(()=>closeWin());
+await p.evaluate(()=>useSkill("bear")); await p.waitForTimeout(300); await p.screenshot({path:'F_bear.png',clip:{x:330,y:200,width:240,height:200}});
+await p.evaluate(()=>{ endForm(); skillCd.wolf=0; useSkill("wolf"); hero.path=[[Math.round(hero.x)+1,Math.round(hero.y)]]; }); await p.waitForTimeout(250); await p.screenshot({path:'F_wolf.png',clip:{x:330,y:200,width:240,height:200}});
+console.log('errs',errs); await b.close();})();
