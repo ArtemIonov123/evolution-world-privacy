@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch(); const p=await b.newPage({viewport:{width:900,height:650}}); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
 await p.addInitScript(()=>localStorage.setItem('island_nick','Artem'));
-await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200);
+await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200); await p.evaluate(()=>{ setClass('warrior'); const w=document.getElementById('classWrap'); if(w) w.remove(); });
 await p.evaluate(()=>{ skipTime(); });
 await p.waitForTimeout(300);
 const setup=()=>p.evaluate(()=>{ for(const a of animals) a.dead=true; spawnT=99;
