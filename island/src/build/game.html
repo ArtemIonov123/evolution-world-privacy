@@ -197,6 +197,21 @@ canvas.drag{cursor:grabbing}
 .edb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .edopt{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .edmrow{display:flex;gap:8px;align-items:flex-start}
+.edtabs{display:flex;gap:4px;flex-wrap:wrap}
+.edtabs .btn{flex:1;font-family:var(--f-body);font-weight:700;letter-spacing:0;font-size:12px;min-height:34px;padding:4px 6px}
+.edtabs .btn.on{background:var(--accent);color:var(--panel)}
+.edtxt{display:flex;flex-direction:column;gap:3px}
+.edtxth{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.edtxth b{font-size:12px;color:var(--accent);font-weight:700}
+.edtxt textarea{font:14px/1.35 var(--f-body);padding:6px 8px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0;resize:vertical;width:100%;box-sizing:border-box}
+.edtxt textarea:focus-visible,.ednum:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.edpanel .btn.mini{min-height:26px;padding:2px 6px;font-family:var(--f-body);font-size:11px;letter-spacing:0}
+.edshop{display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 0;border-bottom:1px solid var(--panel-2)}
+.edshop img{width:28px;height:28px;image-rendering:pixelated;flex:none}
+.edshop span{flex:1;min-width:0}
+.edchk{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
+.ednum{width:64px;font:14px var(--f-body);padding:4px 6px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
+.edpanel .sub{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:11px;letter-spacing:.04em;margin-top:4px}
 .edmini{width:150px;height:150px;image-rendering:pixelated;border:2px solid var(--edge);cursor:pointer;flex:none}
 .edside{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
 .edside .btn{font-family:var(--f-body);font-weight:700;letter-spacing:0;font-size:12px;min-height:34px;padding:4px 6px}
@@ -399,7 +414,7 @@ function validMap(m){ try{
   return /[1-9]/.test(m.levels.join("")); }catch(e){ return false; } }
 let MAP_V=0;
 try{ const raw=localStorage.getItem(mapKey()); if(raw){ const o=JSON.parse(raw);
-  if(o&&validMap(o.m)){ Object.assign(MAP,{hut:null,npc:null,merchant:null,stall:null,pier:null},o.m); MAP_V=o.v||0; } } }catch(e){}
+  if(o&&validMap(o.m)){ Object.assign(MAP,{hut:null,npc:null,merchant:null,stall:null,pier:null,zones:null},o.m); MAP_V=o.v||0; } } }catch(e){}
 
 // ================= Языки =================
 const I18N={
@@ -460,6 +475,15 @@ const I18N={
     ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
     ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
     ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
+    ed_g_zones:"Strefy zwierząt", ed_t_zone_hare:"Zające", ed_t_zone_wolf:"Wilki", ed_t_zone_erase:"Usuń strefę",
+    ed_zone_note:"Bez stref zwierzęta pojawiają się na całej wyspie.", ed_tab_map:"Mapa", ed_tab_texts:"Teksty", ed_tab_shop:"Sklep",
+    ed_txt_npc:"Rybak", ed_txt_merch:"Kupiec", ed_txt_hint:"Słowa w nawiasach {n}, {c}, {item} zostaw — gra wstawia tam liczby i nazwy.", ed_txt_reset:"↺ domyślny",
+    ed_cfg_saved:"Zapisano!", ed_cfg_saved_sub:"gracze widzą zmiany od razu",
+    ed_shop_buy:"Sprzedaje graczom (cena)", ed_shop_on:"w sklepie", ed_shop_sell:"Kupuje od graczy (cena za sztukę)",
+    edk_npc_name:"Imię", edk_npc_hello:"Powitanie", edk_npc_hello_active:"Powitanie (zadanie w toku)", edk_npc_hello_done:"Powitanie (po zadaniu)", edk_npc_who:"„Kim jesteś?”",
+    edk_npc_quest:"Zadanie: drewno", edk_npc_accepted:"Przyjęcie zadania", edk_npc_reward:"Nagroda za drewno", edk_npc_wolfq:"Zadanie: wilki", edk_npc_wolf_acc:"Przyjęcie zadania (wilki)",
+    edk_npc_reward2:"Nagroda za skóry", edk_npc_craft:"Rzemiosło", edk_merch_name:"Imię", edk_shop_hello:"Powitanie", edk_shop_bought:"Po zakupie", edk_shop_sold:"Po sprzedaży",
+    edk_shop_no_money:"Za mało monet", edk_shop_nothing:"Nie ma co kupić od gracza",
     ed_mode_paint:"Tryb: rysowanie", ed_mode_move:"Tryb: przesuwanie", ed_fill:"wypełnienie", ed_mini_hint:"Stuknij mini-mapę, aby tam przejść · dwoma palcami przesuwasz mapę",
     ed_drag_sub:"prowadź palcem, aby malować", ed_g_size:"Rozmiar {w} × {d}", ed_side_t:"Góra", ed_side_b:"Dół", ed_side_l:"Lewo", ed_side_r:"Prawo",
     ed_gen:"Losowa wyspa {w}×{d}", ed_gen_confirm:"Zastąpić całą mapę? Stuknij znowu", ed_reset:"Mapa domyślna", ed_reset_confirm:"Na pewno? Stuknij znowu", ed_size_note:"Nowy rozmiar zadziała po zapisie (strona się przeładuje).",
@@ -556,6 +580,15 @@ const I18N={
     ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
     ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
     ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
+    ed_g_zones:"Зоны зверей", ed_t_zone_hare:"Зайцы", ed_t_zone_wolf:"Волки", ed_t_zone_erase:"Убрать зону",
+    ed_zone_note:"Без зон звери появляются по всему острову.", ed_tab_map:"Карта", ed_tab_texts:"Тексты", ed_tab_shop:"Лавка",
+    ed_txt_npc:"Рыбак", ed_txt_merch:"Купец", ed_txt_hint:"Слова в скобках {n}, {c}, {item} не трогай — туда игра подставляет числа и названия.", ed_txt_reset:"↺ по умолчанию",
+    ed_cfg_saved:"Сохранено!", ed_cfg_saved_sub:"игроки видят изменения сразу",
+    ed_shop_buy:"Продаёт игрокам (цена)", ed_shop_on:"в лавке", ed_shop_sell:"Покупает у игроков (цена за штуку)",
+    edk_npc_name:"Имя", edk_npc_hello:"Приветствие", edk_npc_hello_active:"Приветствие (задание идёт)", edk_npc_hello_done:"Приветствие (после задания)", edk_npc_who:"«Кто ты?»",
+    edk_npc_quest:"Задание: дрова", edk_npc_accepted:"Задание принято", edk_npc_reward:"Награда за дрова", edk_npc_wolfq:"Задание: волки", edk_npc_wolf_acc:"Задание принято (волки)",
+    edk_npc_reward2:"Награда за шкуры", edk_npc_craft:"Ремесло", edk_merch_name:"Имя", edk_shop_hello:"Приветствие", edk_shop_bought:"После покупки", edk_shop_sold:"После продажи",
+    edk_shop_no_money:"Мало монет", edk_shop_nothing:"Нечего купить у игрока",
     ed_mode_paint:"Режим: рисование", ed_mode_move:"Режим: перемещение", ed_fill:"заливка", ed_mini_hint:"Тапни мини-карту, чтобы перейти · двумя пальцами двигай карту",
     ed_drag_sub:"веди пальцем, чтобы рисовать", ed_g_size:"Размер {w} × {d}", ed_side_t:"Верх", ed_side_b:"Низ", ed_side_l:"Лево", ed_side_r:"Право",
     ed_gen:"Случайный остров {w}×{d}", ed_gen_confirm:"Заменить всю карту? Нажми ещё раз", ed_reset:"Карта по умолчанию", ed_reset_confirm:"Точно? Нажми ещё раз", ed_size_note:"Новый размер применится после сохранения (страница перезагрузится).",
@@ -600,9 +633,12 @@ let LANG="pl";
 try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v; }catch(e){}
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
+// тексты и цены, которые админ поменял в редакторе (world/config)
+const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{}};
 function tr(k,p){
+  const ck=CFG.texts[LANG]&&CFG.texts[LANG][k];
   if(TOUCH&&I18N.pl[k+"_t"]) k=k+"_t";   // на телефоне — подсказки для пальцев вместо клавиш
-  const s=I18N[LANG][k]??I18N.pl[k]??k;
+  const s=typeof ck==="string"&&ck?ck:(I18N[LANG][k]??I18N.pl[k]??k);
   return p?s.replace(/\{(\w+)\}/g,(_,n)=>{const v=p[n]; return typeof v==="string"&&v[0]==="#"?tr(v.slice(1)):(v??"")}):s;
 }
 let lastStatus=["hint","hint_sub",null];
@@ -1281,7 +1317,7 @@ if(MERCHC){ MERCHC.merchHere=true; MERCHC.props=[]; MERCHC.blocked=true; }
 const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
 const SELL_P={club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
   pelt:4,fang:3,meat_raw:2,meat_cooked:5};
-const sellPrice=id=>SELL_P[id]??PRICE[id]??0;
+const sellPrice=id=>CFG.sell[id]!=null?CFG.sell[id]:(SELL_P[id]??PRICE[id]??0);
 let shopTab="buy", shopMsg=null;
 // левый/правый вариант пропа меняется при повороте камеры на 90°
 const swapLR=n=>n.endsWith("_left")?n.slice(0,-5)+"_right":n.endsWith("_right")?n.slice(0,-6)+"_left":n;
@@ -1372,7 +1408,7 @@ function renderShop(body){
   for(const k of ["buy","sell"]){ const b=mkEl("button","btn"+(shopTab===k?" on":""),tr("shop_"+k)); b.type="button"; b.setAttribute("aria-pressed",shopTab===k);
     b.onclick=()=>{ shopTab=k; bagSel=null; renderWin(); }; tabs.appendChild(b); }
   tabs.appendChild(mkEl("span","coins",tr("shop_coins",{c:inv.coin||0}))); body.appendChild(tabs);
-  const list=shopTab==="buy"?SHOP.map(s=>({id:s.id,s})):ITEMS.filter(f=>inv[f.id]&&f.id!=="coin"&&sellPrice(f.id)>0).map(f=>({id:f.id}));
+  const list=shopTab==="buy"?shopList().map(s=>({id:s.id,s})):ITEMS.filter(f=>inv[f.id]&&f.id!=="coin"&&sellPrice(f.id)>0).map(f=>({id:f.id}));
   if(!list.length){ body.appendChild(mkEl("p","muted",tr("shop_nothing"))); return; }
   if(bagSel&&!list.some(e=>e.id===bagSel)) bagSel=null;
   if(!bagSel) bagSel=list[0].id;
@@ -1381,7 +1417,7 @@ function renderShop(body){
     const pr=mkEl("em",null,String(shopTab==="buy"?e.s.p:sellPrice(e.id))); b.appendChild(pr); grid.appendChild(b); }
   body.appendChild(grid);
   const id=bagSel, det=mkEl("div","detail"), row=mkEl("div","drow"), im=mkEl("img"); im.src=iconURL(id); im.alt=""; row.appendChild(im);
-  const t2=mkEl("div"), s=SHOP.find(x=>x.id===id);
+  const t2=mkEl("div"), s=shopList().find(x=>x.id===id);
   t2.appendChild(mkEl("b",null,tr("fish_"+id)+(shopTab==="buy"&&s.n>1?" ×"+s.n:shopTab==="sell"&&inv[id]>1?" ×"+inv[id]:"")));
   t2.appendChild(mkEl("p",null,itemDesc(id))); row.appendChild(t2); det.appendChild(row);
   const acts=mkEl("div","acts"), act=(label,fn,big,dis)=>{ const b=mkEl("button","btn"+(big?" big":""),label); b.type="button"; b.onclick=fn; b.disabled=!!dis; acts.appendChild(b); };
@@ -2376,13 +2412,13 @@ function updateAnimals(dt){
   spawnT-=dt;
   if(spawnT<=0){ spawnT=1;
     const hares=animals.filter(a=>a.kind==="hare"&&!a.leaving), wolves=animals.filter(a=>a.kind==="wolf"&&!a.leaving&&!(a.dying>0));
-    if(day){ if(hares.length<3){ const c=randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,5)); if(c) spawnAnimal("hare",c); }
-      if(wolves.filter(w=>w.calm).length<2&&Math.random()<0.08){ const c=randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5);
+    if(day){ if(hares.length<3){ const z=zonePick("hare",c=>freeCell(c)&&farFromAll(c,4)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,5)); if(c) spawnAnimal("hare",c); }
+      if(wolves.filter(w=>w.calm).length<2&&Math.random()<0.08){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5), c=z!==undefined?z:randomCell(c=>freeCell(c)&&"gGd".includes(c.t)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5);
         if(c){ spawnAnimal("wolf",c); animals[animals.length-1].calm=true; } } }
     else for(const a of hares){ a.leaving=true; const [tp]=nearestP(a.x,a.y); setPath(a,fleeCell(a,tp?tp.x:a.x,tp?tp.y:a.y,3,6)); a.speed=3; }
     if(night){
       const want=(hourNow()>=23||hourNow()<4)?3:2;
-      if(wolves.length<want){ const c=randomCell(c=>freeCell(c)&&edgeCell(c)&&farFromAll(c,8)&&nearestFire(c.x,c.y)[1]>6);
+      if(wolves.length<want){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>6), c=z!==undefined?z:randomCell(c=>freeCell(c)&&edgeCell(c)&&farFromAll(c,8)&&nearestFire(c.x,c.y)[1]>6);
         if(c){ spawnAnimal("wolf",c); const w=animals[animals.length-1]; w.howlT=1.6; if(!wolves.length) say("wolf_near","night_sub"); } }
     } else for(const a of wolves){ if(a.calm||a.aggro) continue; a.leaving=true; setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; }
   }
@@ -2617,6 +2653,7 @@ const ED_GROUPS=[
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"]]],
   ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["erase",null]]],
   ["ed_g_places",[["start",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]]],
+  ["ed_g_zones",[["zone_hare","hare_se_0"],["zone_wolf","wolf_se_0"],["zone_erase",null]]],
 ];
 const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
@@ -2650,6 +2687,8 @@ function edNewState(t,before){
 function edApplyCell(x,y,stroke){
   const k=x+","+y; if(stroke.seen.has(k)) return; stroke.seen.add(k);
   if(x<0||y<0||x>=W||y>=D) return;
+  if(edTool.startsWith("zone_")){ const c=cellAt(x,y); if(!c||c.water) return;
+    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
   const c=cellAt(x,y); if(isSpecial(c)) return;
   const before=snapCell(c), s=edNewState(edTool,before);
   if(s===undefined||JSON.stringify(before)===JSON.stringify(s)) return;
@@ -2705,6 +2744,71 @@ function edUndoLast(){
   for(let i=u.changes.length-1;i>=0;i--){ const [x,y,s]=u.changes[i]; setCellState(x,y,s); }
   edDraft=JSON.parse(u.draft); rebuildTrees(); edRender(); edMini();
 }
+// ---- зоны зверей, тексты NPC и цены лавки ----
+const NPC_KEYS=["npc_name","npc_hello","npc_hello_active","npc_hello_done","npc_who","npc_quest","npc_accepted","npc_reward","npc_wolfq","npc_wolf_acc","npc_reward2","npc_craft"];
+const MERCH_KEYS=["merch_name","shop_hello","shop_bought","shop_sold","shop_no_money","shop_nothing"];
+const TEXT_KEYS=[...NPC_KEYS,...MERCH_KEYS];
+const SELL_EDIT=["karas","okun","shchuka","gold","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
+let edTab="map", edCfg=null, cfgDirty=false, edTxtLang=null, edTxtWho="npc";
+function applyConfig(d){
+  const t=d&&d.texts&&typeof d.texts==="object"?d.texts:{};
+  for(const L of ["pl","ru"]){ CFG.texts[L]={}; const src=t[L]&&typeof t[L]==="object"?t[L]:{};
+    for(const k of TEXT_KEYS) if(typeof src[k]==="string"&&src[k].trim()) CFG.texts[L][k]=src[k].slice(0,400); }
+  for(const f of ["buy","sell"]){ CFG[f]={}; const src=d&&d[f]&&typeof d[f]==="object"?d[f]:{};
+    for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) CFG[f][k]=Math.min(9999,Math.round(v)); }
+  CFG.off={}; const off=d&&d.off&&typeof d.off==="object"?d.off:{}; for(const [k,v] of Object.entries(off)) if(v===true) CFG.off[k]=true;
+  if(winKind) renderWin(); if(dialogOpen) renderDialog(); if(EDIT&&edTab!=="map"&&!cfgDirty) edRender();
+}
+const shopList=()=>SHOP.filter(s=>!CFG.off[s.id]).map(s=>({...s,p:CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
+function zonePick(kind,filter){
+  const z=MAP.zones&&MAP.zones[kind]; if(!Array.isArray(z)||!z.length) return undefined;   // зон нет — по всему острову
+  for(let i=0;i<30;i++){ const p=z[(Math.random()*z.length)|0], c=Array.isArray(p)&&cellAt(p[0],p[1]); if(c&&filter(c)) return c; }
+  return null;
+}
+function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off}}; }
+async function saveConfig(){
+  if(!NET.db||!edCfg) return; const d=JSON.parse(JSON.stringify(edCfg));
+  await NET.db.doc("world/config").set(d).catch(()=>{});
+  cfgDirty=false; applyConfig(d); say("ed_cfg_saved","ed_cfg_saved_sub"); edRender();
+}
+function renderTextsTab(p){
+  const L=edTxtLang||LANG, keys=edTxtWho==="npc"?NPC_KEYS:MERCH_KEYS;
+  const row=mkEl("div","edtabs");
+  for(const l of ["pl","ru"]){ const b=mkEl("button","btn"+(L===l?" on":""),l.toUpperCase()); b.type="button"; b.onclick=()=>{ edTxtLang=l; edRender(); }; row.appendChild(b); }
+  for(const w of ["npc","merch"]){ const b=mkEl("button","btn"+(edTxtWho===w?" on":""),tr(w==="npc"?"ed_txt_npc":"ed_txt_merch")); b.type="button"; b.onclick=()=>{ edTxtWho=w; edRender(); }; row.appendChild(b); }
+  p.appendChild(row); p.appendChild(mkEl("p","muted",tr("ed_txt_hint")));
+  for(const k of keys){
+    const box=mkEl("div","edtxt"), head=mkEl("div","edtxth"); head.appendChild(mkEl("b",null,tr("edk_"+k)));
+    const def=I18N[L][k]??I18N.pl[k]??"", cur=edCfg.texts[L][k];
+    const ta=mkEl("textarea"); ta.value=cur!=null?cur:def; ta.maxLength=400; ta.rows=k.endsWith("name")?1:3; ta.spellcheck=false;
+    const rs=mkEl("button","btn mini",tr("ed_txt_reset")); rs.type="button"; rs.disabled=cur==null;
+    ta.oninput=()=>{ const v=ta.value; if(!v.trim()||v===def) delete edCfg.texts[L][k]; else edCfg.texts[L][k]=v; cfgDirty=true; rs.disabled=edCfg.texts[L][k]==null; };
+    rs.onclick=()=>{ delete edCfg.texts[L][k]; ta.value=def; cfgDirty=true; rs.disabled=true; };
+    head.appendChild(rs); box.appendChild(head); box.appendChild(ta); p.appendChild(box);
+  }
+}
+function renderShopTab(p){
+  p.appendChild(mkEl("b","sub",tr("ed_shop_buy")));
+  for(const s of SHOP){
+    const r=mkEl("div","edshop"), im=mkEl("img"); im.src=iconURL(s.id); im.alt=""; r.appendChild(im);
+    r.appendChild(mkEl("span",null,tr("fish_"+s.id)+(s.n>1?" ×"+s.n:"")));
+    const lab=mkEl("label","edchk"), cb=mkEl("input"); cb.type="checkbox"; cb.checked=!edCfg.off[s.id];
+    cb.onchange=()=>{ if(cb.checked) delete edCfg.off[s.id]; else edCfg.off[s.id]=true; cfgDirty=true; };
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(tr("ed_shop_on"))); r.appendChild(lab);
+    r.appendChild(numInput(edCfg.buy,s.id,s.p)); p.appendChild(r);
+  }
+  p.appendChild(mkEl("b","sub",tr("ed_shop_sell")));
+  for(const id of SELL_EDIT){
+    const r=mkEl("div","edshop"), im=mkEl("img"); im.src=iconURL(id); im.alt=""; r.appendChild(im);
+    r.appendChild(mkEl("span",null,tr("fish_"+id))); r.appendChild(numInput(edCfg.sell,id,SELL_P[id]??PRICE[id]??0)); p.appendChild(r);
+  }
+}
+function numInput(obj,id,def){
+  const i=mkEl("input","ednum"); i.type="number"; i.min="0"; i.max="9999"; i.step="1"; i.inputMode="numeric";
+  i.placeholder=String(def); i.value=obj[id]!=null?String(obj[id]):"";
+  i.oninput=()=>{ const v=i.value.trim(); if(v===""||+v===def) delete obj[id]; else { const n=Math.max(0,Math.min(9999,Math.round(+v))); if(isFinite(n)) obj[id]=n; } cfgDirty=true; };
+  return i;
+}
 // ---- сохранение ----
 function edSerialize(){
   const w=edW(), d=edD(), ox=edAdd.l, oy=edAdd.t, levels=[], tops=[], stairs={}, props=[];
@@ -2713,7 +2817,8 @@ function edSerialize(){
   for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(!inb(x,y)) continue; if(c.st) stairs[x+","+y]=c.st;
     for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([x,y,n]); }
   const mv=p=>p&&inb(p[0]+ox,p[1]+oy)?[p[0]+ox,p[1]+oy,...p.slice(2)]:null;
-  return {levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
+  const zones={}; for(const z of ["hare","wolf"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
+  return {zones,levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
     merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier)};
 }
 const sameP=(a,b)=>JSON.stringify(a||null)===JSON.stringify(b||null);
@@ -2823,13 +2928,16 @@ let edPrevGrid=false, edExitConfirm=false;
 function edEnter(){
   if(!isAdmin) return; EDIT=true; closeWin(); if(dialogOpen) closeDialog(); stopFishing(); stopChopping(); hero.path=[]; hero.target=null; marker=null;
   edAdd={t:0,b:0,l:0,r:0}; edUndo.length=0;
-  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS};
+  const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
+  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,zones:{hare:zk("hare"),wolf:zk("wolf")}};
+  edTab="map"; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
 }
 function edExit(){
-  if(edUndo.length&&!edExitConfirm){ edExitConfirm=true; edRender(); setTimeout(()=>{edExitConfirm=false; edRender();},4000); return; }
+  if((edUndo.length||cfgDirty)&&!edExitConfirm){ edExitConfirm=true; edRender(); setTimeout(()=>{edExitConfirm=false; edRender();},4000); return; }
   edExitConfirm=false; EDIT=false; showGrid=edPrevGrid; document.body.classList.remove("editing"); document.getElementById("edPanel").hidden=true;
+  cfgDirty=false;
   if(edUndo.length){ setTimeout(()=>location.reload(),300); return; }   // несохранённые правки — вернуть как было
   say("hint","hint_sub"); dirty=true;
 }
@@ -2837,10 +2945,15 @@ function edRender(){
   const p=document.getElementById("edPanel"); if(!p||p.hidden) return; p.textContent="";
   const btn=(label,fn,cls,dis)=>{ const b=mkEl("button","btn"+(cls?" "+cls:""),label); b.type="button"; b.onclick=fn; b.disabled=!!dis; return b; };
   const top=mkEl("div","edtop");
-  top.appendChild(btn(tr("ed_undo"),edUndoLast,"",!edUndo.length));
-  top.appendChild(btn(tr("ed_save"),edSave,"big"));
+  top.appendChild(btn(tr("ed_undo"),edUndoLast,"",edTab!=="map"||!edUndo.length));
+  top.appendChild(btn(tr("ed_save"),()=>edTab==="map"?edSave():saveConfig(),"big"));
   top.appendChild(btn(tr(edExitConfirm?"ed_exit_confirm":"ed_exit"),edExit,edExitConfirm?"warn":""));
   p.appendChild(top);
+  const tabs=mkEl("div","edtabs");
+  for(const t of ["map","texts","shop"]){ const b=btn(tr("ed_tab_"+t),()=>{ edTab=t; edRender(); },edTab===t?"on":""); tabs.appendChild(b); }
+  p.appendChild(tabs);
+  if(edTab==="texts"){ renderTextsTab(p); return; }
+  if(edTab==="shop"){ renderShopTab(p); return; }
   // мини-карта и режим пальца
   const mrow=mkEl("div","edmrow"), mc=mkEl("canvas","edmini"); mc.id="edMini"; mc.width=150; mc.height=150; mrow.appendChild(mc);
   const side=mkEl("div","edside");
@@ -2856,10 +2969,10 @@ function edRender(){
     for(const [id,spr] of items){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=tr("ed_t_"+id);
       const name=spr&&(id==="fence"||id==="stall"||id==="pier")?spr.replace("_left","_"+edDir):spr;
       if(name&&typeof SPRITES!=="undefined"&&SPRITES[name]){ const im=mkEl("img"); im.src=SPRITES[name]; im.alt=""; b.appendChild(im); }
-      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂"}[id]||"?"));
+      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫"}[id]||"?"));
       b.appendChild(mkEl("small",null,tr("ed_t_"+id)));
       b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
-    grp.appendChild(row); tools.appendChild(grp); }
+    grp.appendChild(row); if(gk==="ed_g_zones") grp.appendChild(mkEl("p","muted",tr("ed_zone_note"))); tools.appendChild(grp); }
   p.appendChild(tools);
   // размер: добавить/убрать ряды с любой стороны
   const sz=mkEl("div","edgrp"); sz.appendChild(mkEl("b",null,tr("ed_g_size",{w:edW(),d:edD()})));
@@ -2889,6 +3002,8 @@ function edMini(){
     const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
     g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
     if(c.props.some(n=>n.startsWith("tree"))){ g.fillStyle="#1f4a1a"; g.fillRect(offX+(x+0.25)*k,offY+(y+0.25)*k,Math.max(1,k*0.5),Math.max(1,k*0.5)); } }
+  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"]]) for(const kk of Object.keys(edDraft.zones[z])){
+    const [x,y]=kk.split(",").map(Number); g.fillStyle=col; g.fillRect(offX+(x+ox)*k+k*0.2,offY+(y+oy)*k+k*0.2,Math.max(1,k*0.6),Math.max(1,k*0.6)); }
   const dot=(p,col)=>{ if(!p) return; g.fillStyle=col; g.fillRect(offX+(p[0]+ox)*k-1,offY+(p[1]+oy)*k-1,Math.max(3,k+2),Math.max(3,k+2)); };
   if(edDraft){ dot(edDraft.hut,"#d84a2a"); dot(edDraft.npc,"#ffd66b"); dot(edDraft.merchant,"#ff9a3a"); dot(edDraft.start,"#ffffff"); }
   g.strokeStyle="#1b1528"; g.lineWidth=1; g.strokeRect(offX+0.5,offY+0.5,w*k-1,d*k-1);
@@ -2902,8 +3017,11 @@ function edMiniJump(px,py){
 // метки мест (старт, хижина, NPC…) в режиме редактора
 function edDrawMarks(){
   if(!EDIT||!edDraft) return; worldTransform();
+  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"]]) for(const k of Object.keys(edDraft.zones[z])){
+    const [x,y]=k.split(",").map(Number), c=cellAt(x,y); if(!c) continue; const q=cellQuad(c);
+    ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
   ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
-  for(const [k,p] of Object.entries(edDraft)){ if(!p) continue; const c=cellAt(p[0],p[1]); if(!c) continue;
+  for(const [k,p] of Object.entries(edDraft)){ if(!p||k==="zones") continue; const c=cellAt(p[0],p[1]); if(!c) continue;
     const [x,y]=proj(c.x-MX+(k==="hut"?0.5:0),c.y-MY+(k==="hut"?0.5:0),walkZ(c)), txt=tr("ed_t_"+k), yy=Math.round(y-(k==="hut"?70:56));
     ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
     ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
@@ -3267,6 +3385,7 @@ async function initNet(){
       else if(!s.metadata.fromCache&&!clockDoc) netSetClock(clock);
     },()=>{});
     db.doc("world/map").onSnapshot(onMapDoc,()=>{});
+    db.doc("world/config").onSnapshot(s=>applyConfig(s.exists?s.data():null),()=>{});
     db.collection("trees").onSnapshot(snap=>{ netTreeIds.clear(); for(const s of snap.docs){ netTreeIds.add(s.id); const m=/^t_(\d+)_(\d+)$/.exec(s.id); if(m) applyTreeDoc(cellAt(+m[1],+m[2]),s.data()); } },()=>{});
     db.collection("fires").onSnapshot(snap=>applyFires(snap.docs),()=>{});
     db.collection("players").onSnapshot(snap=>applyPlayers(snap.docs),()=>{});
