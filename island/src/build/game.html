@@ -178,6 +178,28 @@ canvas.drag{cursor:grabbing}
 .tabs .coins{margin-left:auto;font-family:var(--f-display);font-size:12px;color:#ffd66b}
 .wbody .slot em{position:absolute;left:2px;top:0;font:700 10px/12px var(--f-body);font-style:normal;color:#ffd66b;text-shadow:1px 1px 0 var(--edge)}
 .acts .btn:disabled{opacity:.45;cursor:default}
+/* редактор карты */
+.edpanel{position:absolute;z-index:6;left:max(10px,env(safe-area-inset-left,0px));top:10px;bottom:10px;width:min(300px,calc(100% - 20px));
+  overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+.edtop{display:flex;gap:6px}
+.edtop .btn,.edopt .btn{font-family:var(--f-body);font-weight:700;letter-spacing:0}
+.edtop .btn{flex:1;font-size:13px;min-height:38px}
+.edtop .big{background:var(--accent);color:var(--panel)}
+.edpanel .btn.warn{background:#e8402c;color:#fff}
+.edpanel .btn:disabled{opacity:.45;cursor:default}
+.edgrp b{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:11px;letter-spacing:.04em}
+.edrow{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.edb{width:62px;min-height:60px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 2px;background:var(--panel-2);border:2px solid var(--edge);color:var(--ink);cursor:pointer}
+.edb img{width:44px;height:32px;object-fit:contain;image-rendering:pixelated}
+.edb .edic{font-size:20px;line-height:32px;height:32px}
+.edb small{font-size:10px;line-height:1.1;text-align:center}
+.edb.on{box-shadow:inset 0 0 0 2px var(--accent);background:#4b3e6b}
+.edb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.edopt{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.edopt .btn{font-size:12px;min-height:34px;padding:4px 8px}
+.edsize{font-family:var(--f-display);font-size:12px;padding:0 4px}
+.edpanel .muted{color:var(--muted);font-size:12px;margin:0}
+body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .hp{display:none!important}
 /* окно ника */
 .nickwrap{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(20,14,34,.55);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -217,6 +239,10 @@ canvas.drag{cursor:grabbing}
   .inv .slot img{width:28px;height:28px}
   .ctrl{right:max(10px,env(safe-area-inset-right,0px));top:auto;transform:none;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
   .hotbar{left:max(10px,env(safe-area-inset-left,0px));top:46px}
+  .edpanel{top:auto;left:10px;right:10px;width:auto;max-height:48%;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  body.editing .info{display:none}
+  .edb{width:56px} .edb img{width:38px;height:28px}
+  body.editing .ctrl{bottom:calc(48% + 24px)}
   .win{top:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:74%;width:calc(100% - 20px)}
   .fishbar{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   .fishbar .hook{font-size:24px;min-width:220px;padding:18px 30px 22px}
@@ -261,6 +287,8 @@ canvas.drag{cursor:grabbing}
   .hb{width:38px;height:38px} .hb img{width:28px;height:28px}
   .win{top:50%;bottom:auto;transform:translate(-50%,-50%);max-height:calc(100% - 12px);width:min(520px,calc(100% - 20px))}
   .doll{grid-template-columns:1fr 72px 1fr} .heroPrev{width:72px;height:108px}
+  .edpanel{top:6px;bottom:6px;left:max(10px,env(safe-area-inset-left,0px));right:auto;width:min(290px,45%);max-height:none}
+  body.editing .info{display:none} body.editing .ctrl{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 }
 @media (max-height:500px) and (max-width:640px){ .info{max-width:none;right:max(10px,env(safe-area-inset-right,0px));bottom:60px} }
 /* обновление */
@@ -286,6 +314,7 @@ canvas.drag{cursor:grabbing}
     <button class="btn" id="skipTime">Przewiń do nocy</button>
     <button class="btn" id="nickBtn" data-i18n="nick_change">Zmień nick</button>
     <button class="btn" id="inviteBtn" hidden data-i18n="invite">Zaproś znajomego</button>
+    <button class="btn" id="editBtn" hidden data-i18n="ed_open">Edytor mapy</button>
     <button class="btn" id="fsBtn" hidden data-i18n="fs_on">Pełny ekran</button>
   </div>
 </div>
@@ -315,6 +344,7 @@ canvas.drag{cursor:grabbing}
     <button class="hb" data-win="hero" data-i18n-label="win_hero" aria-label="Postać" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg></button>
     <button class="hb" data-win="quests" data-i18n-label="win_quests" aria-label="Zadania" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 4h11v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2h9M9 8h5M9 12h5" stroke-linejoin="round"/></svg><span class="dot" id="qDot" hidden>!</span></button>
   </div>
+  <div class="edpanel panel" id="edPanel" hidden></div>
   <div class="win panel" id="win" hidden role="dialog" aria-labelledby="winTitle">
     <div class="whead"><b id="winTitle"></b><button class="btn wx" id="winClose" data-i18n-label="close" aria-label="Zamknij">✕</button></div>
     <div class="wbody" id="winBody"></div>
@@ -348,6 +378,18 @@ canvas.drag{cursor:grabbing}
 <script>
 const SPRITES = /*SPRITES*/;
 const MAP = /*MAP*/;
+// своя карта мира (из редактора): сначала из кэша браузера, база присылает свежую
+function mapKey(){ return "island_map_"+(window.__islandWorld||"claude"); }
+function validMap(m){ try{
+  if(!m||!Array.isArray(m.levels)||!Array.isArray(m.tops)) return false;
+  const d=m.levels.length, w=(m.levels[0]||"").length; if(d<8||d>40||w<8||w>40||m.tops.length!==d) return false;
+  for(let y=0;y<d;y++){ if(typeof m.levels[y]!=="string"||m.levels[y].length!==w||!/^[0-9]+$/.test(m.levels[y])) return false;
+    if(typeof m.tops[y]!=="string"||m.tops[y].length!==w) return false; }
+  if(!m.stairs||typeof m.stairs!=="object"||!Array.isArray(m.props)||!Array.isArray(m.start)) return false;
+  return /[1-9]/.test(m.levels.join("")); }catch(e){ return false; } }
+let MAP_V=0;
+try{ const raw=localStorage.getItem(mapKey()); if(raw){ const o=JSON.parse(raw);
+  if(o&&validMap(o.m)){ Object.assign(MAP,{hut:null,npc:null,merchant:null,stall:null,pier:null},o.m); MAP_V=o.v||0; } } }catch(e){}
 
 // ================= Языки =================
 const I18N={
@@ -403,6 +445,16 @@ const I18N={
     opt_craft:"Zrób mi coś (rzemiosło)", npc_craft:"Ze skór, kłów i drewna zrobię ci porządny sprzęt. Co robimy?", craft_opt:"{item} — {cost}",
     npc_crafted:"Gotowe! {item} — trzymaj. Załóż w oknie Ekwipunek.", coins:"monet",
     xp:"+{n} XP", lvl_float:"POZIOM {n}!", lvl_up:"Nowy poziom: {n}!", lvl_up_sub:"zdrowie odnowione", blocked_bite:"Unik!",
+    ed_open:"Edytor mapy", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
+    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Woda", ed_t_up:"Wyżej", ed_t_down:"Niżej", ed_t_stairs:"Schody",
+    ed_t_tree_big:"Duże drzewo", ed_t_tree_small:"Małe drzewo", ed_t_bush:"Krzak", ed_t_rock_big:"Duży kamień", ed_t_rock_small:"Mały kamień", ed_t_grass_tuft:"Trawka", ed_t_fence:"Płot", ed_t_erase:"Gumka",
+    ed_t_start:"Start", ed_t_hut:"Chata", ed_t_npc:"Rybak", ed_t_merchant:"Kupiec", ed_t_stall:"Lada", ed_t_pier:"Pomost",
+    ed_undo:"Cofnij", ed_save:"Zapisz", ed_exit:"Wyjdź", ed_exit_confirm:"Wyjść bez zapisu?", ed_brush:"Pędzel {n}", ed_dir:"Obróć ↻", ed_size:"{w} × {d}",
+    ed_reset:"Mapa domyślna", ed_reset_confirm:"Na pewno? Stuknij znowu", ed_size_note:"Nowy rozmiar zadziała po zapisie (strona się przeładuje).",
+    ed_hint:"Edytor mapy", ed_hint_sub:"wybierz narzędzie i stukaj w pola · mapę przesuwaj palcem", ed_tap_sub:"stukaj w pola na mapie",
+    ed_bad_place:"Tu nie można tego postawić", ed_placed:"Miejsce wybrane", ed_placed_sub:"zmiana po zapisie", ed_bad_map:"Mapa jest pusta albo błędna",
+    ed_saved:"Mapa zapisana!", ed_saved_sub:"wszyscy gracze zobaczą ją od razu", ed_saved_reload:"Mapa zapisana — przeładowuję…",
+    map_changed:"Mapa wyspy się zmieniła!", map_changed_sub:"wczytuję nową…", admin_bad:"Zły kod admina",
     win_shop:"Sklep", merch_name:"Kupiec Zbyszek", go_trade:"Idziesz do kupca",
     shop_hello:"Witaj, wędrowcze! Mam towar z lądu — i chętnie kupię, co upolujesz.", shop_buy:"Kup", shop_sell:"Sprzedaj", shop_coins:"{c} monet",
     shop_nothing:"Nie masz nic, co mógłbym kupić. Wróć z rybami albo skórami!", shop_buy_for:"Kup za {c} monet", shop_sell_one:"Sprzedaj 1 (+{c})", shop_sell_all:"Sprzedaj wszystko (+{c})",
@@ -487,6 +539,16 @@ const I18N={
     opt_craft:"Сделай мне вещь (ремесло)", npc_craft:"Из шкур, клыков и дерева сделаю тебе добрую снасть. Что делаем?", craft_opt:"{item} — {cost}",
     npc_crafted:"Готово! {item} — держи. Надень в окне Снаряжение.", coins:"монет",
     xp:"+{n} XP", lvl_float:"УРОВЕНЬ {n}!", lvl_up:"Новый уровень: {n}!", lvl_up_sub:"здоровье восстановлено", blocked_bite:"Увернулся!",
+    ed_open:"Редактор карты", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
+    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Вода", ed_t_up:"Выше", ed_t_down:"Ниже", ed_t_stairs:"Лестница",
+    ed_t_tree_big:"Большое дерево", ed_t_tree_small:"Малое дерево", ed_t_bush:"Куст", ed_t_rock_big:"Большой камень", ed_t_rock_small:"Малый камень", ed_t_grass_tuft:"Травка", ed_t_fence:"Забор", ed_t_erase:"Ластик",
+    ed_t_start:"Старт", ed_t_hut:"Хижина", ed_t_npc:"Рыбак", ed_t_merchant:"Купец", ed_t_stall:"Прилавок", ed_t_pier:"Пристань",
+    ed_undo:"Отменить", ed_save:"Сохранить", ed_exit:"Выйти", ed_exit_confirm:"Выйти без сохранения?", ed_brush:"Кисть {n}", ed_dir:"Повернуть ↻", ed_size:"{w} × {d}",
+    ed_reset:"Карта по умолчанию", ed_reset_confirm:"Точно? Нажми ещё раз", ed_size_note:"Новый размер применится после сохранения (страница перезагрузится).",
+    ed_hint:"Редактор карты", ed_hint_sub:"выбери инструмент и тапай по клеткам · карту двигай пальцем", ed_tap_sub:"тапай по клеткам на карте",
+    ed_bad_place:"Сюда это поставить нельзя", ed_placed:"Место выбрано", ed_placed_sub:"применится после сохранения", ed_bad_map:"Карта пустая или с ошибкой",
+    ed_saved:"Карта сохранена!", ed_saved_sub:"все игроки увидят её сразу", ed_saved_reload:"Карта сохранена — перезагружаю…",
+    map_changed:"Карта острова изменилась!", map_changed_sub:"загружаю новую…", admin_bad:"Неверный код админа",
     win_shop:"Лавка", merch_name:"Купец Збышек", go_trade:"Идёшь к купцу",
     shop_hello:"Здравствуй, путник! У меня товар с большой земли — и охотно куплю, что добудешь.", shop_buy:"Купить", shop_sell:"Продать", shop_coins:"{c} монет",
     shop_nothing:"Тебе нечего мне продать. Возвращайся с рыбой или шкурами!", shop_buy_for:"Купить за {c} монет", shop_sell_one:"Продать 1 (+{c})", shop_sell_all:"Продать всё (+{c})",
@@ -585,6 +647,11 @@ for(const [x,y,name] of MAP.props){const c=grid[y]?.[x]; if(!c) continue; c.prop
 for(const c of cells) if(c.t==="w"){c.water=true;c.blocked=true;}  // вода: по ней не ходят
 const cellAt=(x,y)=> (x>=0&&y>=0&&x<W&&y<D)?grid[y][x]:null;
 const walkZ=c=> c.water ? c.L-0.3 : c.st ? c.L+0.5 : c.L;  // вода чуть ниже берега
+// места из карты должны стоять на суше
+{ const land=p=>p&&cellAt(p[0],p[1])&&!cellAt(p[0],p[1]).water;
+  if(MAP.hut&&[[0,0],[1,0],[0,1],[1,1]].some(([a,b])=>!land([MAP.hut[0]+a,MAP.hut[1]+b]))) MAP.hut=null;
+  if(MAP.npc&&!land(MAP.npc)) MAP.npc=null;
+  if(!land(MAP.start)){ const c=cells.find(c=>!c.water&&!c.blocked)||cells[0]; MAP.start=[c.x,c.y]; } }
    // высота поверхности, по которой идёт герой
 
 // ---------- Камера и поворот ----------
@@ -1184,19 +1251,19 @@ function initRPG(){
     if(typeof SPRITES!=="undefined"&&SPRITES[name]){ const s=b.querySelector("svg"); if(s) s.remove(); const im=mkEl("img"); im.src=SPRITES[name]; im.alt=""; b.prepend(im); }
     b.onclick=()=>openWin(k); });
   document.getElementById("winClose").onclick=closeWin;
-  addEventListener("keydown",e=>{ if(e.target&&e.target.tagName==="INPUT") return;
+  addEventListener("keydown",e=>{ if(e.target&&e.target.tagName==="INPUT") return; if(EDIT) return;
     if(e.key==="Escape"&&winKind){ closeWin(); return; }
     const m={i:"bag",b:"bag",c:"hero",k:"equip",j:"quests"}[e.key.toLowerCase()]; if(m&&!e.ctrlKey&&!e.metaKey&&!e.altKey) openWin(m); });
   recalcHP(); refreshUI();
 }
 
 // ================= Торговец Збышек у пристани =================
-const MERCH_POS=[17,12], STALL_POS=[18,12,"stall_left"], PIER_POS=[16,12,"pier_right"];
-const MERCHC=cellAt(MERCH_POS[0],MERCH_POS[1]);
+const MERCH_POS=MAP.merchant!==undefined?MAP.merchant:[17,12], STALL_POS=MAP.stall!==undefined?MAP.stall:[18,12,"stall_left"], PIER_POS=MAP.pier!==undefined?MAP.pier:[16,12,"pier_right"];
+const MERCHC=MERCH_POS&&cellAt(MERCH_POS[0],MERCH_POS[1])&&!cellAt(MERCH_POS[0],MERCH_POS[1]).water?cellAt(MERCH_POS[0],MERCH_POS[1]):null;
 const merch=MERCHC?{x:MERCHC.x,y:MERCHC.y,z:walkZ(MERCHC),facing:"sw",t:0,turnT:4}:null;
 if(MERCHC){ MERCHC.merchHere=true; MERCHC.props=[]; MERCHC.blocked=true; }
-{ const s=cellAt(STALL_POS[0],STALL_POS[1]); if(s&&!s.water){ s.props=[STALL_POS[2]]; s.stall=true; s.blocked=true; } }
-{ const p=cellAt(PIER_POS[0],PIER_POS[1]); if(p&&p.water) p.pier=PIER_POS[2]; }
+{ const s=STALL_POS&&cellAt(STALL_POS[0],STALL_POS[1]); if(s&&!s.water&&!s.merchHere){ s.props=[STALL_POS[2]]; s.stall=true; s.blocked=true; } }
+{ const p=PIER_POS&&cellAt(PIER_POS[0],PIER_POS[1]); if(p&&p.water) p.pier=PIER_POS[2]; }
 const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
 const SELL_P={club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
   pelt:4,fang:3,meat_raw:2,meat_cooked:5};
@@ -2524,6 +2591,186 @@ function atkSprite(facing,t,hue){
 }
 // иконки добычи кодом (если GPT ещё не нарисовал)
 
+// ================= Редактор карты (только для админа) =================
+// Карта хранится в базе (world/map) и в кэше браузера; игроки получают её сразу после сохранения.
+let EDIT=false, isAdmin=false, edTool="g", edBrush=1, edDir="left", edW=W, edD=D, edDraft=null, edSaving=false;
+const edUndo=[], netTreeIds=new Set();
+const ED_GROUPS=[
+  ["ed_g_terrain",[["g","block_grass"],["G","block_grass_2"],["d","block_grass_dark"],["s","block_stone_path"],["e","block_dirt"],["w",null]]],
+  ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"]]],
+  ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["erase",null]]],
+  ["ed_g_places",[["start",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]]],
+];
+const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
+const isSpecial=c=>c&&(c.hutPart||c.npcHere||c.merchHere||c.stall||c.pier||c.fire);
+function setCellState(x,y,s){
+  let c=cellAt(x,y);
+  if(!s){ if(c&&!isSpecial(c)){ const i=cells.indexOf(c); if(i>=0) cells.splice(i,1); grid[y][x]=null; } return; }
+  if(!c){ c={x,y,L:s.L,t:s.t,st:null,props:[],blocked:false,leaves:[],grow:1}; cells.push(c); grid[y][x]=c; }
+  c.L=s.L; c.t=s.t; c.st=s.st||null; c.props=[...s.props]; c.water=c.t==="w"; c.falling=null; c.grow=1; c.stump=null;
+  if(c.water){ c.props=[]; c.st=null; }
+  refreshBlocked(c);
+}
+function rebuildTrees(){ TREES.length=0; for(const c of cells) for(const n of c.props) if(n.startsWith("tree")) TREES.push({c,big:n==="tree_big"}); dirty=true; }
+// клетка под пальцем, даже если там пусто (для «поднять» на пустом месте)
+function pickGrid(mx,my){
+  const wx=(mx-panX)/scale, wy=(my-panY)/scale, a=wx/HW, b=wy/HH, u=(a+b)/2, v=(b-a)/2;
+  const X=u*ca+v*sa, Y=-u*sa+v*ca, x=Math.round(X+MX), y=Math.round(Y+MY);
+  return x>=0&&y>=0&&x<W&&y<D?{x,y}:null;
+}
+function edTap(mx,my){
+  const c0=pick(mx,my), g=c0?{x:c0.x,y:c0.y}:pickGrid(mx,my); if(!g) return;
+  const t=edTool, changes=[], draftBefore=JSON.stringify(edDraft);
+  if(["start","hut","npc","merchant","stall","pier"].includes(t)){ if(!edPlace(t,g.x,g.y)) { say("ed_bad_place"); return; }
+    edUndo.push({changes,draft:draftBefore}); dirty=true; say("ed_placed","ed_placed_sub"); return; }
+  const r=edBrush===3&&t!=="stairs"?1:0;
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    const x=g.x+dx, y=g.y+dy; if(x<0||y<0||x>=W||y>=D) continue;
+    const c=cellAt(x,y); if(isSpecial(c)) continue;
+    const before=snapCell(c); let s=before?{...before,props:[...before.props]}:null;
+    if("gGdsew".includes(t)){ if(!s) continue; s.t=t; if(t==="w"){ s.props=[]; s.st=null; } }
+    else if(t==="up"){ s=s?{...s,L:Math.min(9,s.L+1)}:{L:1,t:"g",st:null,props:[]}; }
+    else if(t==="down"){ if(!s) continue; s=s.L>1?{...s,L:s.L-1}:null; }
+    else if(t==="stairs"){ if(!s||s.t==="w") continue; s.st=s.st===null?"L":s.st==="L"?"R":null; }
+    else if(t==="erase"){ if(!s) continue; s.props=[]; }
+    else { if(!s||s.t==="w") continue; s.props=[t==="fence"?"fence_"+edDir:t]; }
+    if(JSON.stringify(before)===JSON.stringify(s)) continue;
+    changes.push([x,y,before]); setCellState(x,y,s);
+  }
+  if(changes.length){ edUndo.push({changes,draft:draftBefore}); if(edUndo.length>200) edUndo.shift(); rebuildTrees(); }
+}
+function edPlace(t,x,y){
+  const c=cellAt(x,y), land=c&&!c.water;
+  if(t==="hut"){ const cs=[[0,0],[1,0],[0,1],[1,1]].map(([a,b])=>cellAt(x+a,y+b));
+    if(cs.some(k=>!k||k.water||k.L!==cs[0].L)) return false; edDraft.hut=[x,y]; return true; }
+  if(t==="pier"){ if(!c||!c.water) return false; edDraft.pier=[x,y,"pier_"+edDir]; return true; }
+  if(!land) return false;
+  if(t==="start") edDraft.start=[x,y]; else if(t==="npc") edDraft.npc=[x,y]; else if(t==="merchant") edDraft.merchant=[x,y];
+  else if(t==="stall") edDraft.stall=[x,y,"stall_"+edDir];
+  return true;
+}
+function edUndoLast(){
+  const u=edUndo.pop(); if(!u) return;
+  for(let i=u.changes.length-1;i>=0;i--){ const [x,y,s]=u.changes[i]; setCellState(x,y,s); }
+  edDraft=JSON.parse(u.draft); rebuildTrees(); edRender();
+}
+// ---- сохранение ----
+function edSerialize(){
+  const levels=[], tops=[], stairs={}, props=[];
+  for(let y=0;y<edD;y++){ let l="",t=""; for(let x=0;x<edW;x++){ const c=cellAt(x,y); if(c){ l+=String(Math.min(9,c.L)); t+=c.t||"g"; } else { l+="0"; t+="."; } } levels.push(l); tops.push(t); }
+  for(const c of cells){ if(c.x>=edW||c.y>=edD) continue; if(c.st) stairs[c.x+","+c.y]=c.st;
+    for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([c.x,c.y,n]); }
+  const inb=p=>p&&p[0]<edW&&p[1]<edD?p:null;
+  return {levels,tops,stairs,props,start:inb(edDraft.start)||[Math.floor(edW/2),Math.floor(edD/2)],hut:inb(edDraft.hut),npc:inb(edDraft.npc),
+    merchant:inb(edDraft.merchant),stall:inb(edDraft.stall),pier:inb(edDraft.pier)};
+}
+const sameP=(a,b)=>JSON.stringify(a||null)===JSON.stringify(b||null);
+function edNeedsReload(m){ return edW!==W||edD!==D||!sameP(m.hut,MAP.hut)||!sameP(m.npc,MAP.npc)||!sameP(m.merchant,MAP.merchant)||!sameP(m.stall,MAP.stall)||!sameP(m.pier,MAP.pier); }
+async function edSave(){
+  const m=edSerialize(); if(!validMap(m)){ say("ed_bad_map"); return; }
+  const v=Date.now(), reload=edNeedsReload(m); edSaving=true; MAP_V=v; Object.assign(MAP,m);
+  try{ localStorage.setItem(mapKey(),JSON.stringify({v,m})); }catch(e){}
+  if(NET.db){
+    await NET.db.doc("world/map").set({v,m:JSON.stringify(m)}).catch(()=>{});
+    for(const id of netTreeIds) NET.db.doc("trees/"+id).delete().catch(()=>{});
+    for(const id of fireDocs) NET.db.doc("fires/"+id).delete().catch(()=>{});
+  }
+  edUndo.length=0; edSaving=false;
+  if(reload){ say("ed_saved_reload"); try{ lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
+  else { say("ed_saved","ed_saved_sub"); edRender(); }
+}
+async function edReset(){
+  if(!confirmReset) { confirmReset=true; edRender(); setTimeout(()=>{confirmReset=false; edRender();},4000); return; }
+  try{ localStorage.removeItem(mapKey()); }catch(e){}
+  if(NET.db) await NET.db.doc("world/map").delete().catch(()=>{});
+  MAP_V=0; setTimeout(()=>location.reload(),400);
+}
+let confirmReset=false;
+// ---- карта от других: перезагрузка ----
+function onMapDoc(s){
+  if(EDIT||edSaving) return;
+  const d=s.exists?s.data():null;
+  if(d&&typeof d.m==="string"&&typeof d.v==="number"){
+    if(d.v===MAP_V) return; let m; try{ m=JSON.parse(d.m); }catch(e){ return; } if(!validMap(m)) return;
+    try{ localStorage.setItem(mapKey(),JSON.stringify({v:d.v,m})); }catch(e){}
+    reloadForMap();
+  } else if(!d&&MAP_V&&!(s.metadata&&s.metadata.fromCache)){ try{ localStorage.removeItem(mapKey()); }catch(e){} reloadForMap(); }
+}
+let mapReloading=false;
+function reloadForMap(){ if(mapReloading) return; mapReloading=true; say("map_changed","map_changed_sub");
+  try{ lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),1800); }
+// ---- права админа ----
+async function sha256(t){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function initAdmin(){
+  let code=(/[#&]admin=([^&]+)/.exec(location.hash)||[])[1];
+  if(code){ code=decodeURIComponent(code); try{ sessionStorage.setItem("island_admin",code); }catch(e){}
+    try{ history.replaceState(null,"",location.pathname+location.search+location.hash.replace(/[&]?admin=[^&]*/,"")); }catch(e){} }
+  else { try{ code=sessionStorage.getItem("island_admin"); }catch(e){} }
+  let ok=false;
+  if(code&&NET.db&&window.crypto&&crypto.subtle){
+    const h=await sha256(code+"|wyspa");
+    try{ const s=await NET.db.doc("world/admin").get();
+      if(!s.exists){ await NET.db.doc("world/admin").set({h}); ok=true; } else ok=(s.data()||{}).h===h; }catch(e){}
+    if(!ok) say("admin_bad");
+  } else if(!window.__islandWorld&&NET.user&&NET.user.isOwner){ try{ ok=!!(await NET.user.isOwner()); }catch(e){} }
+  isAdmin=ok; const b=document.getElementById("editBtn"); if(b) b.hidden=!ok;
+}
+// ---- режим редактора ----
+function edEnter(){
+  if(!isAdmin) return; EDIT=true; closeWin(); if(dialogOpen) closeDialog(); stopFishing(); stopChopping(); hero.path=[]; hero.target=null; marker=null;
+  edW=W; edD=D; edUndo.length=0;
+  edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS};
+  edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
+  document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
+}
+let edPrevGrid=false;
+function edExit(){
+  if(edUndo.length&&!edExitConfirm){ edExitConfirm=true; edRender(); setTimeout(()=>{edExitConfirm=false; edRender();},4000); return; }
+  edExitConfirm=false; EDIT=false; showGrid=edPrevGrid; document.body.classList.remove("editing"); document.getElementById("edPanel").hidden=true;
+  if(edUndo.length){ setTimeout(()=>location.reload(),300); return; }   // несохранённые правки — вернуть как было
+  say("hint","hint_sub"); dirty=true;
+}
+let edExitConfirm=false;
+function edRender(){
+  const p=document.getElementById("edPanel"); if(!p||p.hidden) return; p.textContent="";
+  const top=mkEl("div","edtop");
+  const btn=(label,fn,cls,dis)=>{ const b=mkEl("button","btn"+(cls?" "+cls:""),label); b.type="button"; b.onclick=fn; b.disabled=!!dis; return b; };
+  top.appendChild(btn(tr("ed_undo"),edUndoLast,"",!edUndo.length));
+  top.appendChild(btn(tr("ed_save"),edSave,"big"));
+  top.appendChild(btn(tr(edExitConfirm?"ed_exit_confirm":"ed_exit"),edExit,edExitConfirm?"warn":""));
+  p.appendChild(top);
+  const tools=mkEl("div","edtools");
+  for(const [gk,items] of ED_GROUPS){ const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
+    const row=mkEl("div","edrow");
+    for(const [id,spr] of items){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=tr("ed_t_"+id);
+      const name=spr&&(id==="fence"||id==="stall"||id==="pier")?spr.replace("_left","_"+edDir):spr;
+      if(name&&typeof SPRITES!=="undefined"&&SPRITES[name]){ const im=mkEl("img"); im.src=SPRITES[name]; im.alt=""; b.appendChild(im); }
+      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂"}[id]||"?"));
+      b.appendChild(mkEl("small",null,tr("ed_t_"+id)));
+      b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,"ed_tap_sub"); }; row.appendChild(b); }
+    grp.appendChild(row); tools.appendChild(grp); }
+  p.appendChild(tools);
+  const opt=mkEl("div","edopt");
+  opt.appendChild(btn(tr("ed_brush",{n:edBrush===1?"1×1":"3×3"}),()=>{ edBrush=edBrush===1?3:1; edRender(); }));
+  opt.appendChild(btn(tr("ed_dir"),()=>{ edDir=edDir==="left"?"right":"left"; edRender(); }));
+  const sz=mkEl("span","edsize",tr("ed_size",{w:edW,d:edD}));
+  opt.appendChild(btn("W−",()=>{ edW=Math.max(10,edW-1); edRender(); })); opt.appendChild(btn("W+",()=>{ edW=Math.min(40,edW+1); edRender(); }));
+  opt.appendChild(sz);
+  opt.appendChild(btn("H−",()=>{ edD=Math.max(10,edD-1); edRender(); })); opt.appendChild(btn("H+",()=>{ edD=Math.min(40,edD+1); edRender(); }));
+  opt.appendChild(btn(tr(confirmReset?"ed_reset_confirm":"ed_reset"),edReset,confirmReset?"warn":""));
+  p.appendChild(opt);
+  if(edW!==W||edD!==D) p.appendChild(mkEl("p","muted",tr("ed_size_note")));
+}
+// метки мест (старт, хижина, NPC…) в режиме редактора
+function edDrawMarks(){
+  if(!EDIT||!edDraft) return; worldTransform();
+  ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
+  for(const [k,p] of Object.entries(edDraft)){ if(!p) continue; const c=cellAt(p[0],p[1]); if(!c) continue;
+    const [x,y]=proj(c.x-MX+(k==="hut"?0.5:0),c.y-MY+(k==="hut"?0.5:0),walkZ(c)), txt=tr("ed_t_"+k), yy=Math.round(y-(k==="hut"?70:56));
+    ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
+    ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
+}
+
 
 // ================= Мультиплеер =================
 // room — кто сейчас в игре (позиции, чат, звери от «хозяина»); db — общий мир (деревья, костры, время)
@@ -2693,7 +2940,7 @@ function mirrorAnimals(h,dt){
 }
 // цели для зверей: я и все остальные игроки
 function playersForAI(){
-  const L=[{x:hero.x,y:hero.y,hp:fainting?0:hero.hp,me:true,peer:NET.myPeer,busy:dialogOpen}];
+  const L=[{x:hero.x,y:hero.y,hp:fainting?0:hero.hp,me:true,peer:NET.myPeer,busy:dialogOpen||EDIT}];
   for(const r of remotes.values()) L.push({x:r.tx,y:r.ty,hp:r.hp,me:false,peer:r.peer,busy:false});
   return L;
 }
@@ -2818,8 +3065,9 @@ function applyTreeDoc(c,d){
 const fireDocs=new Set();
 function applyFires(docs){
   const now=Date.now(), keep=new Set();
+  fireDocs.clear();
   for(const s of docs){
-    const d=s.data(); if(!d) continue;
+    const d=s.data(); if(!d) continue; fireDocs.add(s.id);
     const c=cellAt(num(d.x,0,W-1,0)|0,num(d.y,0,D-1,0)|0); if(!c) continue;
     const until=num(d.until,0,1e15,0);
     if(until<now-10*60*1000){ NET.db.doc("fires/"+s.id).delete().catch(()=>{}); continue; }   // давно потухшие убираем
@@ -2876,7 +3124,8 @@ async function initNet(){
       if(d&&typeof d.t0==="number"&&typeof d.c0==="number"){ clockDoc={t0:d.t0,c0:d.c0}; lastClockText=""; }
       else if(!s.metadata.fromCache&&!clockDoc) netSetClock(clock);
     },()=>{});
-    db.collection("trees").onSnapshot(snap=>{ for(const s of snap.docs){ const m=/^t_(\d+)_(\d+)$/.exec(s.id); if(m) applyTreeDoc(cellAt(+m[1],+m[2]),s.data()); } },()=>{});
+    db.doc("world/map").onSnapshot(onMapDoc,()=>{});
+    db.collection("trees").onSnapshot(snap=>{ netTreeIds.clear(); for(const s of snap.docs){ netTreeIds.add(s.id); const m=/^t_(\d+)_(\d+)$/.exec(s.id); if(m) applyTreeDoc(cellAt(+m[1],+m[2]),s.data()); } },()=>{});
     db.collection("fires").onSnapshot(snap=>applyFires(snap.docs),()=>{});
     db.collection("players").onSnapshot(snap=>applyPlayers(snap.docs),()=>{});
     db.collection("chat").onSnapshot(snap=>applyChat(snap.docs),()=>{});
@@ -2889,6 +3138,7 @@ async function initNet(){
     document.getElementById("chatBtn").hidden=false;
     renderPlayers();
   }
+  if(db) initAdmin();
 }
 
 
@@ -3144,6 +3394,7 @@ function render(now){
   applyLighting();      // закат, ночь и огни
   drawNightFx();
   drawHitFx();
+  edDrawMarks();
   drawOverlay(now);
   updateTags();
   // вывод на экран
@@ -3257,7 +3508,8 @@ function endPointer(e){
   const wasTap=drag&&!drag.moved&&pointers.size===1&&!pinch;
   pointers.delete(e.pointerId);
   if(wasTap&&!anim&&e.type==="pointerup"){
-    if(fishing&&fishing.state==="bite") catchFish();
+    if(EDIT) edTap(x,y);
+    else if(fishing&&fishing.state==="bite") catchFish();
     else goTo((!placing&&pickWolf(x,y))||pickEntity(x,y)||pickTree(x,y)||pick(x,y));
   }
   if(pointers.size<2) pinch=null;
@@ -3309,6 +3561,7 @@ loadAll.then(()=>{
     if(setNick(document.getElementById("nickIn").value)){ document.getElementById("nickWrap").hidden=true; say("nick_hi","hint_sub",{n:myNick}); if(TOUCH) goFull(); }
     else document.getElementById("nickErr").hidden=false; };
   document.getElementById("nickBtn").onclick=()=>{ menuEl.classList.remove("open"); openNick(); };
+  document.getElementById("editBtn").onclick=()=>{ menuEl.classList.remove("open"); edEnter(); };
   if(window.__islandWorld){ const ib=document.getElementById("inviteBtn"); ib.hidden=false;
     ib.onclick=async()=>{ menuEl.classList.remove("open"); const url=location.origin+location.pathname+"#world="+window.__islandWorld;
       try{ if(navigator.share&&TOUCH){ await navigator.share({title:document.title,url}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
