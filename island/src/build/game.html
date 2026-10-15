@@ -429,7 +429,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 const SPRITES = /*SPRITES*/;
 // зона: остров или пещера (общий данж). Пещера — отдельная карта; переход — перезагрузкой страницы
 const ZONE=(()=>{ try{ return sessionStorage.getItem("island_zone")==="cave"?"cave":"island"; }catch(e){ return "island"; } })(), CAVE=ZONE==="cave";
-const CAVE_DEFAULT = {"levels":["0000044444444444400000","0004442222222222444000","0044222222222222224400","0042222222222222222400","0042222222222222222400","0044222222222222224400","0004444111221114444000","0000033111111113300000","0003331111111111333000","0033111111111111113300","0331111111111111111330","0311111113333311111113","0311111133000331111113","0331111130000031111113","0031111330000033111133","0031111130000031111330","0033111113333311111300","0003311111111111111300","0000333311111113333300","0000000333333333000000"],"tops":[".....cccccccccccc.....","...cccrrrcrrrrcrccc...","..ccrrrrcrrrrcrrrrcc..","..crrrrcrrrccrrrrcrc..","..crrrcrrrrcrrrrcrrc..","..ccrcrrrrcrrrrcrrcc..","...ccccrrrrrrrrcccc...",".....ccrrrrrrrrcc.....","...cccrrrrwwwrrrccc...","..ccrrorrrwwwvrrrocc..",".ccrroorrrvvvrrrrrrcc.",".crrrrrrrcccccrrrrrrrc",".crrmrrrcc...ccrrrrrrc",".ccrrrrrc.....crroorrc","..crrrrcc.....ccrrrrcc","..crrrrrc.....crrrrcc.","..ccrrrrrcccccrrrrrc..","...ccrrrrrrrrrrrrrrc..","....ccccrrrrrrrccccc..",".......ccccccccc......"],"stairs":{},"props":[[4,9,"prop_crystal"],[17,10,"prop_crystal"],[4,3,"prop_crystal"],[17,4,"prop_crystal"],[3,13,"prop_mushrooms"],[18,15,"prop_mushrooms"],[6,16,"rock_small"]],"start":[11,18],"exit":[12,18],"boss":[11,3],"zones":{"spider":[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[14,11],[15,11],[16,11],[17,11],[18,11],[19,11],[20,11],[2,12],[3,12],[4,12],[5,12],[6,12],[7,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[3,13],[4,13],[5,13],[6,13],[7,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],[3,14],[4,14],[5,14],[6,14],[16,14],[17,14],[18,14],[19,14],[3,15],[4,15],[5,15],[6,15],[7,15],[15,15],[16,15],[17,15],[18,15],[4,16],[5,16],[6,16],[7,16],[14,16],[15,16],[16,16],[17,16],[18,16]],"bat":[[6,8],[7,8],[8,8],[9,8],[13,8],[14,8],[15,8],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[13,9],[14,9],[15,9],[16,9],[17,9],[3,10],[4,10],[5,10],[6,10],[7,10],[8,10],[9,10],[10,10],[11,10],[12,10],[13,10],[14,10],[15,10],[16,10],[17,10],[18,10]],"hare":[],"wolf":[]},"hut":null,"npc":null,"merchant":null,"stall":null,"pier":null};
+const CAVE_DEFAULT = {"levels":["0000044444444444400000","0004442222222222444000","0044222222222222224400","0042222222222222222400","0042222222222222222400","0044222222222222224400","0004444111221114444000","0000033111111113300000","0003331111111111333000","0033111111111111113300","0331111111111111111330","0311111113333311111113","0311111133000331111113","0331111130000031111113","0031111330000033111133","0031111130000031111330","0033111113333311111300","0003311111111111111300","0000333311111113333300","0000000333333333000000"],"tops":[".....xxxxxxxxxxxx.....","...xxxkkkKkkkkkkxxx...","..xxkkkKkkkkkkkkkkxx..","..xkkKkkkkklkkkkKkkx..","..xKkkkkkkkkkkKkkkkx..","..xxkkkkkkkkKkkkkkxx..","...xxxxkkkKkkkkxxxx...",".....xxkkkkKkkkxx.....","...xxxkKkjwwwjkkxxx...","..xxkkqkkjwwwvjkKqxx..",".xxkkqqkkjvvvjkkkkkxx.",".xkkkkkkKxxxxxkkkkkkkx",".xkkjkkkxx...xxkkKkkkx",".xxkkkkkx.....xkkqqkkx","..xkkkkxx.....xxkkkkxx","..xkkKkkx.....xkkkKxx.","..xxkkkkkxxxxxKkkkkx..","...xxkkkkkKkkkkkkkkx..","....xxxxkkkkkkkxxxxx..",".......xxxxxxxxx......"],"stairs":{},"props":[[4,9,"prop_crystal"],[17,10,"prop_crystal"],[4,3,"prop_crystal"],[17,4,"prop_crystal"],[3,13,"prop_mushrooms"],[18,15,"prop_mushrooms"],[6,16,"rock_small"]],"start":[11,18],"exit":[12,18],"boss":[11,3],"zones":{"spider":[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[14,11],[15,11],[16,11],[17,11],[18,11],[19,11],[20,11],[2,12],[3,12],[4,12],[5,12],[6,12],[7,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[3,13],[4,13],[5,13],[6,13],[7,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],[3,14],[4,14],[5,14],[6,14],[16,14],[17,14],[18,14],[19,14],[3,15],[4,15],[5,15],[6,15],[7,15],[15,15],[16,15],[17,15],[18,15],[4,16],[5,16],[6,16],[7,16],[14,16],[15,16],[16,16],[17,16],[18,16]],"bat":[[6,8],[7,8],[8,8],[9,8],[13,8],[14,8],[15,8],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[13,9],[14,9],[15,9],[16,9],[17,9],[3,10],[4,10],[5,10],[6,10],[7,10],[8,10],[9,10],[10,10],[11,10],[12,10],[13,10],[14,10],[15,10],[16,10],[17,10],[18,10]],"hare":[],"wolf":[]},"hut":null,"npc":null,"merchant":null,"stall":null,"pier":null};
 const ISLAND_MAP = /*MAP*/;
 const MAP = CAVE ? JSON.parse(JSON.stringify(CAVE_DEFAULT)) : ISLAND_MAP;
 const ZC=n=>CAVE?"cave_"+n:n, MAP_DOC=CAVE?"world/map_cave":"world/map";
@@ -501,7 +501,7 @@ const I18N={
     npc_crafted:"Gotowe! {item} — trzymaj. Załóż w oknie Ekwipunek.", coins:"monet",
     xp:"+{n} XP", lvl_float:"POZIOM {n}!", lvl_up:"Nowy poziom: {n}!", lvl_up_sub:"zdrowie odnowione", blocked_bite:"Unik!",
     ed_open:"Edytor mapy", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
-    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", go_cave:"Idziesz do jaskini", go_exit:"Idziesz do wyjścia", cave_enter:"Schodzisz do jaskini…", cave_leave:"Wychodzisz na wyspę…",
+    ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", ed_g_cave:"Jaskinia", ed_t_k:"Skała", ed_t_K:"Skała z mchem", ed_t_x:"Ściana", ed_t_q:"Kryształy", ed_t_l:"Lawa", ed_t_j:"Błoto jaskini", go_cave:"Idziesz do jaskini", go_exit:"Idziesz do wyjścia", cave_enter:"Schodzisz do jaskini…", cave_leave:"Wychodzisz na wyspę…",
     cave_hello:"Jesteś w jaskini", where_cave:"w jaskini", where_island:"na wyspie", spider_killed:"Pająk pokonany!", boss_killed:"Golem pokonany!", boss_killed_sub:"skarb w torbie · golem wróci za kilka minut",
     boss_name:"KAMIENNY GOLEM", boss_summon:"Golem wzywa nietoperze!", fish_spider_silk:"Pajęczyna", fish_golem_core:"Serce golema", fish_sword_steel:"Stalowy miecz",
     ed_t_cave:"Wejście do jaskini", ed_t_exit:"Wyjście", ed_t_boss:"Boss", ed_t_zone_spider:"Pająki", ed_t_prop_crystal:"Kryształ", ed_src_spider:"Pająk", ed_src_golem:"Golem (boss)",
@@ -626,7 +626,7 @@ const I18N={
     npc_crafted:"Готово! {item} — держи. Надень в окне Снаряжение.", coins:"монет",
     xp:"+{n} XP", lvl_float:"УРОВЕНЬ {n}!", lvl_up:"Новый уровень: {n}!", lvl_up_sub:"здоровье восстановлено", blocked_bite:"Увернулся!",
     ed_open:"Редактор карты", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
-    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", go_cave:"Идёшь к пещере", go_exit:"Идёшь к выходу", cave_enter:"Спускаешься в пещеру…", cave_leave:"Выходишь на остров…",
+    ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", ed_g_cave:"Пещера", ed_t_k:"Камень", ed_t_K:"Камень со мхом", ed_t_x:"Стена", ed_t_q:"Кристаллы", ed_t_l:"Лава", ed_t_j:"Грязь пещеры", go_cave:"Идёшь к пещере", go_exit:"Идёшь к выходу", cave_enter:"Спускаешься в пещеру…", cave_leave:"Выходишь на остров…",
     cave_hello:"Ты в пещере", where_cave:"в пещере", where_island:"на острове", spider_killed:"Паук повержен!", boss_killed:"Голем повержен!", boss_killed_sub:"сокровища в сумке · голем вернётся через несколько минут",
     boss_name:"КАМЕННЫЙ ГОЛЕМ", boss_summon:"Голем зовёт летучих мышей!", fish_spider_silk:"Паутина", fish_golem_core:"Сердце голема", fish_sword_steel:"Стальной меч",
     ed_t_cave:"Вход в пещеру", ed_t_exit:"Выход", ed_t_boss:"Босс", ed_t_zone_spider:"Пауки", ed_t_prop_crystal:"Кристалл", ed_src_spider:"Паук", ed_src_golem:"Голем (босс)",
@@ -758,8 +758,9 @@ const TOPS = MAP.tops;
 const W = LEVELS[0].length, D = LEVELS.length;
 const MX = (W-1)/2, MY = (D-1)/2;
 const TOP_SPRITE = {g:"block_grass",G:"block_grass_2",d:"block_grass_dark",s:"block_stone_path",e:"block_dirt",w:"block_dirt",v:"block_dirt",
-  n:"block_sand",N:"block_sand_wet",r:"block_gravel",m:"block_mud",f:"block_grass_flowers",o:"block_moss",c:"block_cobble_dark",p:"block_planks",z:"block_snow",u:"block_grass_autumn"};
-const LAND_TILES="gGdsenNrmfocpzu", GRASSY="gGdfou";   // виды земли; «травяные» — где растут деревья и бегают зайцы
+  n:"block_sand",N:"block_sand_wet",r:"block_gravel",m:"block_mud",f:"block_grass_flowers",o:"block_moss",c:"block_cobble_dark",p:"block_planks",z:"block_snow",u:"block_grass_autumn",
+  k:"block_cave_floor",K:"block_cave_floor_2",x:"block_cave_wall",q:"block_cave_crystal",l:"block_cave_lava",j:"block_cave_mud"};
+const LAND_TILES="gGdsenNrmfocpzukKxqlj", GRASSY="gGdfou";   // виды земли; «травяные» — где растут деревья и бегают зайцы
 const TOP_NAME = {g:"трава",G:"трава",d:"тёмная трава",s:"каменная тропа",e:"земля",w:"вода"};
 const BLOCKING = new Set(["tree_big","tree_small","bush","rock_big","fence_left","fence_right","prop_reeds","prop_rock_water",
   "prop_barrel","prop_crate","prop_stump","prop_log","prop_signpost","prop_bush_berry","prop_crystal"]);
@@ -988,7 +989,7 @@ function drawSprites(anchor){
     for(let z=0;z<c.L;z++){
       if(wet(c)&&z===c.L-1) continue;
       const p=proj(X,Y,z+1), top=z===c.L-1;
-      const name=top?TOP_SPRITE[c.t]:(z<2||CAVE?"block_rock":"block_grass");
+      const name=top?TOP_SPRITE[c.t]:CAVE?"block_cave_wall":(z<2?"block_rock":"block_grass");
       ctx.drawImage(img[name],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y));
     }
     if(c.st){ const sn=stairSprite(c.st,q); if(sn==="block_stone_path") drawStairsBack(c); else { const p=proj(X,Y,c.L+1); ctx.drawImage(img[sn],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y)); } }
@@ -2372,6 +2373,7 @@ function collectLights(){
     for(const r of remotes.values()){ const q=proj(r.x-MX,r.y-MY,r.z+1.5); L.push({x:q[0],y:q[1],r:66,c:"255,206,150",a:0.85}); }
     if(PORTAL){ const q=proj(PORTAL.x-MX,PORTAL.y-MY,PORTAL.L+1.2); L.push({x:q[0],y:q[1],r:70,c:"255,240,200",a:0.9}); }
     for(const c of cells) for(const n of c.props) if(n==="prop_crystal"){ const q=proj(c.x-MX,c.y-MY,c.L+0.6); L.push({x:q[0],y:q[1],r:46+Math.sin(T*2+c.x)*3,c:"130,210,255",a:0.8}); }
+    for(const c of cells) if(c.t==="l"){ const q=proj(c.x-MX,c.y-MY,c.L); L.push({x:q[0],y:q[1],r:34+Math.sin(T*1.7+c.x*2)*3,c:"255,120,50",a:0.7}); }
     for(const a of animals) if(a.kind==="golem"&&a.alpha>0.2){ const q=proj(a.x-MX,a.y-MY,a.z+1.6); L.push({x:q[0],y:q[1],r:a.slamT>0?60:34,c:a.slamT>0?"255,120,90":"120,220,255",a:0.8}); } }
   else L.push({x:hp[0],y:hp[1],r:30,c:"170,185,255",a:0.35});
   for(const f of fireflies){ if(f.b<=0.05) continue; const p=proj(f.x-MX,f.y-MY,f.z); L.push({x:p[0],y:p[1],r:9,c:"210,255,130",a:0.55*f.b}); }
@@ -2918,6 +2920,7 @@ const edW=()=>W+edAdd.l+edAdd.r, edD=()=>D+edAdd.t+edAdd.b;
 const ED_GROUPS=[
   ["ed_g_terrain",[["g","block_grass"],["G","block_grass_2"],["d","block_grass_dark"],["f","block_grass_flowers"],["u","block_grass_autumn"],["o","block_moss"],
     ["e","block_dirt"],["m","block_mud"],["n","block_sand"],["N","block_sand_wet"],["r","block_gravel"],["s","block_stone_path"],["c","block_cobble_dark"],["p","block_planks"],["z","block_snow"]],"land"],
+  ["ed_g_cave",[["k","block_cave_floor"],["K","block_cave_floor_2"],["j","block_cave_mud"],["q","block_cave_crystal"],["l","block_cave_lava"],["x","block_cave_wall"]],"land"],
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"],["stairs_del",null]],"land"],
   ["ed_g_water",[["w","water_deep_0"],["v","water_shallow_0"],["prop_lily_pad","prop_lily_pad"],["prop_reeds","prop_reeds"],["prop_rock_water","prop_rock_water"],["erase",null]],"water"],
   ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["prop_crystal",null],["erase",null]],"decor"],
@@ -3391,7 +3394,7 @@ function edMini(){
   edMiniGeom={k,offX,offY,ox,oy};
   g.fillStyle="#2a6aa8"; g.fillRect(0,0,mc.width,mc.height);
   g.fillStyle="rgba(255,255,255,.08)"; g.fillRect(offX,offY,w*k,d*k);
-  const COL={g:[110,180,70],G:[96,168,60],d:[60,120,48],s:[170,166,150],e:[150,104,64],w:[60,120,200],v:[110,200,225],n:[232,206,140],N:[196,166,110],r:[150,150,150],m:[96,66,44],f:[120,186,80],o:[50,100,40],c:[80,80,86],p:[176,120,70],z:[236,244,250],u:[226,150,40]};
+  const COL={k:[70,74,92],K:[70,84,110],x:[44,44,54],q:[60,110,160],l:[150,60,30],j:[70,52,40],g:[110,180,70],G:[96,168,60],d:[60,120,48],s:[170,166,150],e:[150,104,64],w:[60,120,200],v:[110,200,225],n:[232,206,140],N:[196,166,110],r:[150,150,150],m:[96,66,44],f:[120,186,80],o:[50,100,40],c:[80,80,86],p:[176,120,70],z:[236,244,250],u:[226,150,40]};
   for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(x<0||y<0||x>=w||y>=d) continue;
     const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
     g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
@@ -4121,7 +4124,7 @@ function draw3D(anchor){
     for(const sd of SIDES){
       const nu=sd.n[0]*ca-sd.n[1]*sa, nv=sd.n[0]*sa+sd.n[1]*ca; if(nu+nv<=0.001) continue;
       const nb=cellAt(c.x+sd.n[0],c.y+sd.n[1]), nh=nb?(wet(nb)?nb.L-1:nb.L):0, side=(nu-nv)<0?"_L":"_R", sx=X0+sd.dx, sy=Y0+sd.dy;
-      for(let z=nh;z<c.L;z++){const p0=proj(sx,sy,z+1);face(TEX[(z<2||CAVE?"block_rock":"block_grass")+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,z+1),p0),sub(proj(sx,sy,z),p0));}
+      for(let z=nh;z<c.L;z++){const p0=proj(sx,sy,z+1);face(TEX[(CAVE?"block_cave_wall":z<2?"block_rock":"block_grass")+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,z+1),p0),sub(proj(sx,sy,z),p0));}
       if(c.st){const p0=proj(sx,sy,c.L+.5);face(TEX["block_stone_path"+side],p0,sub(proj(sx+sd.ax,sy+sd.ay,c.L+.5),p0),sub(proj(sx,sy,c.L),p0));}
     }
     const Z=c.st?c.L+.5:c.L, top=c.st?"block_stone_path":TOP_SPRITE[c.t], p0=proj(X0,Y0,Z);

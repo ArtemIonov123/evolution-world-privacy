@@ -28,15 +28,15 @@ for y,r in enumerate(A):
   l="";t=""
   for x,ch in enumerate(r):
     if ch==" ": l+="0";t+="."
-    elif ch=="#": l+=("4" if y<=6 else "3");t+="c"
-    elif ch==",": l+="2";t+="r" if (x+y)%5 else "c"
-    elif ch=="B": l+="2";t+="c";boss=[x,y]
+    elif ch=="#": l+=("4" if y<=6 else "3");t+="x"
+    elif ch==",": l+="2";t+="K" if (x*7+y*3)%11==0 else "k"
+    elif ch=="B": l+="2";t+="l";boss=[x,y]
     elif ch=="~": l+="1";t+="w"
     elif ch=="v": l+="1";t+="v"
-    elif ch=="o": l+="1";t+="o"
-    elif ch=="m": l+="1";t+="m"
+    elif ch=="o": l+="1";t+="q"
+    elif ch=="m": l+="1";t+="j"
     else:
-      l+="1";t+="r"
+      l+="1";t+=("K" if (x*5+y*7)%13==0 else "j" if (A[y][x-1:x+2].count("~")+A[y][x-1:x+2].count("v"))>0 else "k")
       if ch=="E": start=[x,y]
       if ch=="X": exit=[x,y]
   lv.append(l);tp.append(t)
