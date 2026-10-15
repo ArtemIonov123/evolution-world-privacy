@@ -1,0 +1,10 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext(); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')});
+const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{ if(!sessionStorage.getItem('i')){ sessionStorage.setItem('i',1); localStorage.setItem('island_nick','Artem'); } });
+await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(1500);
+await p.evaluate(()=>{ inv.pelt=3; inv.coin=20; quest2="active"; giveItem("club"); giveItem("cap_leather"); addXP(70,"fight"); prog.st.wolves=5; renderInv(); });
+const before=await p.evaluate(()=>({eq:{...equip},xp:prog.xp,lv:heroLevel(),hp:HP_MAX,q2:quest2,w:prog.st.wolves}));
+await p.waitForTimeout(5500); await p.reload(); await p.waitForTimeout(2500);
+const after=await p.evaluate(()=>({eq:{...equip},xp:prog.xp,lv:heroLevel(),hp:HP_MAX,q2:quest2,w:prog.st.wolves}));
+console.log(JSON.stringify(before)); console.log(JSON.stringify(after)); console.log('same',JSON.stringify(before)===JSON.stringify(after),'errs',errs); await b.close();})();

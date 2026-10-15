@@ -1,0 +1,13 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch();
+const ctx=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:3,isMobile:true,hasTouch:true});
+const p=await ctx.newPage(); const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{try{localStorage.setItem('island_nick','Tester')}catch(e){}});await p.goto('file://'+process.argv[2]);await p.waitForTimeout(1200);
+await p.evaluate(()=>{inv.wood=6;inv.cooked=1;renderInv();hero.hp=3;renderHP();});
+await p.evaluate(()=>{const c=[[17,17],[15,17],[16,15],[17,16]].map(([x,y])=>cellAt(x,y)).find(c=>c&&freeCell(c)&&!c.props.length&&!c.st); startPlacing(); goTo(c);});
+await p.waitForFunction(()=>fires.length>0,null,{timeout:15000});
+await p.evaluate(()=>skipTime()); await p.waitForTimeout(1500);
+await p.screenshot({path:'np.png'});
+await p.tap('.hb[data-win="bag"]'); await p.waitForTimeout(150); await p.tap('.wbody .slot[title="Pieczona ryba"]'); await p.waitForTimeout(100); await p.tap('.acts .big'); await p.waitForTimeout(200); await p.tap('#winClose');
+console.log('ate on phone',await p.evaluate(()=>hero.hp));
+console.log('errors',errs);await b.close();})();

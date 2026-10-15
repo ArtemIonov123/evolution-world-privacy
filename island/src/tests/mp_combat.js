@@ -1,0 +1,24 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const fake=fs.readFileSync('fake_rtdb.js','utf8');
+const ctx=await b.newContext({viewport:{width:800,height:600}}); await ctx.addInitScript({content:fake});
+const errs=[]; const pg=async(who,url,nick,uid)=>{const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(who+':'+e.message));
+  await p.addInitScript(([n,u])=>{ if(!sessionStorage.getItem('i')){ sessionStorage.setItem('i',1); localStorage.setItem('island_nick',n); localStorage.setItem('island_uid',u);} },[nick,uid]);
+  await p.goto(url); await p.waitForTimeout(1500); return p;};
+const A=await pg('A','http://localhost:8765/index.html','Artem','uAAAAAAAAAAAAAA');
+const B=await pg('B',A.url(),'Kolega','uBBBBBBBBBBBBBB'); await B.waitForTimeout(1500);
+const hostA=await A.evaluate(()=>NET.host); const H=hostA?A:B, G=hostA?B:A; console.log('host',hostA?'A':'B');
+await H.evaluate(()=>skipTime()); await H.waitForTimeout(800);
+// guest near host? place wolf next to guest on host
+const gpos=await G.evaluate(()=>[hero.x,hero.y]);
+await H.evaluate((gp)=>{ for(const a of animals) a.dead=true; spawnT=99;
+  const c=cells.find(c=>freeCell(c)&&Math.hypot(c.x-gp[0],c.y-gp[1])>=1.5&&Math.hypot(c.x-gp[0],c.y-gp[1])<2.6&&findPath(c.x,c.y,Math.round(gp[0]),Math.round(gp[1])));
+  spawnAnimal('wolf',c); animals[animals.length-1].alpha=1; },gpos);
+await G.waitForTimeout(1200);
+console.log('guest sees',await G.evaluate(()=>animals.filter(a=>a.kind==='wolf').map(a=>a.nid+':'+a.hp)));
+await G.evaluate(()=>{giveItem("club"); goTo(animals.find(a=>a.kind==='wolf'));});
+await G.waitForTimeout(800); await G.screenshot({path:'mpc_g.png'});
+await G.waitForFunction(()=>(inv.pelt||0)>0,null,{timeout:15000}).catch(()=>{});
+console.log('guest inv',await G.evaluate(()=>({...inv})),'guest hp',await G.evaluate(()=>hero.hp));
+console.log('host wolves',await H.evaluate(()=>animals.filter(a=>a.kind==='wolf').map(a=>[a.hp,+(a.dying||0).toFixed(1)])),'host inv',await H.evaluate(()=>({...inv})));
+console.log('host saw guest attack anim',await H.evaluate(()=>[...remotes.values()].map(r=>r.ak)));
+console.log('errors',errs); await b.close();})();
