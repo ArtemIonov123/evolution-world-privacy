@@ -3934,7 +3934,7 @@ function openClassPick(change){
   const row=mkEl("div","clrow");
   for(const c of CLASSES){ const card=mkEl("button","clcard"+(heroClass===c?" on":"")); card.type="button";
     const cv2=mkEl("canvas","clpic"); cv2.width=48; cv2.height=60; const g=cv2.getContext("2d"); g.imageSmoothingEnabled=false;
-    const sp=heroSprite("hero_se_0",myHueIdx); if(sp) g.drawImage(sp,Math.round(24-sp.width/2),58-sp.height);
+    const sp=heroSprite(c==="druid"&&img.druid_se_0?"druid_se_0":"hero_se_0",myHueIdx); if(sp) g.drawImage(sp,Math.round(24-sp.width/2),58-sp.height);
     if(c==="druid"){ const sv=ctx; ctx=g; drawDruidMark(24,58,"se",sp?sp.height:48); ctx=sv; }
     card.appendChild(cv2); card.appendChild(mkEl("b",null,tr("cl_"+c))); card.appendChild(mkEl("small",null,tr("cl_"+c+"_d")));
     const ul=mkEl("ul"); for(const sk of SKILLS[c]) ul.appendChild(mkEl("li",null,tr("sk_n_"+sk.id))); card.appendChild(ul);
@@ -3988,7 +3988,7 @@ function useSkill(id){
     for(let i=0;i<24;i++){ const an=i/24*Math.PI*2; chips.push({x:hero.x+Math.cos(an)*0.5,y:hero.y+Math.sin(an)*0.5,z:hero.z*LH+12,vx:Math.cos(an)*2,vy:Math.sin(an)*2,vz:8,t:0,life:0.45,col:"#ffcf8a",spark:true}); }
     if(!n) floats.push({key:"sk_miss",col:"#c8c0e0",t:0}); }
   else if(id==="thorn"){ const a=skillTarget(5.5); if(!a){ say("sk_no_target"); return; } faceTo(a.x,a.y);
-    projectiles.push({x:hero.x,y:hero.y,z:hero.z+1.3,a,t:0}); }
+    projectiles.push({x:hero.x,y:hero.y,z:hero.z+1.3,a,t:0}); hero.castT=0.35; }
   else if(id==="heal"){ hero.hp=Math.min(HP_MAX,hero.hp+2); renderHP(); healFx(hero.x,hero.y,hero.z);
     for(const r of remotes.values()) if(Math.hypot(r.tx-hero.x,r.ty-hero.y)<4.5){ healOut.push({p:r.peer,s:++healSeq,n:2}); healFx(r.x,r.y,r.z); }
     while(healOut.length>6) healOut.shift(); lastPresJSON=""; floats.push({key:"sk_healed",col:"#7cf07a",t:0}); }
@@ -4002,6 +4002,7 @@ function endForm(){ const was=form; form=null; formT=0; recalcHP(); if(hero.hp>H
 function healFx(x,y,z){ for(let i=0;i<14;i++) chips.push({x:x+(Math.random()-.5)*0.6,y:y+(Math.random()-.5)*0.6,z:z*LH+4,vx:0,vy:0,vz:24+Math.random()*24,t:0,life:0.8,col:i%2?"#7cf07a":"#d8ffd0",spark:true}); }
 function updateSkills(dt){
   for(const k of Object.keys(skillCd)) if(skillCd[k]>0) skillCd[k]=Math.max(0,skillCd[k]-dt);
+  if(hero.castT>0) hero.castT-=dt;
   if(shieldT>0){ shieldT-=dt; if(shieldT<=0){ shieldT=0; lastPresJSON=""; } dirty=true; }
   if(form){ formT-=dt; if(formT<=0) endForm(); dirty=true; }
   if(hero.dash){ const d=hero.dash; d.t+=dt/0.18; const k=Math.min(1,d.t); hero.x=d.x0+(d.x1-d.x0)*k; hero.y=d.y0+(d.y1-d.y0)*k;
@@ -4019,6 +4020,7 @@ function updateSkills(dt){
     if(s>(lastHeal[r.peer]||0)){ lastHeal[r.peer]=s; if(!fainting&&hero.hp>0){ hero.hp=Math.min(HP_MAX,hero.hp+num(h.n|0,1,3,2)); renderHP(); healFx(hero.x,hero.y,hero.z); floats.push({key:"sk_healed_by",p:{n:playerName(r)},col:"#7cf07a",t:0}); } } }
   skBarT-=dt; if(skBarT<=0){ skBarT=0.1; updateSkillBar(); }
 }
+function druidAtk(facing,hue){ return heroSprite(`druid_atk_${facing[0]}e_0`,hue); }
 function drawShieldFx(fx,fy){
   ctx.save(); const a=0.45+0.25*Math.sin(T*10); ctx.strokeStyle=`rgba(255,214,107,${a})`; ctx.lineWidth=2;
   ctx.beginPath(); ctx.ellipse(fx,fy-14,14,20,0,0,Math.PI*2); ctx.stroke(); ctx.fillStyle=`rgba(255,230,150,${a*0.25})`; ctx.fill(); ctx.restore();
@@ -4033,8 +4035,9 @@ function drawForm(fx,fy,f,facing,moving,phase,atk){
   const fr=moving?Math.floor(phase/Math.PI*2)%4:0, mirror=facing[1]==="w";
   ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)); ctx.imageSmoothingEnabled=false;
   ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(0,0,f==="bear"?14:11,5,0,0,Math.PI*2); ctx.fill();
-  let sp=img[`${f}_${facing}_${fr%2}`]||img[`${f}_${facing[0]}e_${fr%2}`];
-  if(f==="wolf"&&!sp){ sp=img[`wolf_${facing[0]}e_${fr}`]; if(sp) ctx.filter="hue-rotate(70deg) saturate(1.4) brightness(1.15)"; }
+  const key=f==="wolf"?(img.dwolf_se_0?"dwolf":"wolf"):f;
+  let sp=key==="wolf"?img[`wolf_${facing[0]}e_${fr}`]:(img[`${key}_${facing}_${fr%2}`]||img[`${key}_${facing[0]}e_${fr%2}`]);
+  if(key==="wolf"&&sp) ctx.filter="hue-rotate(70deg) saturate(1.4) brightness(1.15)";
   if(mirror) ctx.scale(-1,1);
   const lunge=atk?3:0;
   if(sp) ctx.drawImage(sp,-Math.round(sp.width/2)+lunge,-sp.height+2);
@@ -4224,9 +4227,10 @@ function drawRemote(r){
   if(r.fm){ drawForm(fx,fy,r.fm==="b"?"bear":"wolf",r.f,r.m,r.phase,!!r.ak); return; }
   ctx.fillStyle="rgba(20,10,40,.28)"; ctx.beginPath(); ctx.ellipse(fx,fy,9,4.5,0,0,Math.PI*2); ctx.fill();
   const frame=r.m?[1,2,3,2][Math.floor(r.phase/Math.PI*2)%4]:0;
-  let name=`hero_${r.f}_${frame}`, mirror=false;
-  if(!img[name]&&r.f[1]==="w"){ name=`hero_${r.f[0]}e_${frame}`; mirror=true; }
-  const at=r.ak?Math.min(r.akT||0,ATK_TIME-0.01):-1, as=at>=0?atkSprite(r.f,at,r.c):null;
+  const pre=r.cl==="druid"&&img.druid_se_0?"druid":"hero";
+  let name=`${pre}_${r.f}_${frame}`, mirror=false;
+  if(!img[name]&&r.f[1]==="w"){ name=`${pre}_${r.f[0]}e_${frame}`; mirror=true; }
+  const at=r.ak?Math.min(r.akT||0,ATK_TIME-0.01):-1, as=at>=0?(pre==="druid"?{sp:druidAtk(r.f,r.c),mirror:r.f[1]==="w"}:atkSprite(r.f,at,r.c)):null;
   const sp=as&&as.sp?as.sp:heroSprite(name,r.c); if(as&&as.sp) mirror=as.mirror;
   const [lx,ly]=at>=0?atkLunge(r.f,at):[0,0];
   ctx.save(); ctx.translate(Math.round(fx)+lx,Math.round(fy)+ly); if(mirror) ctx.scale(-1,1);
@@ -4531,8 +4535,11 @@ function drawHero(){
   // цикл шага 1-2-3-2, кадр 0 — стойка
   const frame=hero.moving?[1,2,3,2][Math.floor(hero.phase/Math.PI*2)%4]:0;
   // спрайты смотрят вправо (se/ne); влево — зеркально, если нет своих sw/nw
-  let hn=`hero_${hero.facing}_${frame}`, mirror=false;
-  if(!img[hn]&&hero.facing[1]==="w"){ hn=`hero_${hero.facing[0]}e_${frame}`; mirror=true; }
+  const pre=heroClass==="druid"&&img.druid_se_0?"druid":"hero";
+  let hn=`${pre}_${hero.facing}_${frame}`, mirror=false;
+  if(!img[hn]&&hero.facing[1]==="w"){ hn=`${pre}_${hero.facing[0]}e_${frame}`; mirror=true; }
+  if(pre==="druid"&&(hero.atk||hero.castT>0)){ const sp=druidAtk(hero.facing,myHueIdx), lk=hero.atk?Math.sin(Math.min(1,hero.atk.t/ATK_TIME)*Math.PI)*3:2, dir=hero.facing[1]==="e"?1:-1;
+    if(sp){ ctx.translate(Math.round(fx)+dir*Math.round(lk),Math.round(fy)); if(hero.facing[1]==="w") ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+2); ctx.restore(); return; } }
   if(hero.atk){ const as=atkSprite(hero.facing,hero.atk.t,myHueIdx), [lx,ly]=atkLunge(hero.facing,hero.atk.t);
     if(as&&as.sp){ ctx.save(); ctx.translate(Math.round(fx)+lx,Math.round(fy)+ly); if(as.mirror) ctx.scale(-1,1); ctx.drawImage(as.sp,-Math.round(as.sp.width/2),-as.sp.height+2); ctx.restore();
       drawSlash(fx,fy,hero.facing,hero.atk.t); ctx.restore(); return; } }

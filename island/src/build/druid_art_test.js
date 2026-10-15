@@ -1,0 +1,18 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:900,height:600},deviceScaleFactor:2}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')}); const errs=[];
+const WK='DruidArtKey12345678';
+const pg=async(who,uid,nick)=>{const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(who+':'+e.message));
+  await p.addInitScript(([u,n])=>{ const me=sessionStorage.getItem('myuid')||u; sessionStorage.setItem('myuid',me); localStorage.setItem('island_uid',me); localStorage.setItem('island_nick',n); localStorage.setItem('island_lang','ru'); },[uid,nick]);
+  await p.goto(`http://localhost:8765/index.html#world=${WK}`); await p.waitForTimeout(2500); return p;};
+const A=await pg('A','uAAAAAAAAAAAAAA','Artem'), B=await pg('B','uBBBBBBBBBBBBBB','Bogdan');
+await A.screenshot({path:'DA_pick.png',clip:{x:250,y:150,width:400,height:300}});
+await A.evaluate(()=>[...document.querySelectorAll('.clcard')][1].click());
+await B.evaluate(()=>[...document.querySelectorAll('.clcard')][1].click());
+await A.evaluate(()=>{ prog.xp=3000; recalcHP(); renderSkills(); });
+const pos=await A.evaluate(()=>[hero.x,hero.y]);
+await B.evaluate(([x,y])=>{ hero.x=x+1; hero.y=y+1; hero.path=[]; },pos);
+await A.waitForTimeout(1500);
+await A.screenshot({path:'DA_two.png',clip:{x:300,y:180,width:300,height:240}});
+await A.evaluate(()=>{ hero.castT=0.35; }); await A.waitForTimeout(80); await A.screenshot({path:'DA_cast.png',clip:{x:300,y:180,width:300,height:240}});
+await A.evaluate(()=>{ useSkill("wolf"); }); await A.waitForTimeout(300); await A.screenshot({path:'DA_wolf.png',clip:{x:300,y:180,width:300,height:240}});
+console.log('errs',errs); await b.close();})();
