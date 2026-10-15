@@ -82,6 +82,8 @@ canvas.drag{cursor:grabbing}
 
 /* часы, здоровье, действия, затемнение */
 .bar h1{margin-right:0}
+.hdcoin{display:flex;align-items:center;gap:3px;margin-left:4px;padding-left:7px;border-left:2px solid var(--edge);color:#ffd66b}
+.hdcoin img{width:16px;height:16px;image-rendering:pixelated}
 .clock{display:flex;align-items:center;gap:5px;margin-right:auto;font-family:var(--f-display);font-size:12px;color:var(--ink);
   background:var(--panel-2);border:2px solid var(--edge);padding:3px 7px;font-variant-numeric:tabular-nums}
 .hp{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:12px;display:flex;gap:2px;padding:5px 7px}
@@ -371,7 +373,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 
 <div class="bar">
   <h1 data-i18n="title_h">Wyspa</h1>
-  <span class="clock" aria-live="off"><svg id="clkIcon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"></svg><span id="clkTime">08:00</span></span>
+  <span class="clock" aria-live="off"><svg id="clkIcon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"></svg><span id="clkTime">08:00</span><span class="hdcoin" id="hdCoins" role="img" aria-label="0"><img id="hdCoinIcon" alt="" width="16" height="16"><b id="hdCoinN">0</b></span></span>
   <div class="lang" role="group" aria-label="Język / Язык">
     <button class="btn" data-lang="pl" aria-pressed="true">PL</button><button class="btn" data-lang="ru" aria-pressed="false">RU</button>
   </div>
@@ -1621,8 +1623,14 @@ function renderShop(body){
   det.appendChild(acts); body.appendChild(det);
 }
 
+function renderHdCoins(){
+  const n=inv.coin||0, el=document.getElementById("hdCoinN"); if(!el) return;
+  if(el.textContent!==String(n)){ el.textContent=String(n); document.getElementById("hdCoins").setAttribute("aria-label",tr("shop_coins",{c:n})); }
+  const im=document.getElementById("hdCoinIcon"); if(im&&!im.getAttribute("src")&&typeof ICONS!=="undefined"&&ICONS.coin) im.src=iconURL("coin");
+}
+setInterval(renderHdCoins,500);
 function renderInv(){
-  refreshUI();
+  refreshUI(); renderHdCoins();
   const el=document.getElementById("inv"), got=ITEMS.filter(f=>inv[f.id]);
   if(!got.length){el.innerHTML=`<b>${tr("catch_title")}</b><div class="empty">${tr("catch_empty")}</div>`;return}
   el.innerHTML=`<b>${tr("catch_title")}</b><div class="slots">`+got.map(f=>{const n=tr("fish_"+f.id);
