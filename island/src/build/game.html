@@ -1080,7 +1080,8 @@ function waterTex(kind,f){
   const sc=document.createElement("canvas"); sc.width=im.width; sc.height=im.height; const sg=sc.getContext("2d"); sg.drawImage(im,0,0);
   const sd=sg.getImageData(0,0,im.width,im.height), N=32, c=document.createElement("canvas"); c.width=c.height=N;
   const g=c.getContext("2d"), o=g.createImageData(N,N);
-  for(let j=0;j<N;j++)for(let i=0;i<N;i++){ const a=(i+.5)/N,b=(j+.5)/N, px=Math.max(0,Math.min(im.width-1,(32+32*a-32*b)|0)), py=Math.max(0,Math.min(im.height-1,(2+17*a+17*b)|0));
+  // ромб в спрайте: верх y=0, высота 32; берём середину без рваных краёв
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){ const a=0.08+0.84*(i+.5)/N,b=0.08+0.84*(j+.5)/N, px=Math.max(0,Math.min(im.width-1,(32+32*a-32*b)|0)), py=Math.max(0,Math.min(im.height-1,(16*a+16*b)|0));
     const si=(py*im.width+px)*4, di=(j*N+i)*4; for(let t=0;t<3;t++) o.data[di+t]=sd.data[si+t]; o.data[di+3]=255; }
   g.putImageData(o,0,0); return WATER_TEX[k]=c;
 }
