@@ -2532,7 +2532,7 @@ function renderHP(){
 }
 function hurtHero(n,from){
   if(hero.hp<=0||fainting) return;
-  lastCombat=Date.now();
+  lastCombat=Date.now(); if(isMob(from)){ hero.attacker=from; hero.attackedAt=Date.now(); }
   if(shieldT>0&&Math.random()<0.8){ floats.push({key:"sk_shield_block",col:"#ffd66b",t:0}); return; }
   if(heroClass==="warrior"&&(++hitsTaken)%4===0){ floats.push({key:"sk_temper_block",col:"#ffd66b",t:0}); return; }
   if(Math.random()<blockChance()){ floats.push({key:"blocked_bite",col:"#9fe0ff",t:0}); return; }
@@ -2891,8 +2891,16 @@ function attackWolf(a){
   follow=true; document.getElementById("follow").setAttribute("aria-pressed","true");
   say("go_attack","attack_sub");
 }
+// ответный удар: если моб напал, а герой стоит без дела — герой сам бьёт его
+function autoRetaliate(){
+  if(hero.target||hero.path.length||hero.dash||fainting||dialogOpen||EDIT||placing||fishing||chopping) return;
+  const a=hero.attacker; if(!a||Date.now()-(hero.attackedAt||0)>5000) return;
+  if(!animals.includes(a)||a.dying>0||a.alpha<0.3||Math.hypot(a.x-hero.x,a.y-hero.y)>3){ hero.attacker=null; return; }
+  if(hasWeapon()){ hero.target=a; hero.retarget=0; return; }
+  if(heroClass==="druid"&&!(skillCd.thorn>0)&&heroLevel()>=1) useSkill("thorn");
+}
 function updateCombat(dt){
-  hero.atkCd=Math.max(0,hero.atkCd-dt);
+  hero.atkCd=Math.max(0,hero.atkCd-dt); autoRetaliate();
   if(hero.atk){ const k=hero.atk; k.t+=dt;
     if(!k.hit&&k.t>=ATK_HIT){ k.hit=true; landHit(k.a); }
     if(k.t>=ATK_TIME) hero.atk=null; }
