@@ -121,9 +121,11 @@ canvas.drag{cursor:grabbing}
 /* кнопки окон и окна персонажа */
 .hotbar{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:3}
 .skills{position:absolute;right:calc(max(16px,env(safe-area-inset-right,0px)) + 62px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:3;display:flex;gap:8px;align-items:flex-end}
-.skb{position:relative;width:52px;height:52px;padding:0;display:grid;place-items:center;background:var(--panel);border:2px solid var(--edge);box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);cursor:pointer;overflow:hidden}
+.skb{position:relative;width:52px;height:52px;padding:0;display:grid;place-items:center;background:var(--panel);border:2px solid var(--edge);border-radius:50%;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);cursor:pointer;overflow:hidden}
 .skb::after{content:"";position:absolute;inset:0;background:conic-gradient(rgba(10,6,20,.72) calc(var(--cd,0)*360deg),transparent 0);pointer-events:none}
 .skb.active{box-shadow:inset 0 0 0 2px #7cf07a,0 0 10px rgba(124,240,122,.6)}
+.skb::after{border-radius:50%}
+.skb .sklv{bottom:6px}
 .skb.locked{filter:grayscale(1) brightness(.6);cursor:default}
 .skb .sklv{display:none;position:absolute;bottom:1px;left:0;right:0;font:700 9px/1 var(--f-body);font-style:normal;color:#fff;text-align:center;z-index:1}
 .skb.locked .sklv{display:block}
@@ -794,7 +796,7 @@ function say(main,sub,p,force){
 function applyLang(){
   document.documentElement.lang=LANG;
   document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(CAVE&&el.dataset.i18n==="title_h"?"title_h_cave":el.dataset.i18n));
-  { const sk=document.getElementById("skipTime"); if(sk&&CAVE) sk.hidden=true; }
+  { const sk=document.getElementById("skipTime"); if(sk&&(CAVE||ALWAYS_DAY)) sk.hidden=true; }
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.placeholder=tr(el.dataset.i18nPh));
   document.querySelectorAll("[data-q]").forEach(el=>el.textContent=tr(el.dataset.q));
   if(typeof renderPlayers==="function") renderPlayers();
@@ -2396,8 +2398,10 @@ function drawPortrait(){
 const DAY_LEN=420;                 // секунд на сутки (7 минут)
 let clock=8/24;                    // доля суток, 0 = полночь; старт в 8:00
 const hourNow=()=>clock*24;
+const ALWAYS_DAY=true;             // пока ночь выключена: на острове всегда день
 function darkness(){               // 0 — день, 1 — глубокая ночь
   if(CAVE) return 0.94;
+  if(ALWAYS_DAY) return 0;
   const h=hourNow();
   if(h>=7&&h<17.5) return 0;
   if(h>=17.5&&h<21) return (h-17.5)/3.5;
@@ -2405,16 +2409,16 @@ function darkness(){               // 0 — день, 1 — глубокая н�
   return 1-(h-5)/2;
 }
 function duskAmt(){                // оранжевый закат и розовый рассвет
-  if(CAVE) return 0;
+  if(CAVE||ALWAYS_DAY) return 0;
   const h=hourNow();
   if(h>=16.5&&h<20.5) return Math.sin((h-16.5)/4*Math.PI);
   if(h>=4.5&&h<7.5) return Math.sin((h-4.5)/3*Math.PI)*0.6;
   return 0;
 }
-const isNight=()=>{ if(CAVE) return true; const h=hourNow(); return h>=20.5||h<5.5;};
+const isNight=()=>{ if(CAVE) return true; if(ALWAYS_DAY) return false; const h=hourNow(); return h>=20.5||h<5.5;};
 let wasNight=null, lastClockText="";
 function updateClock(dt){
-  { const nc=netClock(); clock=nc!==null?nc:(clock+dt/DAY_LEN)%1; }
+  { const nc=netClock(); clock=ALWAYS_DAY?12/24:nc!==null?nc:(clock+dt/DAY_LEN)%1; }
   const night=isNight();
   if(wasNight!==null&&night!==wasNight){
     if(night) say("night_falls","night_sub"); else say("morning");
