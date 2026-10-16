@@ -39,7 +39,9 @@ function applyFires(docs){
   for(const f of fires) if(keep.has(f.c)) f.synced=true;
 }
 // ---- личное сохранение ----
-let saveT=3, saving=false, lastSaveJSON="", forcedNick=null;
+let saveT=3, saving=false, lastSaveJSON="", forcedNick=null, savedCr=0;
+// вход через сервер (подпись Telegram проверена): правила базы защищают кошелёк, баны и настройки мира
+const secureOn=()=>!!(window.__islandAuth&&window.__islandAuth.ok);
 const INV_MAX_COIN=2e9, INV_MAX=1e6;   // сколько можно хранить: монет/кристаллов и любой другой вещи
 async function loadSave(){
   try{
@@ -53,7 +55,7 @@ async function loadSave(){
     if(["none","active","done"].includes(d.q2)) quest2=d.q2;
     rodLevel=d.rod===2?2:1;
     if(CLASSES.includes(d.cl)) heroClass=d.cl;
-    crystals=Math.floor(num(d.cr,0,INV_MAX_COIN,0)); renderSkills();
+    savedCr=Math.floor(num(d.cr,0,INV_MAX_COIN,0)); if(!secureOn()) crystals=savedCr; renderSkills();
     if(d.eq&&typeof d.eq==="object") for(const sl of SLOTS){ const id=d.eq[sl]; equip[sl]=typeof id==="string"&&GEAR[id]&&GEAR[id].slot===sl?id:null; }
     if(d.pg&&typeof d.pg==="object"){ prog.xp=num(d.pg.xp,0,1e7,0)|0;
       for(const k of Object.keys(prog.sk)) prog.sk[k]=num(d.pg.sk&&d.pg.sk[k],0,1e7,0)|0;
@@ -113,6 +115,11 @@ async function initNet(){
     classLoaded=true;
     if(NET.myId){
       db.doc("admin_ops/"+NET.myId).onSnapshot(s=>{ if(s.exists) applyAdminOp(s.data()); },()=>{});
+      db.doc("wallet/"+NET.myId).onSnapshot(s=>{ const d=s.exists?s.data():null;
+        if(d&&typeof d.cr==="number") crystals=Math.floor(num(d.cr,0,INV_MAX_COIN,0));
+        else if(window.__islandAuth&&window.__islandAuth.admin&&savedCr>0) NET.db.doc("wallet/"+NET.myId).set({cr:savedCr}).catch(()=>{});   // перенос старого счёта админа
+        else if(secureOn()) crystals=0;
+        lastSaveJSON=""; },()=>{});
       db.doc("world/bans").onSnapshot(s=>{ BANS=(s.exists&&s.data()&&s.data().list)||{}; checkBan(); if(winKind==="admin_pl") renderWin(); },()=>{});
     }
     db.doc("world/nickfilter").onSnapshot(s=>{ const d=s.exists?s.data():null; NICK_EXTRA=d&&Array.isArray(d.w)?d.w.filter(w=>typeof w==="string").map(w=>w.toLowerCase().trim()).filter(Boolean).slice(0,300):[]; },()=>{});

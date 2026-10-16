@@ -38,6 +38,20 @@
     try{ TG.ready(); TG.expand(); if(TG.disableVerticalSwipes) TG.disableVerticalSwipes(); if(TG.setHeaderColor) TG.setHeaderColor("#2b2340"); if(TG.setBackgroundColor) TG.setBackgroundColor("#2b2340"); }catch(e){}
   }
   const peer="p"+rnd(10);
+  // вход через наш сервер: он проверяет подпись Telegram и выдаёт пропуск в Firebase на uid "utg<id>" (админу — с отметкой admin)
+  const AUTH_URL=String(window.__islandAuthUrl||"").replace(/\/$/,"");
+  window.__islandAuth={ok:false,admin:false};
+  let authP=null;
+  const authReady=()=>{ if(authP) return authP; authP=(async()=>{
+    const f=getFb(); if(!f||!AUTH_URL||!TG||!TG.initData||!tgUser||typeof firebase.auth!=="function") return;
+    try{
+      const ac=typeof AbortController==="function"?new AbortController():null; const to=setTimeout(()=>{ try{ ac&&ac.abort(); }catch(e){} },8000);
+      const r=await fetch(AUTH_URL+"/auth",{method:"POST",body:TG.initData,signal:ac?ac.signal:undefined}); clearTimeout(to);
+      if(!r.ok) throw new Error("auth "+r.status);
+      const j=await r.json(); const cred=await firebase.auth().signInWithCustomToken(j.token);
+      if(cred&&cred.user&&cred.user.uid===uid) window.__islandAuth={ok:true,admin:!!j.admin,uid};
+    }catch(e){ console.warn("[auth]",e&&e.message||e); }
+  })(); return authP; };
 
   let fb=null; const getFb=()=>{ if(fb) return fb; if(!window.firebase) return null;
     const app=firebase.apps.length?firebase.app():firebase.initializeApp(CFG); fb=app.database(); return fb; };
@@ -99,5 +113,5 @@
     me:()=>Promise.resolve({id:uid,name:"",avatarUrl:"",color:"#888",email:null,isOwner:false,canEdit:true}),
     isOwner:()=>Promise.resolve(false),canEdit:()=>Promise.resolve(true),can:()=>Promise.resolve(true)};
 
-  window.claude={use:n=>Promise.resolve(getFb()?(n==="room"?room:n==="db"?db:n==="user"?user:null):null)};
+  window.claude={use:n=>authReady().then(()=>getFb()?(n==="room"?room:n==="db"?db:n==="user"?user:null):null)};
 })();

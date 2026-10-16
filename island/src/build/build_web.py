@@ -4,9 +4,12 @@ build=time.strftime('%Y%m%d-%H%M%S')
 h=open(src,encoding='utf-8').read()
 def strip(js): return re.sub(r'//# sourceMappingURL=\S+','',js).replace('</script','<\\/script')
 app=strip(open(sdkdir+'/firebase-app-compat.js',encoding='utf-8').read())
+auth=strip(open(sdkdir+'/firebase-auth-compat.js',encoding='utf-8').read())
+import os
+authurl=open('auth_url.txt').read().strip() if os.path.exists('auth_url.txt') else ''
 dbs=strip(open(sdkdir+'/firebase-database-compat.js',encoding='utf-8').read())
 ad=open('fb_adapter.js',encoding='utf-8').read()
-inj='<script src="https://telegram.org/js/telegram-web-app.js"></script>\n<script>window.__islandBuild="'+build+'";</script>\n<script>'+app+'</script>\n<script>'+dbs+'</script>\n<script>'+ad+'</script>\n'
+inj='<script src="https://telegram.org/js/telegram-web-app.js"></script>\n<script>window.__islandBuild="'+build+'";window.__islandAuthUrl='+json.dumps(authurl)+';</script>\n<script>'+app+'</script>\n<script>'+auth+'</script>\n<script>'+dbs+'</script>\n<script>'+ad+'</script>\n'
 i=h.index('<script>'); h=h[:i]+inj+h[i:]
 meta=('<link rel="manifest" href="manifest.webmanifest">\n<meta name="mobile-web-app-capable" content="yes">\n'
       '<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n'

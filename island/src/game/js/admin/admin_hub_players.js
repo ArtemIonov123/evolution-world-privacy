@@ -71,6 +71,7 @@ function renderAdminPlayers(body){
 async function adOpen(id){
   adSel=id; adSave=null; adMsg=""; adEdit=null; renderWin();
   try{ const s=await NET.db.doc(`data/users/${id}/save`).get(); if(adSel!==id) return; adSave=s.exists?(s.data()||{}):false; }catch(e){ adSave=false; }
+  try{ const w=await NET.db.doc("wallet/"+id).get(); if(w.exists&&adSave&&typeof w.data().cr==="number") adSave.cr=w.data().cr; }catch(e){}
   const p=adPlayers.find(x=>x.id===id)||(id===NET.myId?adMine():{d:{}});
   const sv=adSave||{}, iv=sv.inv&&typeof sv.inv==="object"?{...sv.inv}:{};
   adEdit={nick:cleanNick(sv.nf||sv.nick||p.d.n||""),coin:Math.floor(iv.coin||0),cr:Math.floor(sv.cr||0),xp:(sv.pg&&sv.pg.xp)|0,cl:CLASSES.includes(sv.cl)?sv.cl:"",inv:Object.fromEntries(Object.entries(iv).filter(([k,v])=>k!=="coin"&&typeof v==="number"&&v>0))};
@@ -119,12 +120,13 @@ async function adApply(id){
   for(const [k,v] of Object.entries(E.inv)) if(v>0&&ITEMS.some(it=>it.id===k)) inv2[k]=Math.min(INV_MAX,Math.floor(v));
   if(E.coin>0) inv2.coin=Math.min(INV_MAX_COIN,Math.floor(E.coin));
   const set={inv:inv2,cr:Math.floor(E.cr||0),xp:Math.floor(E.xp||0),cl:E.cl||""}; if(nick.length>=2) set.nick=nick;
-  if(id===NET.myId){ applyAdminOp({id:Date.now(),set},true); adMsg=tr("ad_saved"); renderWin(); return; }
+  if(id===NET.myId){ NET.db.doc("wallet/"+id).set({cr:set.cr}).catch(()=>{}); applyAdminOp({id:Date.now(),set},true); adMsg=tr("ad_saved"); renderWin(); return; }
   try{
     const ref=NET.db.doc(`data/users/${id}/save`); const s=await ref.get(); const sv=s.exists?(s.data()||{}):{};
     sv.inv=inv2; sv.cr=set.cr; sv.pg={...(sv.pg||{}),xp:set.xp}; if(set.cl) sv.cl=set.cl; else delete sv.cl;
     if(set.nick){ sv.nick=set.nick; sv.nf=set.nick; }
     await ref.set(sv);
+    await NET.db.doc("wallet/"+id).set({cr:set.cr}).catch(()=>{});
     await NET.db.doc("admin_ops/"+id).set({id:Date.now(),set});
     const pd=adPlayers.find(x=>x.id===id); if(pd&&set.nick){ pd.d.n=set.nick; NET.db.doc("players/"+id).set({...pd.d,n:set.nick,lv:lvlInfo(set.xp).l,cl:set.cl}).catch(()=>{}); }
     adSave=sv; adMsg=tr("ad_saved");
@@ -136,7 +138,9 @@ function adBan(id,on){
   const list={...BANS};
   if(on){ const ri=document.getElementById("adBanR"), r=ri?ri.value:""; const pd=adPlayers.find(x=>x.id===id); list[id]={r:String(r).slice(0,120),t:Date.now(),n:pd?String(pd.d.n||"").slice(0,16):""}; }
   else delete list[id];
-  BANS=list; NET.db.doc("world/bans").set({list}).catch(()=>{}); renderWin();
+  BANS=list; NET.db.doc("world/bans").set({list}).catch(()=>{});
+  if(on) NET.db.doc("banned/"+id).set({r:list[id].r,t:list[id].t}).catch(()=>{}); else NET.db.doc("banned/"+id).delete().catch(()=>{});
+  renderWin();
 }
 // изменения от админа: применяем у себя и удаляем заявку
 function applyAdminOp(op,self){
