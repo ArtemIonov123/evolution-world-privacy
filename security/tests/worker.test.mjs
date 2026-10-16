@@ -32,4 +32,47 @@ ok(r.status === 200 && j.admin === false && !JSON.parse(Buffer.from(j.token.spli
 r = await call("hash=bad"); ok(r.status === 401, "/auth: без подписи — 401");
 r = await worker.fetch(new Request("https://x.workers.dev/setup?key=wrong"), env); ok(r.status === 403, "/setup без ключа — 403");
 r = await worker.fetch(new Request("https://x.workers.dev/bot", { method: "POST", body: "{}" }), env); ok(r.status === 403, "/bot без секрета Telegram — 403");
+
+// ---- оплата звёздами и обмен (Telegram и база — подменены) ----
+const DB = {}, TG = []; let etagN = 1; const etags = {};
+const realFetch = globalThis.fetch;
+globalThis.fetch = async (u, o = {}) => {
+  u = String(u); const H = o.headers || {};
+  if (u.startsWith("https://oauth2.googleapis.com")) return new Response(JSON.stringify({ access_token: "gt", expires_in: 3600 }));
+  if (u.startsWith("https://api.telegram.org")) { const m = u.split("/").pop(), b = JSON.parse(o.body); TG.push([m, b]);
+    return new Response(JSON.stringify(m === "createInvoiceLink" ? { ok: true, result: "https://t.me/$inv" + b.payload } : { ok: true })); }
+  if (u.startsWith("https://db.test/")) { const path = u.slice(16).split(".json")[0], meth = o.method || "GET";
+    if (H.Authorization !== "Bearer gt") return new Response("{}", { status: 401 });
+    const tag = etags[path] || "null_etag";
+    if (meth === "GET") return new Response(JSON.stringify(DB[path] ?? null), { headers: { ETag: tag } });
+    if (H["if-match"] && H["if-match"] !== tag) return new Response("{}", { status: 412 });
+    DB[path] = JSON.parse(o.body); etags[path] = "e" + etagN++;
+    if (path.endsWith("/done")) DB[path.slice(0, -5)].done = DB[path];
+    return new Response(o.body); }
+  return realFetch(u, o);
+};
+const penv = { ...env, WORLD: "W1", DB_URL: "https://db.test/" };
+const post = (p, b) => worker.fetch(new Request("https://x.workers.dev" + p, { method: "POST", body: JSON.stringify(b), headers: { Origin: "https://artemionov123.github.io" } }), penv);
+const W = "w/W1/db/wallet/utg777001", crOf = () => JSON.parse(DB[W]?.j || '{"cr":0}').cr;
+r = await post("/invoice", { init: other, pack: "p2", lang: "ru" }); j = await r.json();
+const inv = TG.find((x) => x[0] === "createInvoiceLink");
+ok(r.status === 200 && j.link && inv[1].currency === "XTR" && inv[1].prices[0].amount === 50 && inv[1].payload === "777001|p2" && inv[1].provider_token === "", "/invoice: счёт в звёздах, цена с сервера");
+r = await post("/invoice", { init: other, pack: "p9" }); ok(r.status === 400, "/invoice: несуществующий пакет — 400");
+r = await post("/invoice", { init: "hash=bad", pack: "p1" }); ok(r.status === 401, "/invoice: без подписи — 401");
+const hook = async (upd) => worker.fetch(new Request("https://x.workers.dev/bot", { method: "POST", body: JSON.stringify(upd),
+  headers: { "X-Telegram-Bot-Api-Secret-Token": (crypto.createHash("sha256").update("hook|" + BOT).digest("hex")).slice(0, 48) } }), penv);
+await hook({ pre_checkout_query: { id: "q1", from: { id: 777001 }, currency: "XTR", total_amount: 50, invoice_payload: "777001|p2" } });
+ok(TG.at(-1)[0] === "answerPreCheckoutQuery" && TG.at(-1)[1].ok === true, "проверка оплаты: верный счёт — да");
+await hook({ pre_checkout_query: { id: "q2", from: { id: 777001 }, currency: "XTR", total_amount: 1, invoice_payload: "777001|p2" } });
+ok(TG.at(-1)[1].ok === false, "проверка оплаты: подменённая сумма — нет");
+await hook({ pre_checkout_query: { id: "q3", from: { id: 999999 }, currency: "XTR", total_amount: 50, invoice_payload: "777001|p2" } });
+ok(TG.at(-1)[1].ok === false, "проверка оплаты: чужой счёт — нет");
+const paid = { message: { chat: { id: 777001 }, from: { id: 777001, language_code: "ru" }, successful_payment: { currency: "XTR", total_amount: 50, invoice_payload: "777001|p2", telegram_payment_charge_id: "ch.1" } } };
+r = await hook(paid); ok(r.status === 200 && crOf() === 120, "оплата прошла: +120 кристаллов");
+r = await hook(paid); ok(crOf() === 120, "повтор того же платежа не начисляет второй раз");
+ok(DB["pay/ch_1"] && DB["pay/ch_1"].done === true && DB["pay/ch_1"].tg === "777001", "платёж записан (вне мира, игрокам не виден)");
+r = await post("/exchange", { init: other, n: 20 }); j = await r.json();
+ok(r.status === 200 && j.cr === 100 && crOf() === 100, "/exchange: списано 20 кристаллов");
+r = await post("/exchange", { init: other, n: 500 }); ok(r.status === 409 && crOf() === 100, "/exchange: больше, чем есть — отказ");
+r = await post("/exchange", { init: other, n: -5 }); ok(r.status === 400 && crOf() === 100, "/exchange: отрицательное число — отказ");
 console.log(fail ? `\n${fail} FAILED` : "\nALL PASSED"); process.exit(fail ? 1 : 0);

@@ -40,7 +40,7 @@ function renderWin(){
   document.getElementById("win").classList.toggle("wbag",winKind==="bag");
   const body=document.getElementById("winBody"); body.textContent="";
   if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else if(winKind==="admin_bosses") renderAdminBosses(body); else if(winKind==="admin_zones") renderAdminZones(body); else if(winKind==="admin_portals") renderAdminPortals(body); else
-  if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
+  if(winKind==="crystals") renderCrystals(body); else if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
 }
 const BAG_TABS=["all","gear","food","mat"];
 let bagTab="all";

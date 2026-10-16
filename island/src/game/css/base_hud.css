@@ -311,3 +311,24 @@ body.bagart .win .wx{background:var(--ui-close) center/100% 100% no-repeat;borde
 .tabs .coins{margin-left:auto;font-family:var(--f-display);font-size:12px;color:#ffd66b}
 .wbody .slot em{position:absolute;left:2px;top:0;font:700 10px/12px var(--f-body);font-style:normal;color:#ffd66b;text-shadow:1px 1px 0 var(--edge)}
 .acts .btn:disabled{opacity:.45;cursor:default}
+/* ---- кристаллы ---- */
+.crtop{display:flex;gap:8px;justify-content:center}
+.crbal{display:flex;align-items:center;gap:6px;padding:4px 12px;background:#1b1528;border:2px solid #b8862e;font-size:15px}
+.crbal img{width:20px;height:20px;image-rendering:pixelated}.crbal b{font-family:var(--f-display);font-weight:400;color:#b8a8ff}.crbal.gold b{color:#ffd66b}
+.crbox{display:flex;flex-direction:column;gap:7px;padding:8px;background:#1b1528;border:2px solid #b8862e}
+.crh{text-align:center;font-size:15px;color:#ffd66b}
+.crrate,.crres{margin:0;display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;color:#e8e0f4}
+.crrate img,.crres img{width:16px;height:16px;image-rendering:pixelated}.crres b{color:#ffd66b;font-size:15px}
+.crrow{display:grid;grid-template-columns:44px 1fr 44px;gap:6px}
+.crstep{min-height:38px;padding:0;font-size:18px}
+.crinp{min-width:0;text-align:center;font:inherit;font-size:17px;font-weight:700;background:#2b2340;color:#fff;border:2px solid #7a5a24;padding:4px}
+.crquick{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.crquick .btn{min-height:32px;font-size:13px;padding:2px}
+.crgo{min-height:42px}.crgo:disabled,.crpack:disabled{opacity:.45;filter:grayscale(.6);cursor:default}
+.crmsg{margin:0;text-align:center;font-size:13px}.crmsg.ok{color:#8fe08a}.crmsg.bad{color:#ff8a7a}
+.crpacks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.crpack{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 4px 6px;min-height:0;background:#2b2340;border:2px solid #b8862e;color:#fff}
+.crpic{width:34px;height:34px;image-rendering:pixelated}
+.crn{font-family:var(--f-display);font-weight:400;font-size:16px;color:#b8a8ff}
+.crst{font-size:13px;font-weight:700;color:#ffd66b;background:#1b1528;padding:2px 8px;border:1px solid #7a5a24}
+.crbonus{position:absolute;top:-2px;right:-2px;background:#d8443a;color:#fff;font-size:10px;font-weight:700;padding:1px 4px}
+.win .crbox .adnote{margin:0;text-align:center}

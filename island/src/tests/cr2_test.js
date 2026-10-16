@@ -1,0 +1,16 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const errs=[];
+const ctx=await b.newContext({viewport:{width:390,height:800}}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')});
+const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(`window.Telegram={WebApp:{initData:"x",initDataUnsafe:{start_param:"",user:{id:777061,first_name:"T",language_code:"ru"}},ready(){},expand(){},openInvoice(l,cb){ window.__inv=l; setTimeout(()=>cb("paid"),50); }}};try{localStorage.setItem("island_lang","ru")}catch(e){}`);
+await p.goto('http://localhost:8765/index.html#world=Cr2'+Date.now()); await p.waitForTimeout(2500);
+const r=await p.evaluate(async()=>{ if(!heroClass) setClass('warrior'); const c=document.getElementById('classWrap'); if(c) c.remove();
+  window.__islandAuthUrl="https://srv.test"; window.__islandAuth={ok:true,uid:NET.myId};
+  const calls=[]; window.fetch=async(u,o)=>{ calls.push([u,JSON.parse(o.body)]); const pth=u.split("/").pop();
+    if(pth==="invoice") return new Response(JSON.stringify({link:"https://t.me/$x"}));
+    if(pth==="exchange") return new Response(JSON.stringify({ok:true,cr:3,n:7})); };
+  crystals=10; inv.coin=0; openWin("crystals"); crEx=7; await crExchange(7);
+  const ex={crystals,coin:inv.coin};
+  await crBuy(CR_PACKS[2]); await new Promise(r=>setTimeout(r,200));
+  return {ex,calls:calls.map(c=>[c[0],c[1].n||c[1].pack]),inv:window.__inv,msg:[...document.querySelectorAll('.crmsg')].map(x=>x.textContent)}; });
+console.log(JSON.stringify(r)); console.log('errs',errs); await b.close();})();
