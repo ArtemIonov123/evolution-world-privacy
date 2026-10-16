@@ -10,14 +10,14 @@ function initUpdates(){
     const go=()=>location.replace(location.pathname+"?v="+encodeURIComponent(updBuild||Date.now())+location.hash);
     setTimeout(go,500); };
   if(window.__islandTG) (async()=>{ try{ const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"}); const j=await r.json();
-      if(j&&j.build&&j.build!==mine&&sessionStorage.getItem("island_autoupd")!==j.build){ sessionStorage.setItem("island_autoupd",j.build); location.replace(location.pathname+"?v="+encodeURIComponent(j.build)+location.hash); } }catch(e){} })();
+      if(j&&j.build&&j.build!==mine&&sessionStorage.getItem("pa_autoupd")!==j.build){ sessionStorage.setItem("pa_autoupd",j.build); location.replace(location.pathname+"?v="+encodeURIComponent(j.build)+location.hash); } }catch(e){} })();
   setTimeout(check,8000); setInterval(check,60000);
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) check(); });
   addEventListener("online",check);
 }
 function setNick(v,force){
   const n=cleanNick(v); if(n.length<2) return false; if(!force&&badNick(n)) return false;
-  myNick=n; try{ localStorage.setItem("island_nick",n); }catch(e){}
+  myNick=n; try{ localStorage.setItem("pa_nick",n); }catch(e){}
   lastPresJSON=""; lastPlayerJSON=""; lastSaveJSON=""; renderPlayers();
   return true;
 }

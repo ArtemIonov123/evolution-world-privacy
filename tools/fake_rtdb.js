@@ -1,6 +1,6 @@
 (()=>{
-  const K='fakertdb', bc=new BroadcastChannel('fakertdb'); const TS={'.sv':'timestamp'};
-  const P='frt:';
+  const K='pa_fakertdb', bc=new BroadcastChannel('pa_fakertdb'); const TS={'.sv':'timestamp'};
+  const P='pa_frt:';
   const segs=p=>String(p).split('/').filter(Boolean); const norm=p=>segs(p).join('/');
   const fix=v=>{ if(v&&typeof v==='object'){ if(v['.sv']==='timestamp') return Date.now(); const o={}; for(const k in v){ const x=fix(v[k]); if(x!=null) o[k]=x; } return Object.keys(o).length?o:null; } return v; };
   const getAt=(_,p)=>{ p=norm(p); const ex=localStorage.getItem(P+p); if(ex!=null) return JSON.parse(ex);

@@ -25,7 +25,7 @@ const PORTAL=(()=>{
 })();
 // где появиться после перехода: у входа/выхода или (после обморока в пещере) у хижины
 let SPAWN_FIXED=false;
-{ let sp=null; try{ sp=sessionStorage.getItem("island_spawn"); sessionStorage.removeItem("island_spawn"); }catch(e){} window.__spawnReq=sp||"";
+{ let sp=null; try{ sp=sessionStorage.getItem("pa_spawn"); sessionStorage.removeItem("pa_spawn"); }catch(e){} window.__spawnReq=sp||"";
   const near=t=>t&&[...Array(9)].map((_,i)=>cellAt(t.x+(i%3)-1,t.y+((i/3)|0)-1)).filter(n=>n&&!n.blocked&&!wet(n)&&Math.abs(walkZ(n)-walkZ(t))<=1)
     .sort((a,b)=>depthOf(b.x-MX,b.y-MY)-depthOf(a.x-MX,a.y-MY))[0];
   const spot=sp==="portal"?near(PORTAL):sp==="faint"?near(NPCC):null;
@@ -34,7 +34,7 @@ function usePortal(){
   if(!PORTAL||fainting) return;
   fainting=true; hero.path=[]; document.getElementById("fade").style.opacity="1"; say(CAVE?"cave_leave":"cave_enter");
   saveNow();
-  try{ sessionStorage.setItem("island_zone",CAVE?"island":"cave"); sessionStorage.setItem("island_spawn","portal"); }catch(e){}
+  try{ sessionStorage.setItem("pa_zone",CAVE?"island":"cave"); sessionStorage.setItem("pa_spawn","portal"); }catch(e){}
   setTimeout(()=>location.reload(),1100);
 }
 function saveNow(){ try{ lastSaveJSON=""; saveT=0; saving=false; tickSave(0); }catch(e){} }

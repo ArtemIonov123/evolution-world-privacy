@@ -55,7 +55,7 @@ function renderPortalCard(body){
             lkWrite({...LINKS,[E.ap]:{...LINKS[E.ap],to:E.z,arr:"link",ap:id}}); adMsg=tr("pt_backlinked"); renderWin(); }); bb.classList.add("wide"); f2.appendChild(bb); } } }
     if(E.arr==="cell"){ f2.appendChild(mkEl("p","adnote wide",E.ac?tr("pt_cell",{x:E.ac[0],y:E.ac[1]}):tr("pt_cell_none")));
       const pb=adBtn(tr("pt_pick"),()=>{ if(!LINKS[id]||LINKS[id].to!==E.to){ adMsg=tr("pt_save_first"); renderWin(); return; }
-        try{ sessionStorage.setItem("island_pt_pick",id); }catch(e){} closeWin();
+        try{ sessionStorage.setItem("pa_pt_pick",id); }catch(e){} closeWin();
         if(E.to===ZONE){ if(!EDIT) edEnter("map"); ptAfterReedit(); } else travelTo(E.to,"start",true); }); pb.classList.add("wide"); f2.appendChild(pb); }
     body.appendChild(f2); }
   const f3=mkEl("div","plform");
@@ -74,7 +74,7 @@ function ptCenter(L){ const c=cellAt(L.x,L.y); if(!c) return; follow=false; docu
   const [fx,fy]=proj(c.x-MX,c.y-MY,c.L), r=cv.getBoundingClientRect(); panX=r.width/2-fx*scale; panY=r.height/2-(fy-20)*scale; dirty=true; }
 // после перехода «выбрать клетку появления»: включаем инструмент в редакторе
 function ptAfterReedit(){
-  let id=null; try{ id=sessionStorage.getItem("island_pt_pick"); sessionStorage.removeItem("island_pt_pick"); }catch(e){}
+  let id=null; try{ id=sessionStorage.getItem("pa_pt_pick"); sessionStorage.removeItem("pa_pt_pick"); }catch(e){}
   if(!id||!LINKS[id]||!EDIT) return; edCat="places"; edTool="parr_"+id; edRender(); say("pt_pick_hint");
 }
 function ptPickAt(id,c){

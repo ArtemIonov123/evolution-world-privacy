@@ -1,7 +1,7 @@
 // ================= Группа (пати) =================
 // лидер — тот, к кому присоединились (pj участников = id лидера); всё — через «присутствие», без базы
 const online=new Map();          // uid -> сведения о каждом игроке в сети (любая зона)
-const PARTY_MAX=4, partyKeyLS="island_party_"+(window.__islandWorld||"c")+"_"+(()=>{ try{ return localStorage.getItem("island_uid")||""; }catch(e){ return ""; } })();
+const PARTY_MAX=4, partyKeyLS="pa_party_"+(window.__islandWorld||"c")+"_"+(()=>{ try{ return localStorage.getItem("pa_uid")||""; }catch(e){ return ""; } })();
 let partyPdSeen=null, partyLead=null, partyJoinTs=0, myInvite=null, myDisband=0, selPlayer=null, partyAsk=null, partyMissT=0, lastLeadZn=null;
 const myKicks=[], xsList=[]; let xsSeq=0; const lastXs={}; const answered=new Set(); const invSeen=new Map();
 try{ const o=JSON.parse(localStorage.getItem(partyKeyLS)||"null"); if(o&&typeof o.lead==="string"&&Date.now()-(o.j||0)<6*3600e3){ partyLead=o.lead; partyJoinTs=o.j; } }catch(e){}
@@ -38,7 +38,7 @@ function declineInvite(){ if(partyAsk&&partyAsk.key) answered.add(partyAsk.key);
 function travelZone(zn){
   if(CUSTOMZ||ZID.test(zn)){ travelTo(zn,"start"); return; }
   if(zn===ZONE||fainting) return; fainting=true; hero.path=[]; document.getElementById("fade").style.opacity="1"; say(zn==="cave"?"cave_enter":"cave_leave");
-  saveNow(); try{ sessionStorage.setItem("island_zone",zn); sessionStorage.setItem("island_spawn","portal"); }catch(e){}
+  saveNow(); try{ sessionStorage.setItem("pa_zone",zn); sessionStorage.setItem("pa_spawn","portal"); }catch(e){}
   setTimeout(()=>location.reload(),1100);
 }
 function partyTick(){

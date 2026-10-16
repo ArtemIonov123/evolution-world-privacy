@@ -2,7 +2,7 @@
 const sleepers=new Map();       // id -> {kind:"sleeper", by, x,y,z,c,last}
 const chatLog=[];               // [{id,t,by,ts,c}] — последние сообщения из базы
 let lastPlayerWrite=0, lastPlayerJSON="", lastReadTs=0;
-try{ lastReadTs=+localStorage.getItem("island_chat_read")||0; }catch(e){}
+try{ lastReadTs=+localStorage.getItem("pa_chat_read")||0; }catch(e){}
 // моя запись «где я и когда был» — чтобы друзья видели меня спящим, когда меня нет
 function tickPlayerDoc(){
   if(!NET.db||!NET.myId) return;
@@ -78,7 +78,7 @@ function updateUnread(fromSnapshot){
 }
 function markChatRead(){
   if(chatLog.length) lastReadTs=Math.max(lastReadTs,chatLog[chatLog.length-1].ts);
-  try{ localStorage.setItem("island_chat_read",String(lastReadTs)); }catch(e){}
+  try{ localStorage.setItem("pa_chat_read",String(lastReadTs)); }catch(e){}
   updateUnread(false);
 }
 function personName(by){ if(by&&by===NET.myId) return tr("you"); return (by&&names[by])||tr("someone"); }

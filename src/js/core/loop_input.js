@@ -1,7 +1,10 @@
 // ---------- Цикл ----------
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let last=performance.now(), dirty=true;
-function frame(now){
+// одна ошибка в кадре не должна останавливать игру: показываем её и рисуем дальше
+let frameErrs=0;
+function frame(now){ try{ frameBody(now); }catch(e){ if(frameErrs++<3) showGameError(e&&e.message||e,e&&e.stack?String(e.stack).split("\n").slice(1,4).join("\n"):""); requestAnimationFrame(frame); } }
+function frameBody(now){
   const dt=Math.min(0.05,(now-last)/1000); last=now;
   T+=dt; updateWind(dt); updateFishing(dt); updateChopping(dt); updateSmoke(dt); updateNPC(dt); updateMerchant(dt); updateClock(dt); updateFires(dt); prog.st.time+=dt; updateCombat(dt); updateSkills(dt); updateBossBar(); updateAnimalsNet(dt); updateRemotes(dt); updateHitFx(dt); sendPresence(now); tickSave(dt); tickPlayerDoc(); updateFireflies(); syncActions(); syncFishUI(); dirty=true;
   if(anim){

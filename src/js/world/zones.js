@@ -4,7 +4,7 @@
 // Оба списка кэшируются в браузере: при загрузке зона и место появления известны сразу, ещё до базы.
 const ZID=/^z[a-z0-9]{4,10}$/, LID=/^l[a-z0-9]{4,12}$/, LINK_LOOKS=["portal","cave","ladder"];
 let ZONES=ZONES0, LINKS={};
-try{ const l=JSON.parse(localStorage.getItem("island_links")||"{}"); if(l&&typeof l==="object") LINKS=l; }catch(e){}
+try{ const l=JSON.parse(localStorage.getItem("pa_links")||"{}"); if(l&&typeof l==="object") LINKS=l; }catch(e){}
 const zoneOk=z=>z==="island"||z==="cave"||ZID.test(z||"");
 const zoneKind=z=>z==="cave"?"cave":z==="island"?"island":(ZONES[z]&&ZONES[z].k)||"island";
 const allZones=()=>["island","cave",...Object.keys(ZONES)];
@@ -29,14 +29,14 @@ let zonesLoaded=false;
 function applyZones(d){
   const list=d&&d.list&&typeof d.list==="object"?d.list:{}; const z={};
   for(const [id,o] of Object.entries(list).slice(0,40)){ const v=znSanitize(id,o); if(v) z[id]=v; }
-  ZONES=z; zonesLoaded=true; try{ localStorage.setItem("island_zones",JSON.stringify(z)); }catch(e){}
+  ZONES=z; zonesLoaded=true; try{ localStorage.setItem("pa_zones",JSON.stringify(z)); }catch(e){}
   if(ZID.test(ZONE)&&!ZONES[ZONE]&&!fainting){ setTimeout(()=>travelTo("island",""),300); return; }   // остров удалили — домой
   if(winKind==="admin_zones"||winKind==="admin_mobs"||winKind==="admin_bosses") renderWin(); try{ renderPlayers(); }catch(e){}
 }
 function applyLinks(d){
   const list=d&&d.list&&typeof d.list==="object"?d.list:{}; const l={};
   for(const [id,o] of Object.entries(list).slice(0,200)){ const v=lkSanitize(id,o); if(v) l[id]=v; }
-  LINKS=l; try{ localStorage.setItem("island_links",JSON.stringify(l)); }catch(e){}
+  LINKS=l; try{ localStorage.setItem("pa_links",JSON.stringify(l)); }catch(e){}
   markLinks(); if(winKind==="admin_zones") renderWin(); if(EDIT) edRender();
 }
 function markLinks(){
@@ -63,7 +63,7 @@ async function travelTo(z,spawn,reedit){
   saveNow();
   try{ if(ZID.test(z)&&NET.db){ const s=await NET.db.doc("world/map_"+z).get(); const d=s.exists?s.data():null;
       if(d&&typeof d.m==="string"&&typeof d.v==="number") localStorage.setItem(mapKey(z),JSON.stringify({v:d.v,m:JSON.parse(d.m)})); } }catch(e){}
-  try{ sessionStorage.setItem("island_zone",z); sessionStorage.setItem("island_spawn",spawn||""); if(reedit) sessionStorage.setItem("island_reedit","map"); }catch(e){}
+  try{ sessionStorage.setItem("pa_zone",z); sessionStorage.setItem("pa_spawn",spawn||""); if(reedit) sessionStorage.setItem("pa_reedit","map"); }catch(e){}
   setTimeout(()=>location.reload(),700);
 }
 function linkSpawn(L){ if(L.arr==="start") return "start"; if(L.arr==="cell"&&L.ac) return "cell:"+L.ac[0]+","+L.ac[1];

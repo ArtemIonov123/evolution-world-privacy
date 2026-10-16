@@ -16,7 +16,7 @@ function edExit(toHub){
   if((edUndo.length||cfgDirty)&&!edExitConfirm){ edExitConfirm=true; edRender(); setTimeout(()=>{edExitConfirm=false; edRender();},4000); return; }
   edExitConfirm=false; EDIT=false; showGrid=edPrevGrid; document.body.classList.remove("editing"); document.getElementById("edPanel").hidden=true;
   cfgDirty=false;
-  if(edUndo.length){ if(toHub===true) try{ sessionStorage.setItem("island_adhub","1"); }catch(e){} setTimeout(()=>location.reload(),300); return; }   // несохранённые правки — вернуть как было
+  if(edUndo.length){ if(toHub===true) try{ sessionStorage.setItem("pa_adhub","1"); }catch(e){} setTimeout(()=>location.reload(),300); return; }   // несохранённые правки — вернуть как было
   say("hint","hint_sub"); dirty=true;
   if(toHub===true) openWin("admin");
 }

@@ -21,7 +21,7 @@ function renderAdminHub(body){
   body.appendChild(g);
 }
 function adSwitchZone(){
-  saveNow(); try{ sessionStorage.setItem("island_zone",CAVE?"island":"cave"); sessionStorage.setItem("island_spawn","portal"); sessionStorage.setItem("island_reedit","map"); }catch(e){}
+  saveNow(); try{ sessionStorage.setItem("pa_zone",CAVE?"island":"cave"); sessionStorage.setItem("pa_spawn","portal"); sessionStorage.setItem("pa_reedit","map"); }catch(e){}
   document.getElementById("fade").style.opacity="1"; setTimeout(()=>location.reload(),500);
 }
 function adHead(body,backFn){ const t=mkEl("div","adtop"); t.appendChild(adBtn(tr("ad_back"),backFn||(()=>{ winKind="admin"; renderWin(); }))); body.appendChild(t); return t; }

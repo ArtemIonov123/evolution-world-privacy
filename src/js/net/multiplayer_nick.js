@@ -40,11 +40,11 @@ function badNick(v){
   return false;
 }
 let myNick="";
-try{ myNick=cleanNick(localStorage.getItem("island_nick")||""); }catch(e){}
+try{ myNick=cleanNick(localStorage.getItem("pa_nick")||""); }catch(e){}
 // в Telegram ник берём из профиля Telegram
 { const t=window.__islandTG; if(t){ let n=cleanNick((t.first+" "+t.last).trim()); if(n.length<2||badNick(n)) n=cleanNick(t.user); if(n.length<2||badNick(n)) n=cleanNick("Hero"+t.id.slice(-4));
-    myNick=n; try{ localStorage.setItem("island_nick",n); }catch(e){}
-    if(!localStorage.getItem("island_lang")&&/^(ru|uk|be|kk)/.test(t.lang)) try{ LANG="ru"; }catch(e){} } }
+    myNick=n; try{ localStorage.setItem("pa_nick",n); }catch(e){}
+    if(!localStorage.getItem("pa_lang")&&/^(ru|uk|be|kk)/.test(t.lang)) try{ LANG="ru"; }catch(e){} } }
 function cleanNick(v){
   return String(v||"").replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff]/g,"").replace(/\s+/g," ").trim().slice(0,16);
 }

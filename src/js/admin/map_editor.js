@@ -318,14 +318,14 @@ async function edSaveMap(m,reload){
     for(const id of fireDocs) NET.db.doc(ZC("fires")+"/"+id).delete().catch(()=>{});
   }
   edUndo.length=0; edSaving=false;
-  if(reload){ say("ed_saved_reload"); try{ sessionStorage.setItem("island_reedit",edTab); lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
+  if(reload){ say("ed_saved_reload"); try{ sessionStorage.setItem("pa_reedit",edTab); lastSaveJSON=""; tickSave(99); }catch(e){} setTimeout(()=>location.reload(),900); }
   else { say("ed_saved","ed_saved_sub"); edRender(); }
 }
 function edSave(){ const m=edSerialize(); edSaveMap(m,edNeedsReload(m)); }
 let confirmReset=false;
 async function edReset(){
   if(!confirmReset){ confirmReset=true; edRender(); setTimeout(()=>{confirmReset=false; edRender();},4000); return; }
-  try{ localStorage.removeItem(mapKey()); sessionStorage.setItem("island_reedit","1"); }catch(e){}
+  try{ localStorage.removeItem(mapKey()); sessionStorage.setItem("pa_reedit","1"); }catch(e){}
   if(NET.db) await NET.db.doc(MAP_DOC).delete().catch(()=>{});
   MAP_V=0; setTimeout(()=>location.reload(),400);
 }

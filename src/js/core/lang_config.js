@@ -1,5 +1,5 @@
 let LANG="ru";
-try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v; }catch(e){}
+try{ const v=localStorage.getItem("pa_lang"); if(v==="ru"||v==="pl") LANG=v; }catch(e){}
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
 // тексты и цены, которые админ поменял в редакторе (world/config)
@@ -39,6 +39,6 @@ function applyLang(){
   if(typeof lastClockText!=="undefined") lastClockText="";
   if(typeof renderHP==="function"&&document.getElementById("hp").innerHTML) renderHP();
 }
-function setLang(l){ LANG=l; try{localStorage.setItem("island_lang",l)}catch(e){} applyLang(); }
+function setLang(l){ LANG=l; try{localStorage.setItem("pa_lang",l)}catch(e){} applyLang(); }
 
 

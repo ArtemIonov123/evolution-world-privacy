@@ -9,10 +9,10 @@
   const okKey=k=>typeof k==="string"&&/^[A-Za-z0-9_-]{16,40}$/.test(k);
   // ключ мира: из ссылки → из прошлого раза → новый
   let world="postapo_wasteland_v1";   // новое имя = чистый мир с новой картой (старые правки из браузера не мешают)
-  ls.set("island_world",world);
+  ls.set("pa_world",world);
   if(!location.hash.includes("world="+world)) try{history.replaceState(null,"",location.pathname+location.search+"#world="+world);}catch(e){}
   window.__islandWorld=world;
-  let uid=ls.get("island_uid"); if(!/^u[A-Za-z0-9]{10,20}$/.test(uid||"")){ uid="u"+rnd(14); ls.set("island_uid",uid); }
+  let uid=ls.get("pa_uid"); if(!/^u[A-Za-z0-9]{10,20}$/.test(uid||"")){ uid="u"+rnd(14); ls.set("pa_uid",uid); }
   // Telegram Mini App: игрок = аккаунт Telegram (тот же прогресс на любом телефоне)
   const TG=window.Telegram&&window.Telegram.WebApp, tgUser=TG&&TG.initDataUnsafe&&TG.initDataUnsafe.user;
   window.__islandTG=null;

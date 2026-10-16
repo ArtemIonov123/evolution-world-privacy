@@ -77,7 +77,7 @@ function faint(){
   fainting=true; fadeT=0; hero.path=[]; marker=null; closeDialog(); prog.st.faints++;
   document.getElementById("fade").style.opacity="1";
   if(ZONE!=="island"){ setTimeout(()=>{ const lost=Math.floor((inv.coin||0)*0.3); if(lost){ inv.coin-=lost; if(!inv.coin) delete inv.coin; }
-    hero.hp=HP_MAX; saveNow(); try{ sessionStorage.setItem("island_zone","island"); sessionStorage.setItem("island_spawn","faint"); }catch(e){}
+    hero.hp=HP_MAX; saveNow(); try{ sessionStorage.setItem("pa_zone","island"); sessionStorage.setItem("pa_spawn","faint"); }catch(e){}
     setTimeout(()=>location.reload(),900); },1100); return; }
   setTimeout(()=>{
     // очнулся утром у хижины Богдана
