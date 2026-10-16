@@ -1,4 +1,4 @@
-let LANG="pl";
+let LANG="ru";
 try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v; }catch(e){}
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;

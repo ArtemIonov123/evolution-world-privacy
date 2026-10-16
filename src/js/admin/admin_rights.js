@@ -11,6 +11,7 @@ async function initAdmin(){
   // админ по аккаунту Telegram
   const ADMIN_TG=["1661222371"];
   if(window.__islandTG&&ADMIN_TG.includes(window.__islandTG.id)){ ok=true; code=null; }
+  if(window.__islandLocal){ ok=true; code=null; }   // локальный файл разработки: админ — ты
   if(!ok&&code&&NET.db&&window.crypto&&crypto.subtle){
     const h=await sha256(code+"|wyspa");
     try{ const s=await NET.db.doc("world/admin").get();
