@@ -3508,7 +3508,10 @@ async function initAdmin(){
   if(!code&&window.__islandTG&&/^[A-Za-z0-9_-]{6,64}$/.test(window.__islandTG.sp)) code=window.__islandTG.sp;
   if(!code){ try{ code=sessionStorage.getItem("island_admin")||localStorage.getItem("island_admin_"+(window.__islandWorld||"c")); }catch(e){} }
   let ok=false;
-  if(code&&NET.db&&window.crypto&&crypto.subtle){
+  // админ по аккаунту Telegram
+  const ADMIN_TG=["1661222371"];
+  if(window.__islandTG&&ADMIN_TG.includes(window.__islandTG.id)){ ok=true; code=null; }
+  if(!ok&&code&&NET.db&&window.crypto&&crypto.subtle){
     const h=await sha256(code+"|wyspa");
     try{ const s=await NET.db.doc("world/admin").get();
       if(!s.exists){ await NET.db.doc("world/admin").set({h}); ok=true; } else ok=(s.data()||{}).h===h; }catch(e){}
