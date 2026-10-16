@@ -227,6 +227,7 @@ canvas.drag{cursor:grabbing}
 .wx{min-height:32px;padding:2px 10px;font-family:var(--f-body)}
 .wbody{overflow-y:auto;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .wbody .grid{display:flex;flex-wrap:wrap;gap:6px}
+.wbody>*{flex-shrink:0}
 .wbody .slot{position:relative;width:48px;height:48px;background:var(--panel-2);border:2px solid var(--edge);display:grid;place-items:center;padding:0;cursor:pointer;color:var(--ink)}
 .wbody .slot img{width:36px;height:36px;image-rendering:pixelated}
 .wbody .slot span{position:absolute;right:2px;bottom:0;font-family:var(--f-display);font-size:11px;text-shadow:1px 1px 0 var(--edge)}
@@ -332,6 +333,10 @@ canvas.drag{cursor:grabbing}
 .plform input[type=range]{padding:0}
 .plform .chk{display:flex;align-items:center;gap:6px;font-size:13px}.plform .chk input{width:auto}
 .plform .wide{grid-column:1 / -1}
+.mbprev{display:flex;align-items:center;gap:10px;margin:6px 0}.mbprev canvas{width:96px;height:96px;background:#3d6b3a;border:2px solid #000;image-rendering:pixelated;flex:none}
+.mbbase{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:4px 0 8px}.mbbase button{padding:2px;min-height:48px;display:flex;flex-direction:column;align-items:center;font-size:10px;font-family:var(--f-body);letter-spacing:0}
+.mbbase button.on{background:var(--accent);color:var(--panel)}.mbbase img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated}
+.mbseg{display:flex;gap:4px;flex-wrap:wrap}.mbseg .btn{flex:1;font-family:var(--f-body);letter-spacing:0;font-size:12px;min-height:34px;padding:3px 6px}.mbseg .btn.on{background:var(--accent);color:var(--panel)}
 .banwrap{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#2b2340;color:#f4efe0;text-align:center;padding:24px;font:16px/1.5 system-ui,sans-serif}
 .edtabs .btn{flex:1;font-family:var(--f-body);font-weight:700;letter-spacing:0;font-size:12px;min-height:34px;padding:4px 6px}
 .edtabs .btn.on{background:var(--accent);color:var(--panel)}
@@ -507,6 +512,7 @@ body.bhud .skb::before{content:"";position:absolute;inset:-2px;background:var(--
 body.bhud .skb::after{inset:4px;z-index:1}
 body.bhud .skb .sklv{z-index:3;bottom:-3px;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;font-size:10px}
 body.bhud .skb.active::before{filter:drop-shadow(0 0 4px #7cf07a)}
+body.bhud .win{z-index:9}
 body.bhud .toast{bottom:calc(var(--bh-b) + var(--atk)/2 + var(--arc) + 10px)}
 body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + var(--atk)/2 + var(--arc) + 6px)}
 @media (max-width:720px){
@@ -613,6 +619,7 @@ body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + var(--atk)/2 + v
 <script>
 const SPRITES = /*SPRITES*/;
 // зона: остров или пещера (общий данж). Пещера — отдельная карта; переход — перезагрузкой страницы
+const CMOBS={};   // свои мобы из админки (world/mobs)
 const ZONE=(()=>{ try{ return sessionStorage.getItem("island_zone")==="cave"?"cave":"island"; }catch(e){ return "island"; } })(), CAVE=ZONE==="cave";
 const CAVE_DEFAULT = {"levels":["0000044444444444400000","0004442222222222444000","0044222222222222224400","0042222222222222222400","0042222222222222222400","0044222222222222224400","0004444111221114444000","0000033111111113300000","0003331111111111333000","0033111111111111113300","0331111111111111111330","0311111113333311111113","0311111133000331111113","0331111130000031111113","0031111330000033111133","0031111130000031111330","0033111113333311111300","0003311111111111111300","0000333311111113333300","0000000333333333000000"],"tops":[".....xxxxxxxxxxxx.....","...xxxkkkKkkkkkkxxx...","..xxkkkKkkkkkkkkkkxx..","..xkkKkkkkklkkkkKkkx..","..xKkkkkkkkkkkKkkkkx..","..xxkkkkkkkkKkkkkkxx..","...xxxxkkkKkkkkxxxx...",".....xxkkkkKkkkxx.....","...xxxkKkjwwwjkkxxx...","..xxkkqkkjwwwvjkKqxx..",".xxkkqqkkjvvvjkkkkkxx.",".xkkkkkkKxxxxxkkkkkkkx",".xkkjkkkxx...xxkkKkkkx",".xxkkkkkx.....xkkqqkkx","..xkkkkxx.....xxkkkkxx","..xkkKkkx.....xkkkKxx.","..xxkkkkkxxxxxKkkkkx..","...xxkkkkkKkkkkkkkkx..","....xxxxkkkkkkkxxxxx..",".......xxxxxxxxx......"],"stairs":{},"props":[[4,9,"prop_crystal"],[17,10,"prop_crystal"],[4,3,"prop_crystal"],[17,4,"prop_crystal"],[3,13,"prop_mushrooms"],[18,15,"prop_mushrooms"],[6,16,"rock_small"]],"start":[11,18],"exit":[12,18],"boss":[11,3],"zones":{"spider":[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[14,11],[15,11],[16,11],[17,11],[18,11],[19,11],[20,11],[2,12],[3,12],[4,12],[5,12],[6,12],[7,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[3,13],[4,13],[5,13],[6,13],[7,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],[3,14],[4,14],[5,14],[6,14],[16,14],[17,14],[18,14],[19,14],[3,15],[4,15],[5,15],[6,15],[7,15],[15,15],[16,15],[17,15],[18,15],[4,16],[5,16],[6,16],[7,16],[14,16],[15,16],[16,16],[17,16],[18,16]],"bat":[[6,8],[7,8],[8,8],[9,8],[13,8],[14,8],[15,8],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[13,9],[14,9],[15,9],[16,9],[17,9],[3,10],[4,10],[5,10],[6,10],[7,10],[8,10],[9,10],[10,10],[11,10],[12,10],[13,10],[14,10],[15,10],[16,10],[17,10],[18,10]],"hare":[],"wolf":[]},"hut":null,"npc":null,"merchant":null,"stall":null,"pier":null};
 const ISLAND_MAP = /*MAP*/;
@@ -698,11 +705,20 @@ const I18N={
     ad_me:"To ty", ad_bannedby:"Zbanowany: {r}", ad_nf_note:"Słowa oddzielaj przecinkami. Wbudowana lista działa zawsze.",
     ad_nf_save:"Zapisz", ad_id:"ID: {id}", adm_changed:"Administrator zmienił twoje dane",
     atk_btn:"Atak (najbliższy wróg)", atk_none:"Nie ma wrogów w pobliżu",
+    ad_mobs:"Potwory", ad_mobs_d:"Własne potwory, ich siła i strefy", win_admin_mobs:"Potwory",
+    mb_new:"+ Nowy potwór", mb_none:"Brak własnych potworów. Stwórz pierwszego!", mb_look:"Wygląd", mb_size:"Rozmiar %", mb_where:"Gdzie żyje", mb_island:"Wyspa", mb_cave:"Jaskinia",
+    mb_ai:"Zachowanie", mb_ai_aggr:"Agresywny", mb_ai_night:"Agresywny nocą", mb_ai_passive:"Spokojny", mb_ai_aggr_d:"atakuje każdego, kto podejdzie", mb_ai_night_d:"w dzień spokojny, nocą atakuje", mb_ai_passive_d:"oddaje tylko, gdy go uderzysz",
+    mb_hp:"HP", mb_dmg:"Obrażenia (ukąszenie)", mb_spd:"Szybkość", mb_spd_1:"Wolny", mb_spd_2:"Zwykły", mb_spd_3:"Szybki", mb_spd_4:"Bardzo szybki", mb_range:"Zasięg agresji (pola)", mb_xp:"XP za zabicie",
+    mb_day:"W dzień (ile naraz)", mb_night:"Nocą (ile naraz)", mb_count:"Ile naraz", mb_loot:"Łup →", mb_zone:"Strefa na mapie →", mb_zone_other:"Strefę rysuje się w edytorze tej mapy (przejdź do: {z})",
+    mb_note:"Bez strefy pojawia się w losowym miejscu. Łup ustawiasz w «Drop i potwory».", mb_saved:"Zapisano — potwory pojawią się u wszystkich",
+    mb_b_wolf:"Wilk", mb_b_spider:"Pająk", mb_b_bear:"Niedźwiedź", mb_b_dwolf:"Duch", mb_b_golem:"Golem", mb_b_hare:"Zając", mb_in_editor:"HP, XP i czas pojawiania się — w sekcji «Potwory».",
+    mob_killed:"{m} pokonany!",
     ad_items:"Przedmioty", ad_items_d:"Twórz broń, zbroję, mikstury", win_admin_items:"Przedmioty",
     it_new:"+ Nowy przedmiot", it_none:"Brak własnych przedmiotów. Stwórz pierwszy!", it_name_ru:"Nazwa (RU)", it_name_pl:"Nazwa (PL)", it_desc:"Opis",
     it_type:"Typ", it_t_weapon:"Broń", it_t_head:"Hełm", it_t_body:"Zbroja", it_t_feet:"Buty", it_t_neck:"Amulet", it_t_potion:"Mikstura / jedzenie", it_t_mat:"Materiał",
     it_atk:"Obrażenia", it_def:"Obrona", it_hp:"+HP max", it_heal:"Leczy HP", it_lv:"Od poziomu", it_cl:"Klasa", it_any:"każda",
-    it_shop:"Sprzedawaj w sklepie", it_price:"Cena w sklepie", it_sell:"Kupiec skupi za", it_icon:"Ikona", it_upload:"Wgraj PNG", it_hue:"Kolor",
+    it_shop:"Można kupić", it_price:"Cena", it_sell:"Kupiec skupi za", it_seller:"U kogo", it_sell_auto:"0 = automatycznie (40% ceny). Sprzedać kupcowi można zawsze.",
+    it_nobuy:"Nie do kupienia — tylko łup z potworów albo nagroda za zadanie.", seller_merchant:"Kupiec Zbyszek", seller_npc:"Dziadek Bogdan", opt_buy_npc:"Pokaż, co sprzedajesz", win_shop_npc:"Towary Bogdana", it_icon:"Ikona", it_upload:"Wgraj PNG", it_hue:"Kolor",
     it_save:"Zapisz", it_del:"Usuń", it_del_ok:"Na pewno usunąć?", it_give:"Daj sobie", it_given:"Dodano do twojej torby", it_saved:"Zapisano — gracze widzą od razu",
     it_noname:"Wpisz nazwę", ci_atk:"Obrażenia +{n}", ci_def:"Obrona +{n}", ci_hp:"HP max +{n}", ci_heal:"Leczy {n} HP", ci_lv:"od poz. {n}", ci_cl:"tylko: {c}", ci_sell:"kupiec da {c} monet",
     need_lv:"Potrzebny poziom {n}", need_cl:"Tylko dla klasy: {c}",
@@ -856,11 +872,20 @@ const I18N={
     ad_me:"Это ты", ad_bannedby:"Забанен: {r}", ad_nf_note:"Слова через запятую. Встроенный список работает всегда.",
     ad_nf_save:"Сохранить", ad_id:"ID: {id}", adm_changed:"Админ изменил твои данные",
     atk_btn:"Атака (ближайший враг)", atk_none:"Рядом нет врагов",
+    ad_mobs:"Мобы", ad_mobs_d:"Свои монстры, сила и зоны", win_admin_mobs:"Мобы",
+    mb_new:"+ Новый моб", mb_none:"Своих мобов пока нет. Создай первого!", mb_look:"Вид", mb_size:"Размер %", mb_where:"Где живёт", mb_island:"Остров", mb_cave:"Пещера",
+    mb_ai:"Поведение", mb_ai_aggr:"Агрессивный", mb_ai_night:"Злой ночью", mb_ai_passive:"Мирный", mb_ai_aggr_d:"нападает на всех, кто подойдёт", mb_ai_night_d:"днём мирный, ночью нападает", mb_ai_passive_d:"бьёт только в ответ",
+    mb_hp:"HP", mb_dmg:"Урон за укус", mb_spd:"Скорость", mb_spd_1:"Медленный", mb_spd_2:"Обычный", mb_spd_3:"Быстрый", mb_spd_4:"Очень быстрый", mb_range:"Замечает (клеток)", mb_xp:"Опыт за убийство",
+    mb_day:"Днём (сколько сразу)", mb_night:"Ночью (сколько сразу)", mb_count:"Сколько сразу", mb_loot:"Лут →", mb_zone:"Зона на карте →", mb_zone_other:"Зона рисуется в редакторе этой карты (перейди: {z})",
+    mb_note:"Без зоны появляется в случайном месте. Лут настраивается в «Дроп и мобы».", mb_saved:"Сохранено — мобы появятся у всех",
+    mb_b_wolf:"Волк", mb_b_spider:"Паук", mb_b_bear:"Медведь", mb_b_dwolf:"Дух", mb_b_golem:"Голем", mb_b_hare:"Заяц", mb_in_editor:"HP, опыт и время появления — в разделе «Мобы».",
+    mob_killed:"{m} побеждён!",
     ad_items:"Вещи", ad_items_d:"Создавай оружие, броню, зелья", win_admin_items:"Вещи",
     it_new:"+ Новая вещь", it_none:"Своих вещей пока нет. Создай первую!", it_name_ru:"Название (RU)", it_name_pl:"Название (PL)", it_desc:"Описание",
     it_type:"Тип", it_t_weapon:"Оружие", it_t_head:"Шлем", it_t_body:"Броня", it_t_feet:"Сапоги", it_t_neck:"Амулет", it_t_potion:"Зелье / еда", it_t_mat:"Материал",
     it_atk:"Урон", it_def:"Защита", it_hp:"+HP макс", it_heal:"Лечит HP", it_lv:"С уровня", it_cl:"Класс", it_any:"любой",
-    it_shop:"Продавать в лавке", it_price:"Цена в лавке", it_sell:"Купец купит за", it_icon:"Иконка", it_upload:"Загрузить PNG", it_hue:"Цвет",
+    it_shop:"Можно купить", it_price:"Цена", it_sell:"Купец купит за", it_seller:"У кого", it_sell_auto:"0 = автоматически (40% от цены). Продать купцу можно всегда.",
+    it_nobuy:"Купить нельзя — только выпадает с мобов или награда за задание.", seller_merchant:"Купец Збышек", seller_npc:"Дед Богдан", opt_buy_npc:"Покажи, что продаёшь", win_shop_npc:"Товары Богдана", it_icon:"Иконка", it_upload:"Загрузить PNG", it_hue:"Цвет",
     it_save:"Сохранить", it_del:"Удалить", it_del_ok:"Точно удалить?", it_give:"Выдать себе", it_given:"Добавлено в твою сумку", it_saved:"Сохранено — игроки видят сразу",
     it_noname:"Впиши название", ci_atk:"Урон +{n}", ci_def:"Защита +{n}", ci_hp:"HP макс +{n}", ci_heal:"Лечит {n} HP", ci_lv:"с {n} ур.", ci_cl:"только: {c}", ci_sell:"купец даст {c} монет",
     need_lv:"Нужен уровень {n}", need_cl:"Только для класса: {c}",
@@ -1605,6 +1630,38 @@ function craft(r){
   giveItem(r.id); floats.push({key:"plus",p:{n:1,fish:"#fish_"+r.id},col:"#ffe0a0",t:0});
   dlgParams={item:"#fish_"+r.id}; dlgNode="crafted"; renderDialog();
 }
+// ---- свои мобы из админки (world/mobs) ----
+const MB_BASES=["wolf","spider","bear","dwolf","golem","hare"], MB_AI=["aggr","night","passive"];
+const mobTintCache=new Map();
+function mobTint(kind,sp){
+  const m=CMOBS[kind]; if(!m||!m.hue) return sp; const key=kind+"|"+(sp.__id||(sp.__id=Math.random().toString(36).slice(2)));
+  let c=mobTintCache.get(key); if(c) return c;
+  c=document.createElement("canvas"); c.width=sp.width; c.height=sp.height; const g=c.getContext("2d"); g.drawImage(sp,0,0); hueShift(c,m.hue); mobTintCache.set(key,c); return c;
+}
+function mobPreview(kind,size,def){
+  const m=def||CMOBS[kind]; const c=document.createElement("canvas"); c.width=c.height=size; const g=c.getContext("2d"); g.imageSmoothingEnabled=false;
+  const sp=m&&img[m.b+"_se_0"]; if(!sp) return c.toDataURL();
+  const t=document.createElement("canvas"); t.width=sp.width; t.height=sp.height; t.getContext("2d").drawImage(sp,0,0); hueShift(t,m.hue);
+  const k=Math.min(size/sp.width,size/sp.height)*Math.min(1,0.55+m.sz/400); const w=sp.width*k, h=sp.height*k; g.drawImage(t,(size-w)/2,size-h,w,h); return c.toDataURL();
+}
+function mbSanitize(id,o){
+  if(!/^m[a-z0-9]{4,12}$/.test(id)||!o||typeof o!=="object") return null;
+  const ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
+  return {id,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"wolf",hue:itNum(o.hue,359),sz:Math.max(60,Math.min(200,itNum(o.sz,200)||100)),zn:o.zn==="cave"?"cave":"island",
+    ai:MB_AI.includes(o.ai)?o.ai:"aggr",hp:Math.max(1,itNum(o.hp,999)),dmg:Math.max(1,itNum(o.dmg,10)),spd:Math.max(1,Math.min(4,itNum(o.spd,4)||2)),range:Math.max(2,Math.min(10,itNum(o.range,10)||5)),
+    xp:itNum(o.xp,5000),d:o.d?1:0,dn:itNum(o.dn,20),n:o.n?1:0,nn:itNum(o.nn,20),cn:itNum(o.cn,20)};
+}
+let mobsRaw={};
+function applyMobs(d){
+  const list=d&&d.list&&typeof d.list==="object"?d.list:{}; mobsRaw={};
+  for(const k of Object.keys(CMOBS)){ const i=MOBS.indexOf(k); if(i>=0) MOBS.splice(i,1); delete I18N.ru["ed_src_"+k]; delete I18N.pl["ed_src_"+k]; delete CMOBS[k]; }
+  mobTintCache.clear();
+  for(const [id,o] of Object.entries(list).slice(0,60)){ const m=mbSanitize(id,o); if(!m) continue;
+    CMOBS[id]=m; mobsRaw[id]=m; MOBS.push(id); I18N.ru["ed_src_"+id]=m.ru; I18N.pl["ed_src_"+id]=m.pl;
+    if(!DROP_DEF[id]) DROP_DEF[id]=[{id:"coin",ch:100,a:1,b:3}]; }
+  for(let i=animals.length-1;i>=0;i--){ const a=animals[i]; if(/^m[a-z0-9]{4,12}$/.test(a.kind)&&!CMOBS[a.kind]) animals.splice(i,1); }
+  if(winKind==="admin_mobs") renderWin();
+}
 // ---- свои вещи из админки (world/items) ----
 const CUSTOM={}, CUSTOM_SHOP=[], IT_TYPES=["weapon","head","body","feet","neck","potion","mat"];
 const itClean=v=>String(v||"").replace(/[<>&"'`\u0000-\u001f]/g,"").replace(/\s+/g," ").trim();
@@ -1614,13 +1671,14 @@ function itSanitize(id,o){
   const t=IT_TYPES.includes(o.t)?o.t:"mat", ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
   const gear=["weapon","head","body","feet","neck"].includes(t);
   return {id,t,ru:ru||pl,pl,d:itClean(o.d).slice(0,120),atk:t==="weapon"?itNum(o.atk,99):0,def:gear&&t!=="weapon"?itNum(o.def,99):0,hp:gear?itNum(o.hp,99):0,heal:t==="potion"?itNum(o.heal,99):0,
-    lv:gear?itNum(o.lv,60):0,cl:gear&&CLASSES.includes(o.cl)?o.cl:"",shop:!!o.shop,price:itNum(o.price,999999),sell:itNum(o.sell,999999),
+    lv:gear?itNum(o.lv,60):0,cl:gear&&CLASSES.includes(o.cl)?o.cl:"",seller:["merchant","npc"].includes(o.seller)?o.seller:(o.shop===true?"merchant":""),price:itNum(o.price,999999),sell:itNum(o.sell,999999),
     b:typeof o.b==="string"&&/^[a-z_]{2,20}$/.test(o.b)?o.b:"",hue:itNum(o.hue,359),img:typeof o.img==="string"&&/^data:image\/png;base64,[A-Za-z0-9+\/=]{20,20000}$/.test(o.img)?o.img:""};
 }
 function hueShift(cv,deg){
   if(!deg) return cv; const g=cv.getContext("2d"), d=g.getImageData(0,0,cv.width,cv.height), a=d.data, k=deg/360;
   for(let i=0;i<a.length;i+=4){ if(!a[i+3]) continue; let r=a[i]/255,gg=a[i+1]/255,b=a[i+2]/255; const mx=Math.max(r,gg,b), mn=Math.min(r,gg,b), l=(mx+mn)/2;
-    if(mx===mn) continue; const dd=mx-mn, sat=l>0.5?dd/(2-mx-mn):dd/(mx+mn); let h=mx===r?(gg-b)/dd+(gg<b?6:0):mx===gg?(b-r)/dd+2:(r-gg)/dd+4; h=(h/6+k)%1;
+    const dd=mx-mn; let sat=mx===mn?0:(l>0.5?dd/(2-mx-mn):dd/(mx+mn)), h=mx===mn?0:(mx===r?(gg-b)/dd+(gg<b?6:0):mx===gg?(b-r)/dd+2:(r-gg)/dd+4)/6;
+    if(sat<0.22){ if(l<0.06||l>0.97) continue; h=k; sat=Math.max(sat,0.42); } else h=(h+k)%1;
     const q=l<0.5?l*(1+sat):l+sat-l*sat, pp=2*l-q, f=t=>{ t=(t+1)%1; return t<1/6?pp+(q-pp)*6*t:t<1/2?q:t<2/3?pp+(q-pp)*(2/3-t)*6:pp; };
     a[i]=f(h+1/3)*255; a[i+1]=f(h)*255; a[i+2]=f(h-1/3)*255; }
   g.putImageData(d,0,0); return cv;
@@ -1634,7 +1692,7 @@ function customIcon(it,done){
 function customDesc(it){
   const out=[]; if(it.atk) out.push(tr("ci_atk",{n:it.atk})); if(it.def) out.push(tr("ci_def",{n:it.def})); if(it.hp) out.push(tr("ci_hp",{n:it.hp}));
   if(it.t==="potion"&&it.heal) out.push(tr("ci_heal",{n:it.heal})); if(it.lv>1) out.push(tr("ci_lv",{n:it.lv})); if(it.cl) out.push(tr("ci_cl",{c:"#cl_"+it.cl}));
-  if(it.sell) out.push(tr("ci_sell",{c:it.sell}));
+  out.push(tr("ci_sell",{c:it.sell||Math.max(1,Math.round(it.price*0.4))}));
   return (it.d?it.d+" · ":"")+out.join(" · ");
 }
 let itemsRaw={};
@@ -1648,12 +1706,13 @@ function applyItems(d){
     I18N.ru["fish_"+id]=it.ru; I18N.pl["fish_"+id]=it.pl;
     if(["weapon","head","body","feet","neck"].includes(it.t)){ const gg={slot:it.t}; if(it.atk) gg.atk=it.atk; if(it.def) gg.def=it.def; if(it.hp) gg.hp=it.hp; if(it.lv>1) gg.lv=it.lv; if(it.cl) gg.cl=it.cl; GEAR[id]=gg; }
     if(it.t==="potion") EDIBLE[id]=Math.max(1,it.heal);
-    if(it.sell) SELL_P[id]=it.sell;
-    if(it.shop&&it.price>0) CUSTOM_SHOP.push({id,p:it.price});
+    SELL_P[id]=it.sell||Math.max(1,Math.round(it.price*0.4));
+    if(it.seller&&it.price>0) CUSTOM_SHOP.push({id,p:it.price,by:it.seller});
     ICONS[id]=customIcon(it,()=>{ renderInv(); if(winKind) renderWin(); }); }
   let changed=false; for(const sl of SLOTS) if(equip[sl]&&!GEAR[equip[sl]]){ equip[sl]=null; changed=true; }
   if(changed){ recalcHP(); lastSaveJSON=""; }
   renderInv(); if(winKind) renderWin();
+  if(lastCfgDoc) applyConfig(lastCfgDoc);
 }
 // ---- описание предмета ----
 function itemDesc(id){
@@ -1695,7 +1754,7 @@ function renderWin(){
   if(!winKind) return;
   document.getElementById("winTitle").textContent=tr("win_"+winKind);
   const body=document.getElementById("winBody"); body.textContent="";
-  if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else
+  if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else
   if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
 }
 function renderBag(body){
@@ -1834,7 +1893,8 @@ function updateMerchant(dt){
   const d=Math.hypot(hero.x-merch.x,hero.y-merch.y);
   if(winKind==="shop"||d<3.5) merch.facing=facingTo(merch,hero.x,hero.y);
   else { merch.turnT-=dt; if(merch.turnT<=0){ merch.turnT=3+Math.random()*4; merch.facing=["sw","se","sw","nw"][(Math.random()*4)|0]; } }
-  if(winKind==="shop"&&d>3.2) closeWin();
+  if(winKind==="shop"&&shopNpc!=="npc"&&d>3.2) closeWin();
+  if(winKind==="shop"&&shopNpc==="npc"&&typeof NPCC!=="undefined"&&NPCC&&Math.hypot(hero.x-NPCC.x,hero.y-NPCC.y)>3.5) closeWin();
 }
 function drawMerchant(){
   worldTransform(); ctx.imageSmoothingEnabled=false;
@@ -1862,7 +1922,7 @@ function goTrade(){
   if(Math.hypot(hero.x-merch.x,hero.y-merch.y)<1.6&&!hero.path.length){ openShop(); return; }
   goAdjacent(MERCHC,openShop,"go_trade");
 }
-function openShop(){ if(dialogOpen) closeDialog(); shopTab="buy"; shopMsg=["shop_hello"]; if(winKind==="shop") renderWin(); else openWin("shop"); faceTo(merch.x,merch.y); }
+function openShop(){ shopNpc="merchant"; if(dialogOpen) closeDialog(); shopTab="buy"; shopMsg=["shop_hello"]; if(winKind==="shop") renderWin(); else openWin("shop"); faceTo(merch.x,merch.y); }
 function shopPortrait(){
   const c=mkEl("canvas","sportrait"); c.width=c.height=64; const g=c.getContext("2d"); g.imageSmoothingEnabled=false;
   g.fillStyle="#3d3257"; g.fillRect(0,0,64,64);
@@ -1882,12 +1942,14 @@ function sell(id,all){
   inv[id]-=n; if(!inv[id]) delete inv[id];
   addCoins(c); shopMsg=["shop_sold",{c}]; renderInv();
 }
+function openShopNpc(){ shopNpc="npc"; if(dialogOpen) closeDialog(); shopTab="buy"; shopMsg=["shop_hello"]; if(winKind==="shop") renderWin(); else openWin("shop"); }
 function renderShop(body){
-  const head=mkEl("div","shead"); head.appendChild(shopPortrait());
-  const tx=mkEl("div"); tx.appendChild(mkEl("b",null,tr("merch_name"))); tx.appendChild(mkEl("p",null,tr(shopMsg?shopMsg[0]:"shop_hello",shopMsg&&shopMsg[1]))); head.appendChild(tx);
+  if(shopNpc==="npc") shopTab="buy";
+  const head=mkEl("div","shead"); if(shopNpc!=="npc") head.appendChild(shopPortrait());
+  const tx=mkEl("div"); tx.appendChild(mkEl("b",null,tr(shopNpc==="npc"?"seller_npc":"merch_name"))); tx.appendChild(mkEl("p",null,tr(shopMsg?shopMsg[0]:"shop_hello",shopMsg&&shopMsg[1]))); head.appendChild(tx);
   body.appendChild(head);
   const tabs=mkEl("div","tabs");
-  for(const k of ["buy","sell"]){ const b=mkEl("button","btn"+(shopTab===k?" on":""),tr("shop_"+k)); b.type="button"; b.setAttribute("aria-pressed",shopTab===k);
+  for(const k of shopNpc==="npc"?["buy"]:["buy","sell"]){ const b=mkEl("button","btn"+(shopTab===k?" on":""),tr("shop_"+k)); b.type="button"; b.setAttribute("aria-pressed",shopTab===k);
     b.onclick=()=>{ shopTab=k; bagSel=null; renderWin(); }; tabs.appendChild(b); }
   tabs.appendChild(mkEl("span","coins",tr("shop_coins",{c:inv.coin||0}))); body.appendChild(tabs);
   const list=shopTab==="buy"?shopList().map(s=>({id:s.id,s})):ITEMS.filter(f=>inv[f.id]&&f.id!=="coin"&&sellPrice(f.id)>0).map(f=>({id:f.id}));
@@ -2581,6 +2643,7 @@ function renderDialog(){
     if(quest2==="active"&&(inv.pelt||0)>=2) opts.push(["opt_give_pelts",null,givePelts]);
     const lv=lootValue(); if(lv>0) opts.push(["opt_sell_loot",{c:lv},sellLoot]);
     opts.push(["opt_craft",null,()=>{dlgNode="craft";renderDialog();}]);
+    if(CUSTOM_SHOP.some(s=>s.by==="npc")) opts.push(["opt_buy_npc",null,openShopNpc]);
     opts.push(["opt_who",null,()=>{dlgNode="who";renderDialog();}]);
     opts.push(["opt_bye",null,closeDialog]);
   } else if(dlgNode==="craft"){
@@ -3024,6 +3087,7 @@ function updateAnimals(dt){
     // мобы: в редакторе для каждого — днём / ночью и сколько; днём нейтральны, пока их не тронешь
     const per=night?"n":(day?"d":null);
     if(per) for(const kind of MOBS){
+      if(CMOBS[kind]&&CMOBS[kind].zn!==ZONE) continue;
       const list=animals.filter(a=>a.kind===kind&&!a.leaving&&!(a.dying>0));
       if(!mobOn(kind,per)){ for(const a of list) if(!a.aggro) mobLeave(a); continue; }
       const base=mobCount(kind,per), want=base+(per==="n"&&base>0&&(hourNow()>=23||hourNow()<4)?1:0);
@@ -3072,6 +3136,7 @@ function updateAnimals(dt){
       } else if(a.state!=="wander"||(a.think<=0&&!a.path.length)){ a.state="wander"; a.think=3+Math.random()*3; setPath(a,fleeCell(a,a.x,a.y,2,4)); a.speed=1.3; }
     }
     if(a.kind==="spider"){ updateSpider(a,dt,tp,dh); moveAnimal(a,dt); continue; }
+    if(CMOBS[a.kind]){ if(!a.leaving) updateCMob(a,dt,tp,dh,night); moveAnimal(a,dt); continue; }
     if(a.kind==="golem"){ updateGolem(a,dt,tp,dh,P); moveAnimal(a,dt); continue; }
     if(a.kind==="bat"){ if(a.aggro&&(!tp||dh>8)) a.aggro=false; updateBat(a,dt,tp,dh); continue; }
     moveAnimal(a,dt);
@@ -3108,7 +3173,7 @@ function drawWolfP(g,frame,moving,night){
 }
 function drawAnimal(a){
   if(a.kind==="bat") return drawBat(a);
-  if(a.kind==="spider"||a.kind==="golem") return drawBeast(a);
+  if(a.kind==="spider"||a.kind==="golem"||CMOBS[a.kind]) return drawBeast(a);
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
   let [fx,fy]=proj(a.x-MX,a.y-MY,a.z);
@@ -3149,7 +3214,7 @@ const MOBS=["wolf","bat","spider"], BOSSES=["golem"];                       // �
 const XP_DEF={wolf:10,bat:6,spider:12,golem:150,tree:3,quest:20}, XP_FISH_DEF={karas:2,okun:2,shchuka:4,gold:10,boot:1};
 const FISHER_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood"];
 const dropTable=m=>CFG.drops[m]||DROP_DEF[m]||[];
-const xpOf=k=>CFG.xp[k]!=null?CFG.xp[k]:XP_DEF[k];
+const xpOf=k=>CMOBS[k]?CMOBS[k].xp:CFG.xp[k]!=null?CFG.xp[k]:XP_DEF[k];
 const xpFish=id=>CFG.xpFish[id]!=null?CFG.xpFish[id]:(XP_FISH_DEF[id]??2);
 const fishW=f=>CFG.fishW[f.id]!=null?CFG.fishW[f.id]:f.w;
 const logsOf=name=>CFG.logs[name]!=null?CFG.logs[name]:LOGS[name];
@@ -3170,7 +3235,7 @@ const hasWeapon=()=>!!equip.weapon||!!form;
 function pickWolf(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale; let best=null, bd=1e9;
   for(const a of animals){ if(!isMob(a)||a.dying>0||a.alpha<0.3||!a.drawn) continue;
-    const big=a.kind==="golem", dx=wx-a.drawn.x, dy=wy-(a.drawn.y-(big?24:12));
+    const big=a.kind==="golem"||(CMOBS[a.kind]&&(CMOBS[a.kind].b==="golem"||CMOBS[a.kind].sz>=140)), dx=wx-a.drawn.x, dy=wy-(a.drawn.y-(big?24:12));
     if(Math.abs(dx)<=(big?28:20)&&dy>=(big?-30:-22)&&dy<=(big?26:14)){ const d=Math.hypot(dx,dy); if(d<bd){bd=d;best=a;} } }
   return best;
 }
@@ -3248,6 +3313,7 @@ function giveLoot(a){
   if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; }
   else if(kind==="spider"){ say("spider_killed","bat_killed_sub"); prog.st.spiders=(prog.st.spiders||0)+1; }
   else if(kind==="golem"){ say("boss_killed","boss_killed_sub"); prog.st.bosses=(prog.st.bosses||0)+1; }
+  else if(CMOBS[kind]){ say("mob_killed","bat_killed_sub",{m:LANG==="ru"?CMOBS[kind].ru:CMOBS[kind].pl}); prog.st.mobs=(prog.st.mobs||0)+1; }
   else { say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; }
   addXP(xpOf(kind),"fight");
   if(quest2==="active"&&(inv.pelt||0)>=2) setTimeout(()=>say("pelts_ready","pelts_ready_sub"),1600);
@@ -3330,7 +3396,7 @@ const ED_GROUPS=[
 if(typeof SPRITES!=="undefined"){ const dec=ED_GROUPS.find(g=>g[0]==="ed_g_objects")[1];
   for(const k of Object.keys(SPRITES).sort()) if(k.startsWith("prop_")&&!isWaterProp(k)&&!dec.some(e=>e[0]===k)) dec.splice(dec.length-1,0,[k,k]); }
 const ED_CATS=["land","water","decor","places"]; let edCat="land";
-const edLabel=id=>{ const t=tr("ed_t_"+id); return t==="ed_t_"+id?id.replace(/^prop_/,"").replace(/_/g," "):t; };
+const edLabel=id=>{ if(/^zone_m/.test(id)&&CMOBS[id.slice(5)]) return LANG==="ru"?CMOBS[id.slice(5)].ru:CMOBS[id.slice(5)].pl; const t=tr("ed_t_"+id); return t==="ed_t_"+id?id.replace(/^prop_/,"").replace(/_/g," "):t; };
 let edCellCtx=null;   // клетка, к которой сейчас применяется инструмент
 const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier","cave","exit","boss"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
@@ -3371,7 +3437,7 @@ function edApplyCell(x,y,stroke){
   const k=x+","+y; if(stroke.seen.has(k)) return; stroke.seen.add(k);
   if(x<0||y<0||x>=W||y>=D) return;
   if(edTool.startsWith("zone_")){ const c=cellAt(x,y); if(!c||c.water) return;
-    if(edTool==="zone_erase"){ delete edDraft.zones.hare[k]; delete edDraft.zones.wolf[k]; delete edDraft.zones.bat[k]; delete edDraft.zones.spider[k]; } else edDraft.zones[edTool.slice(5)][k]=1; return; }
+    if(edTool==="zone_erase"){ for(const z of Object.values(edDraft.zones)) delete z[k]; } else (edDraft.zones[edTool.slice(5)]||(edDraft.zones[edTool.slice(5)]={}))[k]=1; return; }
   const c=cellAt(x,y); if(isSpecial(c)) return;
   edCellCtx=[x,y]; const before=snapCell(c), s=edNewState(edTool,before); edCellCtx=null;
   if(s===undefined||JSON.stringify(before)===JSON.stringify(s)) return;
@@ -3446,7 +3512,8 @@ const MERCH_KEYS=["merch_name","shop_hello","shop_bought","shop_sold","shop_no_m
 const TEXT_KEYS=[...NPC_KEYS,...MERCH_KEYS];
 const SELL_EDIT=["karas","okun","shchuka","gold","boot","cooked","pelt","fang","meat_raw","meat_cooked","wood","potion","potion_big","club","sword_wood","sword_iron","cap_leather","helm_iron","armor_leather","boots_leather","amulet_fang","rod_wood","rod_bamboo","rod_steel","bat_wing"];
 let edTab="map", edCfg=null, cfgDirty=false, edTxtLang=null, edTxtWho="npc";
-function applyConfig(d){
+let lastCfgDoc=null;
+function applyConfig(d){ lastCfgDoc=d;
   const t=d&&d.texts&&typeof d.texts==="object"?d.texts:{};
   for(const L of ["pl","ru"]){ CFG.texts[L]={}; const src=t[L]&&typeof t[L]==="object"?t[L]:{};
     for(const k of TEXT_KEYS) if(typeof src[k]==="string"&&src[k].trim()) CFG.texts[L][k]=src[k].slice(0,400); }
@@ -3463,7 +3530,8 @@ function applyConfig(d){
     return {id:r.id,ch:Math.max(0,Math.min(100,Math.round(+r.ch||0))),a,b}; });
   if(winKind) renderWin(); if(dialogOpen) renderDialog(); if(EDIT&&edTab!=="map"&&!cfgDirty) edRender();
 }
-const shopList=()=>SHOP.concat(CUSTOM_SHOP).filter(s=>!CFG.off[s.id]).map(s=>({...s,p:CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
+let shopNpc="merchant";
+const shopList=()=>(shopNpc==="npc"?CUSTOM_SHOP.filter(s=>s.by==="npc"):SHOP.concat(CUSTOM_SHOP.filter(s=>s.by!=="npc"))).filter(s=>!CFG.off[s.id]).map(s=>({...s,p:CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
 function zonePick(kind,filter){
   const z=MAP.zones&&MAP.zones[kind]; if(!Array.isArray(z)||!z.length) return undefined;   // зон нет — по всему острову
   for(let i=0;i<30;i++){ const p=z[(Math.random()*z.length)|0], c=Array.isArray(p)&&cellAt(p[0],p[1]); if(c&&filter(c)) return c; }
@@ -3496,8 +3564,8 @@ let edDropSel=null;
 // карточки «источников» дропа; новые мобы и боссы добавляются в MOBS и появятся здесь сами
 function dropCards(){
   const n=k=>dropTable(k).length;
-  const when=m=>{ if(BOSSES.includes(m)) return " · "+tr("ed_boss_rsp_short",{n:edCfg.mobHp[m+"_rsp"]??5}); const t=edCfg.mobTime[m]||MOB_TIME[m]||{}; return (t.d&&t.dn?" · ☀"+t.dn:"")+(t.n&&t.nn?" · ☾"+t.nn:"")||" · —"; };
-  return [...[...MOBS,...BOSSES].map(m=>({key:"mob:"+m,img:SPRITES[m+"_se_0"]||iconURL({bat:"bat_wing",spider:"spider_silk",golem:"golem_core"}[m]||"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})+when(m)})),
+  const when=m=>{ if(CMOBS[m]){ const c=CMOBS[m]; return c.zn==="cave"?" · \u26F0"+c.cn:(c.d&&c.dn?" · \u2600"+c.dn:"")+(c.n&&c.nn?" · \u263E"+c.nn:"")||" · \u2014"; } if(BOSSES.includes(m)) return " · "+tr("ed_boss_rsp_short",{n:edCfg.mobHp[m+"_rsp"]??5}); const t=edCfg.mobTime[m]||MOB_TIME[m]||{}; return (t.d&&t.dn?" · ☀"+t.dn:"")+(t.n&&t.nn?" · ☾"+t.nn:"")||" · —"; };
+  return [...[...MOBS,...BOSSES].map(m=>({key:"mob:"+m,img:CMOBS[m]?mobPreview(m,40):SPRITES[m+"_se_0"]||iconURL({bat:"bat_wing",spider:"spider_silk",golem:"golem_core"}[m]||"pelt"),label:tr("ed_src_"+m),sub:tr("ed_src_mob_sub",{n:(edCfg.drops[m]||DROP_DEF[m]||[]).length,xp:edCfg.xp[m]??XP_DEF[m]??0})+when(m)})),
     {key:"trees",img:SPRITES.tree_small,label:tr("ed_drop_trees"),sub:tr("ed_src_trees_sub",{a:edCfg.logs.tree_big??LOGS.tree_big,b:edCfg.logs.tree_small??LOGS.tree_small})},
     {key:"fish",img:iconURL("karas"),label:tr("ed_drop_fish"),sub:tr("ed_src_fish_sub",{n:FISH.length})},
     {key:"quests",img:SPRITES.ui_quests||iconURL("coin"),label:tr("ed_drop_quests"),sub:tr("ed_src_quest_sub",{xp:edCfg.xp.quest??XP_DEF.quest})},
@@ -3534,6 +3602,7 @@ function renderDropTab(p){
       row(wrap,valInput(r,"ch",0,100),valInput(r,"a",0,99),valInput(r,"b",0,99),del).classList.add("eddr");
     });
     const add=mkEl("button","btn mini",tr("ed_drop_add")); add.type="button"; add.onclick=()=>{ list.push({id:"coin",ch:100,a:1,b:3}); cfgDirty=true; edRender(); }; p.appendChild(add);
+    if(CMOBS[mob]){ p.appendChild(mkEl("p","muted",tr("mb_in_editor"))); return; }
     p.appendChild(mkEl("b","sub",tr("ed_drop_reward")));
     row(tr("ed_xp_kill"),numInput(edCfg.xp,mob,XP_DEF[mob]??10));
     row(tr("ed_mob_hp"),numInput(edCfg.mobHp,mob,MOB_HP[mob]??3));
@@ -3602,7 +3671,7 @@ function edSerialize(){
   for(const c of cells){ const x=c.x+ox, y=c.y+oy; if(!inb(x,y)) continue; if(c.st) stairs[x+","+y]=c.st;
     for(const n of c.props) if(!/^(stall|pier)_/.test(n)) props.push([x,y,n]); }
   const mv=p=>p&&inb(p[0]+ox,p[1]+oy)?[p[0]+ox,p[1]+oy,...p.slice(2)]:null;
-  const zones={}; for(const z of ["hare","wolf","bat","spider"]){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
+  const zones={}; for(const z of Object.keys(edDraft.zones)){ zones[z]=Object.keys(edDraft.zones[z]).map(k=>k.split(",").map(Number)).map(([x,y])=>[x+ox,y+oy]).filter(([x,y])=>inb(x,y)); }
   return {zones,levels,tops,stairs,props,start:mv(edDraft.start)||[Math.floor(w/2),Math.floor(d/2)],hut:mv(edDraft.hut),npc:mv(edDraft.npc),
     merchant:mv(edDraft.merchant),stall:mv(edDraft.stall),pier:mv(edDraft.pier),cave:mv(edDraft.cave),exit:mv(edDraft.exit),boss:mv(edDraft.boss)};
 }
@@ -3726,6 +3795,7 @@ function renderAdminHub(body){
   card(CAVE?"\u{1F3DD}\uFE0F":"\u26F0\uFE0F",CAVE?"ad_mapi":"ad_mapc","ad_mapc_d",()=>{ closeWin(); adSwitchZone(); });
   card("\u{1F465}","ad_pl","ad_pl_d",()=>{ adSel=null; adMsg=""; winKind="admin_pl"; renderWin(); });
   card("\u{1F5E1}\uFE0F","ad_items","ad_items_d",()=>{ itSel=null; adMsg=""; winKind="admin_items"; renderWin(); });
+  card("\u{1F43A}","ad_mobs","ad_mobs_d",()=>{ mbSel=null; adMsg=""; winKind="admin_mobs"; renderWin(); });
   card("\u{1F4AC}","ad_texts","ad_texts_d",()=>{ closeWin(); edEnter("texts"); });
   card("\u{1F6D2}","ad_shop","ad_shop_d",()=>{ closeWin(); edEnter("shop"); });
   card("\u{1F480}","ad_drop","ad_drop_d",()=>{ closeWin(); edEnter("drop"); });
@@ -3882,7 +3952,7 @@ function renderAdminItems(body){
   if(!isAdmin){ closeWin(); return; }
   if(itSel){ renderItemCard(body); return; }
   adHead(body);
-  const nb=adBtn(tr("it_new"),()=>{ itSel=itRid(); itDelAsk=false; adMsg=""; itDraft={id:itSel,t:"weapon",ru:"",pl:"",d:"",atk:3,def:0,hp:0,heal:0,lv:1,cl:"",shop:true,price:50,sell:20,b:"",hue:0,img:"",isNew:true}; renderWin(); },"big");
+  const nb=adBtn(tr("it_new"),()=>{ itSel=itRid(); itDelAsk=false; adMsg=""; itDraft={id:itSel,t:"weapon",ru:"",pl:"",d:"",atk:3,def:0,hp:0,heal:0,lv:1,cl:"",seller:"merchant",price:50,sell:0,b:"",hue:0,img:"",isNew:true}; renderWin(); },"big");
   nb.style.width="100%"; nb.style.marginBottom="8px"; body.appendChild(nb);
   const ids=Object.keys(CUSTOM);
   if(!ids.length){ body.appendChild(mkEl("p","muted",tr("it_none"))); return; }
@@ -3913,10 +3983,14 @@ function renderItemCard(body){
   if(gear){ field("it_lv",num("lv",60));
     const cs=mkEl("select"); for(const c of ["",...CLASSES]){ const o=mkEl("option",null,c?tr("cl_"+c):tr("it_any")); o.value=c; o.selected=E.cl===c; cs.appendChild(o); }
     cs.onchange=()=>{ E.cl=cs.value; }; field("it_cl",cs); }
-  const sh=mkEl("label","chk wide"), cb=mkEl("input"); cb.type="checkbox"; cb.checked=E.shop; cb.onchange=()=>{ E.shop=cb.checked; renderWin(); };
+  if(E.seller===undefined) E.seller=E.shop?"merchant":"";
+  const sh=mkEl("label","chk wide"), cb=mkEl("input"); cb.type="checkbox"; cb.checked=!!E.seller; cb.onchange=()=>{ E.seller=cb.checked?(E.lastSeller||"merchant"):""; renderWin(); };
   sh.appendChild(cb); sh.appendChild(document.createTextNode(tr("it_shop"))); f.appendChild(sh);
-  if(E.shop) field("it_price",num("price",999999));
+  if(E.seller){ const ss=mkEl("select"); for(const v of ["merchant","npc"]){ const o=mkEl("option",null,tr("seller_"+v)); o.value=v; o.selected=E.seller===v; ss.appendChild(o); }
+    ss.onchange=()=>{ E.seller=ss.value; E.lastSeller=ss.value; }; field("it_seller",ss); field("it_price",num("price",999999)); }
+  else { const n=mkEl("p","adnote wide",tr("it_nobuy")); f.appendChild(n); }
   field("it_sell",num("sell",999999));
+  const na=mkEl("p","adnote wide",tr("it_sell_auto")); f.appendChild(na);
   body.appendChild(f);
   // иконка: готовая из игры (+ сдвиг цвета) или своя картинка
   body.appendChild(mkEl("b",null,tr("it_icon")));
@@ -3949,6 +4023,84 @@ function itSave(){
   const E=itDraft; const it=itSanitize(E.id,E); if(!it){ adMsg=tr("it_noname"); renderWin(); return; }
   delete it.id; itWrite(E.id,it); itDraft={...CUSTOM[E.id]}; adMsg=tr("it_saved"); renderWin();
 }
+let mbSel=null, mbDraft=null, mbDelAsk=false;
+const mbRid=()=>"m"+Math.random().toString(36).slice(2,9).replace(/[^a-z0-9]/g,"x");
+const mbName=m=>LANG==="ru"?m.ru:m.pl;
+function renderAdminMobs(body){
+  if(!isAdmin){ closeWin(); return; }
+  if(mbSel){ renderMobCard(body); return; }
+  adHead(body);
+  const nb=adBtn(tr("mb_new"),()=>{ mbSel=mbRid(); mbDelAsk=false; adMsg="";
+    mbDraft={id:mbSel,ru:"",pl:"",b:"wolf",hue:0,sz:100,zn:CAVE?"cave":"island",ai:"night",hp:6,dmg:1,spd:2,range:5,xp:15,d:1,dn:2,n:1,nn:3,cn:3,isNew:true}; renderWin(); },"big");
+  nb.style.width="100%"; nb.style.marginBottom="8px"; body.appendChild(nb);
+  const ids=Object.keys(CMOBS);
+  if(!ids.length){ body.appendChild(mkEl("p","muted",tr("mb_none"))); return; }
+  const l=mkEl("div","pllist");
+  for(const id of ids){ const m=CMOBS[id], b=mkEl("button","btn itrow"); b.type="button";
+    const im=mkEl("img"); im.src=mobPreview(id,32); im.alt=""; b.appendChild(im);
+    const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,mbName(m)));
+    const when=m.zn==="cave"?tr("mb_cave")+" \u00D7"+m.cn:tr("mb_island")+(m.d&&m.dn?" \u2600"+m.dn:"")+(m.n&&m.nn?" \u263E"+m.nn:"");
+    nm.appendChild(mkEl("small",null,tr("mb_ai_"+m.ai)+" \u00B7 HP "+m.hp+" \u00B7 "+tr("mb_dmg").split(" ")[0]+" "+m.dmg+" \u00B7 "+when)); b.appendChild(nm);
+    b.onclick=()=>{ mbSel=id; mbDelAsk=false; adMsg=""; mbDraft={...m}; renderWin(); }; l.appendChild(b); }
+  body.appendChild(l);
+}
+function renderMobCard(body){
+  const E=mbDraft; if(!E){ mbSel=null; return renderAdminMobs(body); }
+  adHead(body,()=>{ mbSel=null; mbDraft=null; adMsg=""; renderWin(); });
+  const pv=mkEl("div","mbprev"), pc=mkEl("canvas"); pc.width=pc.height=96; pv.appendChild(pc); const pt=mkEl("b",null,""); pv.appendChild(pt); body.appendChild(pv);
+  const prev=()=>{ const g=pc.getContext("2d"); g.clearRect(0,0,96,96); g.imageSmoothingEnabled=false; const sp=img[E.b+"_se_0"];
+    if(sp){ const t=document.createElement("canvas"); t.width=sp.width; t.height=sp.height; t.getContext("2d").drawImage(sp,0,0); hueShift(t,E.hue);
+      const k=Math.min(2,80/Math.max(sp.width,sp.height)*1.25)*E.sz/100*0.8; g.drawImage(t,48-sp.width*k/2,90-sp.height*k,sp.width*k,sp.height*k); }
+    pt.textContent=(LANG==="ru"?E.ru||E.pl:E.pl||E.ru)||"\u2026"; };
+  const f=mkEl("div","plform");
+  const field=(lab,el)=>{ f.appendChild(mkEl("label",null,tr(lab))); f.appendChild(el); return el; };
+  const txt=(k,max)=>{ const i=mkEl("input"); i.maxLength=max; i.value=E[k]; i.spellcheck=false; i.oninput=()=>{ E[k]=i.value; prev(); }; return i; };
+  const num=(k,lo,hi)=>{ const i=mkEl("input"); i.type="number"; i.min=String(lo); i.max=String(hi); i.inputMode="numeric"; i.value=String(E[k]); i.oninput=()=>{ E[k]=Math.max(lo,Math.min(hi,Math.round(+i.value||0))); }; return i; };
+  const seg=(k,opts,lab)=>{ const w=mkEl("div","mbseg"); for(const [v,t] of opts){ const b=adBtn(t,()=>{ E[k]=v; renderWin(); },E[k]===v?"on":""); w.appendChild(b); } return w; };
+  field("it_name_ru",txt("ru",24)); field("it_name_pl",txt("pl",24));
+  body.appendChild(f);
+  body.appendChild(mkEl("b",null,tr("mb_look")));
+  const bases=mkEl("div","mbbase");
+  for(const bk of MB_BASES){ const b=mkEl("button","btn"+(E.b===bk?" on":"")); b.type="button"; const im=mkEl("img"); im.src=SPRITES[bk+"_se_0"]||""; im.alt=""; b.appendChild(im); b.appendChild(mkEl("span",null,tr("mb_b_"+bk)));
+    b.onclick=()=>{ E.b=bk; renderWin(); }; bases.appendChild(b); }
+  body.appendChild(bases);
+  const f2=mkEl("div","plform");
+  const rng=(k,lo,hi,lab)=>{ const r=mkEl("input"); r.type="range"; r.min=String(lo); r.max=String(hi); r.value=String(E[k]); r.oninput=()=>{ E[k]=+r.value; prev(); }; f2.appendChild(mkEl("label",null,tr(lab))); f2.appendChild(r); };
+  rng("hue",0,359,"it_hue"); rng("sz",60,200,"mb_size");
+  f2.appendChild(mkEl("label",null,tr("mb_where"))); f2.appendChild(seg("zn",[["island",tr("mb_island")],["cave",tr("mb_cave")]]));
+  body.appendChild(f2);
+  body.appendChild(mkEl("b",null,tr("mb_ai")));
+  body.appendChild(seg("ai",MB_AI.map(a=>[a,tr("mb_ai_"+a)])));
+  body.appendChild(mkEl("p","adnote",tr("mb_ai_"+E.ai+"_d")));
+  const f3=mkEl("div","plform"); const fd=(lab,el)=>{ f3.appendChild(mkEl("label",null,tr(lab))); f3.appendChild(el); };
+  fd("mb_hp",num("hp",1,999)); fd("mb_dmg",num("dmg",1,10));
+  f3.appendChild(mkEl("label",null,tr("mb_spd"))); f3.appendChild(seg("spd",[1,2,3,4].map(v=>[v,tr("mb_spd_"+v)])));
+  fd("mb_range",num("range",2,10)); fd("mb_xp",num("xp",0,5000));
+  if(E.zn==="cave") fd("mb_count",num("cn",0,20));
+  else { const dl=mkEl("label","chk"), dc=mkEl("input"); dc.type="checkbox"; dc.checked=!!E.d; dc.onchange=()=>{ E.d=dc.checked?1:0; }; dl.append(dc,document.createTextNode(tr("mb_day"))); f3.appendChild(dl); f3.appendChild(num("dn",0,20));
+    const nl=mkEl("label","chk"), nc=mkEl("input"); nc.type="checkbox"; nc.checked=!!E.n; nc.onchange=()=>{ E.n=nc.checked?1:0; }; nl.append(nc,document.createTextNode(tr("mb_night"))); f3.appendChild(nl); f3.appendChild(num("nn",0,20)); }
+  body.appendChild(f3);
+  body.appendChild(mkEl("p","adnote",tr("mb_note")));
+  prev();
+  const bt=mkEl("div","plbtns");
+  bt.appendChild(adBtn(tr("it_save"),mbSave,"big"));
+  if(!E.isNew&&CMOBS[E.id]){
+    bt.appendChild(adBtn(tr("mb_loot"),()=>{ closeWin(); edEnter("drop"); edDropSel="mob:"+E.id; edRender(); }));
+    if(E.zn===ZONE) bt.appendChild(adBtn(tr("mb_zone"),()=>{ closeWin(); edEnter("map"); edCat="places"; edTool="zone_"+E.id; edRender(); }));
+    else bt.appendChild(adBtn(tr("mb_zone"),()=>{ adMsg=tr("mb_zone_other",{z:"#"+(E.zn==="cave"?"ad_mapc":"ad_mapi")}); renderWin(); }));
+    bt.appendChild(adBtn(tr(mbDelAsk?"it_del_ok":"it_del"),()=>{ if(!mbDelAsk){ mbDelAsk=true; renderWin(); return; } mbWrite(E.id,null); mbSel=null; mbDraft=null; renderWin(); },"warn")); }
+  body.appendChild(bt);
+  if(adMsg) body.appendChild(mkEl("div","adok",adMsg));
+}
+function mbWrite(id,val){
+  const list={}; for(const [k,v] of Object.entries(mobsRaw)) list[k]=v;
+  if(val) list[id]=val; else delete list[id];
+  applyMobs({list}); if(NET.db) NET.db.doc("world/mobs").set({list}).catch(()=>{});
+}
+function mbSave(){
+  const E=mbDraft, m=mbSanitize(E.id,E); if(!m){ adMsg=tr("it_noname"); renderWin(); return; }
+  delete m.id; mbWrite(E.id,m); mbDraft={...CMOBS[E.id]}; adMsg=tr("mb_saved"); renderWin();
+}
 function renderNickFilter(body){
   if(!isAdmin){ closeWin(); return; }
   adHead(body);
@@ -3968,6 +4120,7 @@ function edEnter(sec){
   const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
   edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,cave:CAVE?null:(PORTAL?[PORTAL.x,PORTAL.y]:null),exit:CAVE&&PORTAL?[PORTAL.x,PORTAL.y]:null,boss:CAVE?(MAP.boss||null):null,
     zones:{hare:zk("hare"),wolf:zk("wolf"),bat:zk("bat"),spider:zk("spider")}};
+  for(const k of Object.keys(CMOBS)) if(CMOBS[k].zn===ZONE) edDraft.zones[k]=zk(k);
   edTab=sec; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG; edDropSel=null;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
@@ -4007,9 +4160,12 @@ function edRender(){
   for(const k of ED_CATS){ const b=mkEl("button","btn"+(edCat===k?" on":""),tr("ed_cat_"+k)); b.type="button"; b.setAttribute("aria-pressed",edCat===k); b.onclick=()=>{ edCat=k; edRender(); }; cats.appendChild(b); }
   p.appendChild(cats);
   const tools=mkEl("div","edtools");
-  for(const [gk,items,cat] of ED_GROUPS){ if(cat!==edCat) continue; const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
+  for(const [gk,items0,cat] of ED_GROUPS){ if(cat!==edCat) continue; const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
     const row=mkEl("div","edrow");
-    for(const [id,spr] of items){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=edLabel(id);
+    const items=gk==="ed_g_zones"?[...items0.slice(0,-1),...Object.keys(CMOBS).filter(k=>CMOBS[k].zn===ZONE).map(k=>["zone_"+k,"mob:"+k]),items0[items0.length-1]]:items0;
+    for(const [id,spr] of items){
+      if(spr&&spr.startsWith("mob:")){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; const k=spr.slice(4), im=mkEl("img"); im.src=mobPreview(k,40); im.alt=""; b.appendChild(im);
+        b.appendChild(mkEl("small",null,LANG==="ru"?CMOBS[k].ru:CMOBS[k].pl)); b.onclick=()=>{ edTool=id; edRender(); }; row.appendChild(b); continue; } const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=edLabel(id);
       const name=spr&&(id==="fence"||id==="stall"||id==="pier")?spr.replace("_left","_"+edDir):spr;
       if(name&&typeof SPRITES!=="undefined"&&SPRITES[name]){ const im=mkEl("img"); im.src=SPRITES[name]; im.alt=""; b.appendChild(im); }
       else if(id==="w"||id==="v"||isWaterProp(id)){ const cv2=mkEl("canvas"); cv2.width=38; cv2.height=28; const g2=cv2.getContext("2d");
@@ -4049,7 +4205,7 @@ function edMini(){
     const col=COL[c.t]||COL.g, f=0.75+0.07*Math.min(5,c.L); g.fillStyle=`rgb(${col.map(v=>Math.min(255,Math.round(v*f))).join(",")})`;
     g.fillRect(offX+x*k,offY+y*k,Math.ceil(k),Math.ceil(k));
     if(c.props.some(n=>n.startsWith("tree"))){ g.fillStyle="#1f4a1a"; g.fillRect(offX+(x+0.25)*k,offY+(y+0.25)*k,Math.max(1,k*0.5),Math.max(1,k*0.5)); } }
-  if(edDraft&&edDraft.zones) for(const [z,col] of [["hare","rgba(200,255,120,.75)"],["wolf","rgba(255,70,70,.75)"],["bat","rgba(170,110,255,.8)"],["spider","rgba(255,170,60,.8)"]]) for(const kk of Object.keys(edDraft.zones[z]||{})){
+  if(edDraft&&edDraft.zones) for(const [z,col] of zoneCols(0.75)) for(const kk of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=kk.split(",").map(Number); g.fillStyle=col; g.fillRect(offX+(x+ox)*k+k*0.2,offY+(y+oy)*k+k*0.2,Math.max(1,k*0.6),Math.max(1,k*0.6)); }
   const dot=(p,col)=>{ if(!p) return; g.fillStyle=col; g.fillRect(offX+(p[0]+ox)*k-1,offY+(p[1]+oy)*k-1,Math.max(3,k+2),Math.max(3,k+2)); };
   if(edDraft){ dot(edDraft.hut,"#d84a2a"); dot(edDraft.npc,"#ffd66b"); dot(edDraft.merchant,"#ff9a3a"); dot(edDraft.start,"#ffffff"); }
@@ -4062,9 +4218,11 @@ function edMiniJump(px,py){
   panX=r.width*0.62-fx*scale; panY=r.height*0.42-fy*scale; dirty=true;
 }
 // метки мест (старт, хижина, NPC…) в режиме редактора
+function zoneCols(al){ return [["hare",`rgba(200,255,120,${al})`],["wolf",`rgba(255,70,70,${al})`],["bat",`rgba(170,110,255,${al})`],["spider",`rgba(255,170,60,${al})`],
+  ...Object.keys(CMOBS).map(k=>[k,`hsla(${(CMOBS[k].hue+200)%360},90%,60%,${al})`])]; }
 function edDrawMarks(){
   if(!EDIT||!edDraft) return; worldTransform();
-  for(const [z,col] of [["hare","rgba(190,255,110,.38)"],["wolf","rgba(255,80,80,.38)"],["bat","rgba(170,110,255,.42)"],["spider","rgba(255,170,60,.42)"]]) for(const k of Object.keys(edDraft.zones[z]||{})){
+  for(const [z,col] of zoneCols(0.4)) for(const k of Object.keys(edDraft.zones[z]||{})){
     const [x,y]=k.split(",").map(Number), c=cellAt(x,y); if(!c) continue; const q=cellQuad(c);
     ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
   ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
@@ -4085,6 +4243,7 @@ function caveSpawn(farFromAll){
     const z=zonePick(k,c=>freeCell(c)&&farFromAll(c,5)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&farFromAll(c,6));
     if(!c) continue; spawnAnimal(k,c); const a=animals[animals.length-1]; a.home={x:c.x,y:c.y};
     if(k==="bat"){ a.fly=2.2; a.phase=Math.random(); a.attackT=1.5; } }
+  for(const [k,m] of Object.entries(CMOBS)){ if(m.zn!=="cave"||live(k)>=m.cn||Math.random()>0.3) continue; spawnMob(k,"n",farFromAll,0); }
   const b=MAP.boss&&cellAt(MAP.boss[0],MAP.boss[1]);
   if(b&&!animals.some(a=>a.kind==="golem")&&Date.now()-bossDeadAt>bossRespawnMs()&&farFromAll(b,2.5)){
     spawnAnimal("golem",b); const g=animals[animals.length-1]; g.home={x:b.x,y:b.y}; g.slamCd=4; g.attackT=1.2; }
@@ -4096,6 +4255,19 @@ function updateSpider(a,dt,tp,dh){
       if(!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=1.3; a.lunge=0.25; biteTarget(tp,a,1); } } }
     else if(a.think<=0){ a.think=0.4; setPath(a,cellAt(Math.round(tp.x),Math.round(tp.y))); a.attackT=Math.min(a.attackT,0.6); } }
   else { a.aggro=false; if(a.think<=0&&!a.path.length){ a.state="wander"; a.think=2+Math.random()*3; const h=a.home||{x:a.x,y:a.y}; setPath(a,fleeCell({x:h.x,y:h.y},h.x,h.y,0.5,2.5)); } }
+}
+// свой моб: агрессивный / злой ночью / мирный (бьёт в ответ)
+const MB_SPD=[0,1.6,2.3,3.0,3.6];
+function updateCMob(a,dt,tp,dh,night){
+  const m=CMOBS[a.kind], run=MB_SPD[m.spd]||2.3, angry=m.ai==="aggr"||(m.ai==="night"&&night);
+  a.speed=run*0.45;
+  if(a.aggro&&(!tp||dh>m.range+5)){ a.aggroT=(a.aggroT||0)+dt; if(a.aggroT>5){ a.aggro=false; a.aggroT=0; } } else a.aggroT=0;
+  if(tp&&dh<12&&(a.aggro||(angry&&dh<m.range))){ a.state="chase"; a.speed=run*(tp.cl==="druid"&&m.b==="spider"?0.8:1);
+    if(dh<1.4+(m.sz>140?0.3:0)){ a.path=[]; a.facing=facingTo(a,tp.x,tp.y); a.lungeTo=[tp.x,tp.y];
+      if(!tp.busy){ a.attackT-=dt; if(a.attackT<=0){ a.attackT=1.4; a.lunge=0.25; biteTarget(tp,a,m.dmg); } } }
+    else if(a.think<=0){ a.think=0.4; setPath(a,cellAt(Math.round(tp.x),Math.round(tp.y))); a.attackT=Math.min(a.attackT,0.6); } }
+  else if(m.ai==="passive"&&tp&&dh<2&&a.state!=="shy"&&!a.aggro){ a.state="shy"; setPath(a,fleeCell(a,tp.x,tp.y,2,3.5)); a.speed=run*0.8; }
+  else if(a.think<=0&&!a.path.length){ a.state="wander"; a.think=2.5+Math.random()*3; const h=a.home||{x:a.x,y:a.y}; setPath(a,fleeCell({x:h.x,y:h.y},h.x,h.y,0.5,3)); }
 }
 function summonBats(a,n){
   for(let i=0;i<n;i++){ const ang=Math.random()*Math.PI*2, c=cellAt(Math.round(a.x+Math.cos(ang)*2),Math.round(a.y+Math.sin(ang)*2)); if(!c||c.blocked) continue;
@@ -4141,7 +4313,7 @@ function drawGolemP(g,frame,moving,raise,glow){
 function drawBeast(a){
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
-  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const big=a.kind==="golem";
+  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const cm=CMOBS[a.kind], pre=cm?cm.b:a.kind, big=a.kind==="golem", sc=cm?cm.sz/100:1;
   if(big&&(a.slamT>0||a.slamFx>0)){   // красный круг — куда ударит голем; белая волна — удар
     const k=a.slamT>0?1-a.slamT/GOLEM_SLAM_T:1, rr=a.slamT>0?GOLEM_SLAM_R:GOLEM_SLAM_R*(1.2-a.slamFx*0.4);
     ctx.beginPath(); for(let i=0;i<=32;i++){ const an=i/32*Math.PI*2, q=proj(a.x-MX+Math.cos(an)*rr,a.y-MY+Math.sin(an)*rr,a.z); i?ctx.lineTo(...q):ctx.moveTo(...q); }
@@ -4149,21 +4321,22 @@ function drawBeast(a){
     else { ctx.strokeStyle=`rgba(255,255,255,${a.slamFx*1.6})`; ctx.lineWidth=2; ctx.stroke(); } }
   if(a.lunge>0){ const lt=a.lungeTo||[hero.x,hero.y], [hx,hy]=proj(lt[0]-MX,lt[1]-MY,a.z), dx=hx-fx, dy=hy-fy, dd=Math.hypot(dx,dy)||1, k=Math.sin(a.lunge/0.25*Math.PI)*(big?4:5); fx+=dx/dd*k; fy+=dy/dd*k; }
   ctx.globalAlpha=a.dying>0?Math.min(1,a.dying/1.2)*a.alpha:a.alpha;
-  ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(fx,fy,big?20:10,big?7:4,0,0,Math.PI*2); ctx.fill();
-  const nf=img[a.kind+"_se_2"]?4:img[a.kind+"_se_1"]?2:4, frame=a.moving?Math.floor(a.phase*(nf===2?0.5:1))%nf:0;
-  let sp=img[`${a.kind}_${a.facing}_${frame}`], mirror=false;
-  if(!sp&&a.facing[1]==="w"){ sp=img[`${a.kind}_${a.facing[0]}e_${frame}`]; mirror=true; }
-  if(a.dying>0&&img[a.kind+"_dead"]){ sp=img[a.kind+"_dead"]; mirror=a.facing[1]==="w"; }
+  const shw=(big||pre==="golem"?20:pre==="bear"?14:10)*sc; ctx.fillStyle="rgba(20,10,40,.3)"; ctx.beginPath(); ctx.ellipse(fx,fy,shw,shw*0.36,0,0,Math.PI*2); ctx.fill();
+  const nf=img[pre+"_se_2"]?4:img[pre+"_se_1"]?2:4, frame=a.moving?Math.floor(a.phase*(nf===2?0.5:1))%nf:0;
+  let sp=img[`${pre}_${a.facing}_${frame}`], mirror=false;
+  if(!sp&&a.facing[1]==="w"){ sp=img[`${pre}_${a.facing[0]}e_${frame}`]; mirror=true; }
+  if(a.dying>0&&img[pre+"_dead"]){ sp=img[pre+"_dead"]; mirror=a.facing[1]==="w"; }
+  if(cm&&sp) sp=mobTint(a.kind,sp);
   if(big&&a.slamT>0) fx+=Math.round(Math.sin(T*60)*(1-a.slamT/GOLEM_SLAM_T)*2);   // дрожит перед ударом
   a.drawn={x:Math.round(fx),y:Math.round(fy),sp,name:null,mirror};
-  ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)+(a.dying>0&&!img[a.kind+"_dead"]?Math.round((3-a.dying)*3):0));
+  ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)+(a.dying>0&&!img[pre+"_dead"]?Math.round((3-a.dying)*3):0)); if(sc!==1) ctx.scale(sc,sc);
   if(a.hurtT>0) ctx.filter="brightness(2.2)";
   else if(big&&a.slamT>0&&sp) ctx.filter=`sepia(1) saturate(${2+3*(1-a.slamT/GOLEM_SLAM_T)}) hue-rotate(-35deg)`;
   if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+(big?4:3)); }
   else { if(a.facing[1]==="w") ctx.scale(-1,1);
     if(big) drawGolemP(ctx,frame,a.moving,a.slamT>0,a.slamT>0?"#ff6a4a":"#7ae0ff"); else drawSpiderP(ctx,frame,a.moving); }
   ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
-  if(!big) drawMobHP(a,fx,fy);
+  if(!big) drawMobHP(a,fx,fy-(sc>1?Math.round((sc-1)*26):0));
 }
 function updateBossBar(){
   const el=document.getElementById("bossBar"); if(!el) return;
@@ -4175,15 +4348,17 @@ function updateBossBar(){
 }
 // ================= Летучие мыши и удочки =================
 const MOB_HP={wolf:4,bat:2,spider:5,golem:60};
-const mobHp=k=>CFG.mobHp&&CFG.mobHp[k]!=null?CFG.mobHp[k]:(MOB_HP[k]??3);
-const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat"||a.kind==="spider"||a.kind==="golem");
+const mobHp=k=>CMOBS[k]?CMOBS[k].hp:CFG.mobHp&&CFG.mobHp[k]!=null?CFG.mobHp[k]:(MOB_HP[k]??3);
+const isMob=a=>a&&(a.kind==="wolf"||a.kind==="bat"||a.kind==="spider"||a.kind==="golem"||!!CMOBS[a.kind]);
 // когда и сколько мобов: d — днём (нейтральные), n — ночью
 const MOB_TIME={wolf:{d:1,n:1,dn:2,nn:2},bat:{d:0,n:1,dn:2,nn:2},spider:{d:0,n:0,dn:2,nn:4}};
-const mobT=(k,f)=>CFG.mobTime&&CFG.mobTime[k]&&CFG.mobTime[k][f]!=null?CFG.mobTime[k][f]:(MOB_TIME[k]?MOB_TIME[k][f]:0);
+const mobT=(k,f)=>CMOBS[k]?CMOBS[k][f]|0:CFG.mobTime&&CFG.mobTime[k]&&CFG.mobTime[k][f]!=null?CFG.mobTime[k][f]:(MOB_TIME[k]?MOB_TIME[k][f]:0);
 const mobOn=(k,per)=>!!mobT(k,per)&&mobCount(k,per)>0;
 const mobCount=(k,per)=>mobT(k,per+"n")|0;
-function mobLeave(a){ a.leaving=true; if(a.kind==="wolf"){ setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; } else a.path=[]; }
+function mobLeave(a){ a.leaving=true; if(CMOBS[a.kind]){ a.path=[]; return; } if(a.kind==="wolf"){ setPath(a,randomCell(c=>freeCell(c)&&edgeCell(c))); a.speed=2.6; } else a.path=[]; }
 function spawnMob(kind,per,farFromAll,existing){
+  if(CMOBS[kind]){ const z=zonePick(kind,c=>freeCell(c)&&farFromAll(c,6)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&(CAVE||GRASSY.includes(c.t))&&farFromAll(c,7));
+    if(!c) return; spawnAnimal(kind,c); const m=animals[animals.length-1]; m.home={x:c.x,y:c.y}; m.attackT=1.2; return; }
   if(kind==="bat"){ const c=batSpawnCell(farFromAll); if(!c) return; spawnAnimal("bat",c); const b=animals[animals.length-1]; b.fly=2.2; b.home={x:c.x,y:c.y}; b.phase=Math.random(); b.attackT=1.5; return; }
   let c;
   if(per==="d"){ const z=zonePick("wolf",c=>freeCell(c)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5); c=z!==undefined?z:randomCell(c=>freeCell(c)&&GRASSY.includes(c.t)&&farFromAll(c,7)&&nearestFire(c.x,c.y)[1]>5); }
@@ -4362,7 +4537,7 @@ function sendPresence(now){
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:convF(hero.facing,quarter(),0),m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
     id:NET.myId,n:myNick,act:myAct(),chat:myChat,zn:ZONE,hm:HP_MAX,cl:heroClass,fm:form?form[0]:null,sh:shieldT>0?1:0,hl:healOut.length?healOut.slice(-6):null,pj:partyLead,pk:myPartyKey(),pd:myDisband&&Date.now()-myDisband<60000?myDisband:0,kk:myKicks.length?myKicks.map(k=>k.u):null,inv:myInvite&&Date.now()-myInvite.ts<30000?myInvite:null,xs:NET.host&&xsList.length?xsList.slice(-8):null,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
-    p.an=animals.filter(a=>!a.dead).slice(0,10).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||"h",sn:a.stunT>0?1:0,tg:a.slamT>0?+a.slamT.toFixed(2):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
+    p.an=animals.filter(a=>!a.dead).slice(0,16).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||(CMOBS[a.kind]?a.kind:"h"),sn:a.stunT>0?1:0,tg:a.slamT>0?+a.slamT.toFixed(2):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
       f:convF(a.facing,quarter(),0),m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
     p.bt=bites.slice(-6); p.kl=kills.length?kills.slice(-6):null;
   }
@@ -4430,7 +4605,7 @@ function mirrorAnimals(h,dt){
     if(!e||typeof e!=="object") continue;
     const id=String(e.i).slice(0,20); ids.add(id);
     let a=animals.find(x=>x.nid===id);
-    const kind=CODE_KIND[e.k]||"hare";
+    const kind=CODE_KIND[e.k]||(CMOBS[e.k]?e.k:null); if(!kind){ ids.delete(id); continue; }
     if(!a){ a={kind,nid:id,x:num(e.x,-1,W,0),y:num(e.y,-1,D,0),z:num(e.z,0,12,1),path:[],speed:1.5,facing:"se",phase:0,think:1,alpha:0,leaving:false,state:"",attackT:1,lunge:0,howlT:0,fleeing:0}; animals.push(a); }
     a.tx=num(e.x,-1,W,a.x); a.ty=num(e.y,-1,D,a.y); a.tz=num(e.z,0,12,a.z); a.facing=FACINGS.includes(e.f)?convF(e.f,0,quarter()):a.facing; a.moving=e.m===1;
     a.alpha+=(num(e.a,0,1,1)-a.alpha)*Math.min(1,dt*6); a.leaving=e.lv===1;
@@ -4954,6 +5129,8 @@ async function initNet(){
     document.getElementById("chatBtn").hidden=false;
     try{ const s=await db.doc("world/items").get(); applyItems(s.exists?s.data():null); }catch(e){}
     db.doc("world/items").onSnapshot(s=>applyItems(s.exists?s.data():null),()=>{});
+    try{ const s=await db.doc("world/mobs").get(); applyMobs(s.exists?s.data():null); }catch(e){}
+    db.doc("world/mobs").onSnapshot(s=>applyMobs(s.exists?s.data():null),()=>{});
     if(NET.myId) await loadSave();
     classLoaded=true;
     if(NET.myId){

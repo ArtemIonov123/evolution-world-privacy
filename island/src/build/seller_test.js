@@ -1,0 +1,17 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch(); const errs=[]; const p=await (await b.newContext({viewport:{width:390,height:800},hasTouch:true,isMobile:true,deviceScaleFactor:2})).newPage(); p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{localStorage.setItem('island_nick','Artem');localStorage.setItem('island_lang','ru')}); await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1300);
+await p.evaluate(()=>{ setClass('warrior'); document.getElementById('classWrap')&&document.getElementById('classWrap').remove(); isAdmin=true;
+  applyItems({list:{cmerch1:{t:"weapon",ru:"Меч купца",atk:5,seller:"merchant",price:100},cnpc001:{t:"potion",ru:"Настойка",heal:3,seller:"npc",price:20},cdrop01:{t:"mat",ru:"Чешуя",price:0},cold001:{t:"head",ru:"Старый шлем",def:1,shop:true,price:30,sell:12}}}); });
+console.log(await p.evaluate(()=>{ shopNpc="merchant"; const m=shopList().map(s=>s.id).filter(i=>i[0]==="c"); shopNpc="npc"; const n=shopList().map(s=>s.id); shopNpc="merchant";
+  return {merchant:m,npc:n,sell:["cmerch1","cnpc001","cdrop01","cold001"].map(sellPrice),desc:itemDesc("cdrop01")}; }));
+await p.evaluate(()=>{ hero.x=NPCC.x+1; hero.y=NPCC.y; openDialog(); });
+await p.waitForTimeout(200);
+console.log('dlg opts',await p.evaluate(()=>[...document.querySelectorAll('#dlgOpts button')].map(b=>b.textContent).join(' | ')));
+await p.evaluate(()=>{ const b=[...document.querySelectorAll('#dlgOpts button')].find(x=>x.textContent.includes('продаёшь')); b&&b.click(); }); await p.waitForTimeout(200);
+console.log('npc shop',await p.evaluate(()=>({kind:winKind,tabs:[...document.querySelectorAll('.wbody .tabs .btn')].map(b=>b.textContent),name:document.querySelector('.shead b')&&document.querySelector('.shead b').textContent})));
+await p.screenshot({path:'shot_npcshop.png'});
+await p.evaluate(()=>{ openWin("admin"); winKind="admin_items"; itSel="cdrop01"; itDraft={...CUSTOM.cdrop01}; renderWin(); }); await p.waitForTimeout(200);
+await p.evaluate(()=>document.querySelector('.plform .chk').scrollIntoView()); await p.screenshot({path:'shot_it_seller.png'});
+console.log('grid h',await p.evaluate(()=>document.querySelector('.itgrid').getBoundingClientRect().height));
+console.log('errs',errs); await b.close();})();
