@@ -3957,7 +3957,7 @@ function renderSkills(){
   if(!heroClass) return;
   SKILLS[heroClass].forEach((sk,i)=>{ const b=mkEl("button","skb"); b.type="button"; b.dataset.sk=sk.id;
     b.setAttribute("aria-label",tr("sk_n_"+sk.id)+" ("+(i+1)+")"); b.title=tr("sk_n_"+sk.id)+" · "+(i+1);
-    b.appendChild(skillIcon(sk.id,26)); b.appendChild(mkEl("em","sklv",tr("sk_lv",{n:sk.lv})));
+    b.appendChild(skillIcon(sk.id,32)); b.appendChild(mkEl("em","sklv",tr("sk_lv",{n:sk.lv})));
     b.onclick=()=>useSkill(sk.id); el.appendChild(b); });
   updateSkillBar(true);
 }
