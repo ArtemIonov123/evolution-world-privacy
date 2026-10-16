@@ -77,11 +77,12 @@ function render(now){
   const anchor=drawOrder(), d=dprNow(), r=cv.getBoundingClientRect();
   assignEnts();
   const sky=SKY;
-  const bw=Math.ceil(r.width/scale)+3, bh=Math.ceil(r.height/scale)+3;
+  // буфер в RS раз плотнее игровых пикселей: старые картинки увеличиваются чётко, HD (@2x) — рисуются во всю детальность
+  RS=RENDER_SCALE; const bw=(Math.ceil(r.width/scale)+3)*RS, bh=(Math.ceil(r.height/scale)+3)*RS;
   if(buf.width!==bw||buf.height!==bh){buf.width=bw;buf.height=bh}
   // целая часть сдвига камеры — внутри буфера, дробная — при выводе на экран
   const offX=Math.floor(panX/scale)+1, offY=Math.floor(panY/scale)+1;
-  RS=1; ROX=offX; ROY=offY;
+  ROX=offX*RS; ROY=offY*RS;
   ctx=bufCtx; ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha=1;
   ctx.fillStyle=sky; ctx.fillRect(0,0,bw,bh);
   if(!anim){ drawSprites(anchor); }
@@ -110,6 +111,6 @@ function render(now){
   m.setTransform(1,0,0,1,0,0); m.imageSmoothingEnabled=false;
   m.fillStyle=sky; m.fillRect(0,0,cv.width,cv.height);
   const rx=panX-offX*scale, ry=panY-offY*scale;
-  m.drawImage(buf, Math.round(rx*d), Math.round(ry*d), Math.round(bw*scale*d), Math.round(bh*scale*d));
+  m.drawImage(buf, Math.round(rx*d), Math.round(ry*d), Math.round(bw/RS*scale*d), Math.round(bh/RS*scale*d));
 }
 

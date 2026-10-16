@@ -78,9 +78,9 @@ function applyLighting(){
   if(d>0.05){
     Lc.globalCompositeOperation="lighter";
     for(const li of collectLights()){
-      const x=li.x+ROX, y=li.y+ROY, gr=Lc.createRadialGradient(x,y,0,x,y,li.r);
+      const x=li.x*RS+ROX, y=li.y*RS+ROY, lr=li.r*RS, gr=Lc.createRadialGradient(x,y,0,x,y,lr);
       gr.addColorStop(0,`rgba(${li.c},${li.a*d})`); gr.addColorStop(0.55,`rgba(${li.c},${li.a*d*0.45})`); gr.addColorStop(1,`rgba(${li.c},0)`);
-      Lc.fillStyle=gr; Lc.fillRect(x-li.r,y-li.r,li.r*2,li.r*2);
+      Lc.fillStyle=gr; Lc.fillRect(x-lr,y-lr,lr*2,lr*2);
     }
   }
   const B=bufCtx; B.save(); B.setTransform(1,0,0,1,0,0); B.globalCompositeOperation="multiply"; B.drawImage(lightCv,0,0); B.restore();

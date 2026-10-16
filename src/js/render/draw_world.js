@@ -7,6 +7,7 @@ const dprNow=()=>window.devicePixelRatio||1;
 // Так между плитками не бывает щелей, и ничего не мерцает, когда камера едет.
 const buf=document.createElement("canvas"), bufCtx=buf.getContext("2d");
 let RS=1, ROX=0, ROY=0;
+const RENDER_SCALE=2;   // плотность буфера кадра (2 = поддержка картинок @2x)
 function worldTransform(){ctx.setTransform(RS,0,0,RS,ROX,ROY)}
 
 // порядок отрисовки: дальние клетки раньше; герой — после «своей» клетки
@@ -26,8 +27,8 @@ function drawOrder(){
 
 // клетка попадает на экран? (с запасом на деревья вверх и стенки вниз)
 function cellVisible(c){
-  const p=proj(c.x-MX,c.y-MY,c.L), x=p[0]+ROX, y=p[1]+ROY, w=ctx.canvas.width, h=ctx.canvas.height;
-  return x>-80 && x<w+80 && y+c.L*LH+50>0 && y-140<h;
+  const p=proj(c.x-MX,c.y-MY,c.L), x=p[0]*RS+ROX, y=p[1]*RS+ROY, w=ctx.canvas.width, h=ctx.canvas.height;
+  return x>-80*RS && x<w+80*RS && y+(c.L*LH+50)*RS>0 && y-140*RS<h;
 }
 function stairSprite(dir,q){
   const [a,b]=rotQ(STAIR_DIR[dir],q);

@@ -25,9 +25,17 @@ function postapoRecolor(im,mode){
     const [r,gg,b]=hsl2rgb(((h%360)+360)%360,s,Math.max(0,Math.min(1,l))); p[i]=r; p[i+1]=gg; p[i+2]=b; }
   g.putImageData(d,0,0); c.src=im.src; return c;   // .src — некоторые места кэшируют по нему
 }
+// HD-картинки (@2x): везде, где их рисуют «по размеру картинки», рисуем в логическом размере (вдвое меньше),
+// а при вырезании кусочка (ветер, анимация) пересчитываем координаты в пиксели исходника
+{ const di=CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage=function(im,...a){
+    const f=im&&im.__hd; if(!f) return di.call(this,im,...a);
+    if(a.length===2) return di.call(this,im,a[0],a[1],im.width,im.height);
+    if(a.length===8) return di.call(this,im,a[0]*f,a[1]*f,a[2]*f,a[3]*f,a[4],a[5],a[6],a[7]);
+    return di.call(this,im,...a); }; }
 // вызывается для каждой картинки при загрузке (map_camera.js → loadAll)
 function postapoLook(k,im){
-  if(POSTAPO_ART.has(k)) return im;
+  if(POSTAPO_ART.has(k)||im.__hd) return im;
   if(TOXIC_RE.test(k)) return postapoRecolor(im,"toxic");
   if(DUST_RE.test(k)) return postapoRecolor(im,"dust");
   return im;

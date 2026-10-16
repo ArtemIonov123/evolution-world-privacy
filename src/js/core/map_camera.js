@@ -26,7 +26,7 @@ const STAIR_DIR = {L:[-1,0], R:[0,-1], P:[1,0], Q:[0,1]};   // куда лест
 const STAIR_ORDER=["L","R","P","Q"];
 
 const img = {};
-const loadAll = Promise.all(Object.entries(SPRITES).map(([k,src])=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=postapoLook(k,i);r()};i.src=src})));
+const loadAll = Promise.all(Object.entries(SPRITES).map(([k,src])=>new Promise(r=>{const i=new Image();i.onload=()=>{ if(SPRITES_HD.has(k)){ i.__hd=2; i.width=Math.round(i.naturalWidth/2); i.height=Math.round(i.naturalHeight/2); } img[k]=postapoLook(k,i); r(); };i.src=src})));
 
 const cells=[], grid=[...Array(D)].map(()=>Array(W).fill(null));
 for(let y=0;y<D;y++)for(let x=0;x<W;x++){
