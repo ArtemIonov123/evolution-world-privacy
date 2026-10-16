@@ -93,7 +93,7 @@ export async function walletAdd(env, tgId, delta) {
 }
 
 // ---- пакеты кристаллов (цена в звёздах Telegram). Такой же список — в игре (js/ui/crystals.js) только для показа ----
-export const PACKS = { p1: { cr: 50, st: 25 }, p2: { cr: 120, st: 50 }, p3: { cr: 260, st: 100 }, p4: { cr: 700, st: 250 }, p5: { cr: 1500, st: 500 }, p6: { cr: 3500, st: 1000 } };
+export const PACKS = { p1: { cr: 5, st: 50 }, p2: { cr: 25, st: 200 }, p3: { cr: 50, st: 350 }, p4: { cr: 100, st: 600 }, p5: { cr: 200, st: 1100 }, p6: { cr: 500, st: 2500 } };   // ≈100/399/699/1199/2199/4999 ₽
 const PACK_T = { ru: (n) => `${n} кристаллов`, pl: (n) => `${n} kryształów`, en: (n) => `${n} crystals` };
 const PACK_D = { ru: "Кристаллы для Isle of Legends. Придут в игру сразу после оплаты.", pl: "Kryształy do Isle of Legends. Trafią do gry zaraz po zapłacie.", en: "Crystals for Isle of Legends, delivered right after payment." };
 const PAID = { ru: (n, c) => `💎 +${n} кристаллов! Теперь у тебя ${c}.`, pl: (n, c) => `💎 +${n} kryształów! Masz teraz ${c}.`, en: (n, c) => `💎 +${n} crystals! You now have ${c}.` };
