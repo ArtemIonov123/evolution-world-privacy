@@ -1,0 +1,25 @@
+name: Deploy Telegram bot
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: bot } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: cd functions && npm install --omit=dev
+      - name: Firebase login (service account)
+        run: echo '${{ secrets.FIREBASE_SA }}' > "$RUNNER_TEMP/sa.json"
+      - name: Save bot token to Secret Manager
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: printf '%s' "$TOKEN" | npx -y firebase-tools@13.29.1 functions:secrets:set TELEGRAM_TOKEN --data-file=- --force --non-interactive
+      - name: Deploy function
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: npx -y firebase-tools@13.29.1 deploy --only functions --force --non-interactive
+      - name: Connect bot (webhook + menu)
+        run: sleep 20 && curl -s "https://europe-west1-island-6cbab.cloudfunctions.net/tgbot?setup=1"
