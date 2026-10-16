@@ -4909,6 +4909,7 @@ function resize(){const r=cv.getBoundingClientRect(),d=dprNow();cv.width=Math.ro
 window.addEventListener("resize",resize);
 
 loadAll.then(()=>{
+  if(window.__islandBlocked) return;   // открыто не из Telegram
   buildTextures(); setRot(0); resize();
   for(const f of ITEMS) ICONS[f.id]=makeIcon(f); ICONS.campfire=makeIcon({id:"campfire"}); applyLang(); initRPG();
   renderHP(); initFireflies(); initNet();

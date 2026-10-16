@@ -1,6 +1,20 @@
 // Firebase-адаптер: даёт игре те же claude.use("room"|"db"|"user"), что и claude.ai, но на Realtime Database.
 // Мир выбирается ключом в ссылке: #world=XXXXXXXXXXXXXXXX (16+ символов). Без ключа создаётся новый личный мир.
 (()=>{
+  // игра открывается только из Telegram-бота; прямая ссылка в браузере перекидывает в бота
+  const BOT="https://t.me/IsleofLegends_bot?startapp";
+  const inTG=!!(window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.initData);
+  const dev=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  if(!inTG&&!dev){
+    window.__islandBlocked=true;
+    try{ location.replace(BOT); }catch(e){}
+    const show=()=>{ document.body.innerHTML='<div style="position:fixed;inset:0;display:grid;place-items:center;background:#2b2340;color:#f4efe0;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;z-index:99999">'+
+      '<div><div style="font-size:22px;color:#ffd66b;margin-bottom:10px">⚔️ Isle of Legends</div><div style="margin-bottom:18px">Игра доступна только в Telegram<br><span style="opacity:.75">Gra dostępna tylko w Telegramie</span></div>'+
+      '<a href="'+BOT+'" style="display:inline-block;padding:12px 22px;background:#ffd66b;color:#1b1528;text-decoration:none;font-weight:700;border:2px solid #1b1528">Открыть в Telegram</a></div></div>'; };
+    if(document.body) show(); else document.addEventListener("DOMContentLoaded",show);
+    window.addEventListener("error",e=>e.preventDefault(),true);
+    return;   // без Telegram игра не подключается к базе
+  }
   const CFG={apiKey:"AIzaSyDT8NnzhpAqMCHFaiX4FRKbrIOFUdXZOVQ",authDomain:"island-6cbab.firebaseapp.com",
     databaseURL:"https://island-6cbab-default-rtdb.europe-west1.firebasedatabase.app",projectId:"island-6cbab",
     storageBucket:"island-6cbab.firebasestorage.app",messagingSenderId:"626949382687",appId:"1:626949382687:web:09622d7d5ea2a5735beb2a"};
