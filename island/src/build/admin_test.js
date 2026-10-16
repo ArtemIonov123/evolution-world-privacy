@@ -39,11 +39,11 @@ console.log('editor:',await ad.evaluate(()=>({EDIT,tab:edTab,top:[...document.qu
 await ad.screenshot({path:'shot_edmap.png'});
 await ad.evaluate(()=>document.querySelector('#edPanel .edtop .btn').click()); await ad.waitForTimeout(300);
 console.log('after back:',await ad.evaluate(()=>({EDIT,kind:winKind})));
-await ad.evaluate(()=>[...document.querySelectorAll('.adcard')][5].click()); await ad.waitForTimeout(300);
+await ad.evaluate(()=>[...document.querySelectorAll('.adcard')][6].click()); await ad.waitForTimeout(300);
 console.log('drop sec:',await ad.evaluate(()=>({EDIT,tab:edTab,sec:document.querySelector('.edsec').textContent})));
 await ad.screenshot({path:'shot_eddrop.png'});
 await ad.evaluate(()=>document.querySelector('#edPanel .edtop .btn').click()); await ad.waitForTimeout(200);
-await ad.evaluate(()=>[...document.querySelectorAll('.adcard')][6].click()); await ad.waitForTimeout(200);
+await ad.evaluate(()=>[...document.querySelectorAll('.adcard')][7].click()); await ad.waitForTimeout(200);
 await ad.fill('.adarea','badword'); await ad.click('.plbtns .big'); await ad.waitForTimeout(800);
 console.log('nf on player:',await pl.evaluate(()=>[NICK_EXTRA,badNick('xxbadwordxx')]));
 console.log('errs',errs); await b.close();})();
