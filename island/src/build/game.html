@@ -3844,6 +3844,10 @@ const hueCss=i=>PLAYER_HUES[i]===null?"#3a7be0":`hsl(${PLAYER_HUES[i]},70%,55%)`
 // ---- ник игрока ----
 let myNick="";
 try{ myNick=cleanNick(localStorage.getItem("island_nick")||""); }catch(e){}
+// в Telegram ник берём из профиля Telegram
+{ const t=window.__islandTG; if(t){ let n=cleanNick((t.first+" "+t.last).trim()); if(n.length<2) n=cleanNick(t.user); if(n.length<2) n=cleanNick("Hero"+t.id.slice(-4));
+    myNick=n; try{ localStorage.setItem("island_nick",n); }catch(e){}
+    if(!localStorage.getItem("island_lang")&&/^(ru|uk|be|kk)/.test(t.lang)) try{ LANG="ru"; }catch(e){} } }
 function cleanNick(v){
   return String(v||"").replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff]/g,"").replace(/\s+/g," ").trim().slice(0,16);
 }
@@ -3863,6 +3867,8 @@ function initUpdates(){
     try{ lastSaveJSON=""; lastPlayerJSON=""; lastPlayerWrite=0; tickSave(99); tickPlayerDoc(); }catch(e){}
     const go=()=>location.replace(location.pathname+"?v="+encodeURIComponent(updBuild||Date.now())+location.hash);
     setTimeout(go,500); };
+  if(window.__islandTG) (async()=>{ try{ const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"}); const j=await r.json();
+      if(j&&j.build&&j.build!==mine&&sessionStorage.getItem("island_autoupd")!==j.build){ sessionStorage.setItem("island_autoupd",j.build); location.replace(location.pathname+"?v="+encodeURIComponent(j.build)+location.hash); } }catch(e){} })();
   setTimeout(check,8000); setInterval(check,60000);
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) check(); });
   addEventListener("online",check);
@@ -4409,7 +4415,10 @@ function applyFires(docs){
 let saveT=3, saving=false, lastSaveJSON="";
 async function loadSave(){
   try{
-    const s=await NET.db.doc(`data/users/${NET.myId}/save`).get(); if(!s.exists) return;
+    let s=await NET.db.doc(`data/users/${NET.myId}/save`).get();
+    // первый вход через Telegram: переносим прогресс, который был в этом браузере
+    if(!s.exists&&window.__islandOldUid){ const o=await NET.db.doc(`data/users/${window.__islandOldUid}/save`).get(); if(o.exists){ s=o; lastSaveJSON=""; saveT=0; } }
+    if(!s.exists) return;
     const d=s.data()||{};
     if(d.inv&&typeof d.inv==="object") for(const [k,v] of Object.entries(d.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0) inv[k]=Math.min(9999,v|0);
     if(["none","active","done"].includes(d.quest)) quest=d.quest;
@@ -4910,7 +4919,7 @@ loadAll.then(()=>{
     ib.onclick=async()=>{ menuEl.classList.remove("open"); const url=location.origin+location.pathname+"#world="+window.__islandWorld;
       try{ if(navigator.share&&TOUCH){ await navigator.share({title:document.title,url}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
       try{ await navigator.clipboard.writeText(url); say("invite_ok","invite_sub"); }catch(e){ prompt(tr("invite"),url); } }; }
-  if(!myNick) openNick();
+  if(!myNick&&!window.__islandTG) openNick();
   // полный экран: на телефоне — сам при первом касании, везде — кнопкой в меню
   const fsBtn=document.getElementById("fsBtn");
   if(fsSupported()){ fsBtn.hidden=false; fsBtn.onclick=()=>{ menuEl.classList.remove("open"); isFull()?exitFull():goFull(); };

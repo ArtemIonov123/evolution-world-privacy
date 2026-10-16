@@ -15,6 +15,14 @@
   if(!location.hash.includes("world="+world)) try{history.replaceState(null,"",location.pathname+location.search+"#world="+world);}catch(e){}
   window.__islandWorld=world;
   let uid=ls.get("island_uid"); if(!/^u[A-Za-z0-9]{10,20}$/.test(uid||"")){ uid="u"+rnd(14); ls.set("island_uid",uid); }
+  // Telegram Mini App: игрок = аккаунт Telegram (тот же прогресс на любом телефоне)
+  const TG=window.Telegram&&window.Telegram.WebApp, tgUser=TG&&TG.initDataUnsafe&&TG.initDataUnsafe.user;
+  window.__islandTG=null;
+  if(tgUser&&/^\d{3,15}$/.test(String(tgUser.id))){
+    const tid="utg"+tgUser.id; if(uid!==tid){ window.__islandOldUid=uid; } uid=tid;
+    window.__islandTG={id:String(tgUser.id),first:String(tgUser.first_name||""),last:String(tgUser.last_name||""),user:String(tgUser.username||""),lang:String(tgUser.language_code||"")};
+    try{ TG.ready(); TG.expand(); if(TG.disableVerticalSwipes) TG.disableVerticalSwipes(); if(TG.setHeaderColor) TG.setHeaderColor("#2b2340"); if(TG.setBackgroundColor) TG.setBackgroundColor("#2b2340"); }catch(e){}
+  }
   const peer="p"+rnd(10);
 
   let fb=null; const getFb=()=>{ if(fb) return fb; if(!window.firebase) return null;

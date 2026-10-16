@@ -6,7 +6,7 @@ def strip(js): return re.sub(r'//# sourceMappingURL=\S+','',js).replace('</scrip
 app=strip(open(sdkdir+'/firebase-app-compat.js',encoding='utf-8').read())
 dbs=strip(open(sdkdir+'/firebase-database-compat.js',encoding='utf-8').read())
 ad=open('fb_adapter.js',encoding='utf-8').read()
-inj='<script>window.__islandBuild="'+build+'";</script>\n<script>'+app+'</script>\n<script>'+dbs+'</script>\n<script>'+ad+'</script>\n'
+inj='<script src="https://telegram.org/js/telegram-web-app.js"></script>\n<script>window.__islandBuild="'+build+'";</script>\n<script>'+app+'</script>\n<script>'+dbs+'</script>\n<script>'+ad+'</script>\n'
 i=h.index('<script>'); h=h[:i]+inj+h[i:]
 meta=('<link rel="manifest" href="manifest.webmanifest">\n<meta name="mobile-web-app-capable" content="yes">\n'
       '<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n'
