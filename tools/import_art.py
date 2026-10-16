@@ -51,6 +51,46 @@ def fit(src, box_w, box_h):
             if px[x, y][3] == 0: px[x, y] = (0, 0, 0, 0)
     return out, tw, th
 
+# --- блоки земли: ромб строго по сетке движка, бока ровно на высоту уровня, без контура на верхней грани ---
+# геометрия в @2x: верх ромба (64,4), левый/правый угол y=38, низ ромба y=72, бок 20 px (LH=10 × 2)
+BW, TOPV, RH, SIDE = 128, 4, 68, 20
+def block_fit(art):
+    a = art.convert('RGBa').resize((BW, max(1, round(art.size[1] * BW / art.size[0]))), Image.LANCZOS).convert('RGBA')
+    a.putalpha(a.getchannel('A').point(lambda v: 255 if v >= 128 else 0))
+    src = a.load(); w, h = a.size
+    out = Image.new('RGBA', (BW, 96), (0, 0, 0, 0)); dst = out.load()
+    ytop = min((y for x in range(w) for y in range(h) if src[x, y][3]), default=0)
+    def first(x): return next((y for y in range(h) if src[x, y][3]), None)
+    side_ys = [v for v in (first(x) for x in (0, 1, 2, w - 3, w - 2, w - 1)) if v is not None]
+    yl = sum(side_ys) / len(side_ys) if side_ys else ytop + RH / 2        # левый/правый угол ромба в исходнике
+    ky = RH / max(1.0, 2 * (yl - ytop))                                  # ромб у GPT бывает чуть площе — растянуть верх до сетки
+    for x in range(w):
+        col = [y for y in range(h) if src[x, y][3]]
+        if not col: continue
+        dx = abs(x + 0.5 - 64) / 64
+        yf_dst = TOPV + RH / 2 + RH / 2 * (1 - dx)                       # нижний край ромба на сетке
+        yf_src = ytop + (yf_dst - TOPV) / ky
+        bot = col[-1] + 1; L = max(1.0, bot - yf_src)
+        for ty in range(TOPV, min(96, int(round(yf_dst)) + SIDE)):
+            if ty < yf_dst: sy = int(ytop + (ty + 0.5 - TOPV) / ky)        # верхняя грань
+            else: sy = int(yf_src + (ty + 0.5 - yf_dst) * L / SIDE)         # бок — ровно на высоту уровня
+            if 0 <= sy < h and src[x, sy][3]: dst[x, ty] = src[x, sy]
+    # убрать тёмный контур по краю верхней грани (на карте из него получалась «сетка»)
+    lum = lambda p: p[0] * .3 + p[1] * .59 + p[2] * .11
+    for y in range(96):
+        for x in range(BW):
+            p = dst[x, y]
+            if not p[3]: continue
+            e = RH / 2 * (1 - abs(x + 0.5 - 64) / 64) - abs(y + 0.5 - (TOPV + RH / 2))   # до края ромба по вертикали
+            if -3 < e < 0 and y < TOPV + RH / 2:
+                dst[x, y] = (0, 0, 0, 0); continue                 # контур снаружи задних краёв — убрать
+            if (0 <= e < 1.5) or (0 <= e < 3.5 and lum(p) < 75):   # самый край — всегда, чуть глубже — если тёмный
+                step = 1 if y < TOPV + RH / 2 else -1              # внутрь ромба
+                for d in (4, 5, 6, 8):
+                    q = dst[x, min(95, max(0, y + step * d))]
+                    if q[3] and lum(q) >= 75: dst[x, y] = q; break
+    return out
+
 done = 0
 for f in sorted(glob.glob(os.path.join(src_dir, '*.png'))):
     name = os.path.basename(f)[:-4]
@@ -67,9 +107,12 @@ for f in sorted(glob.glob(os.path.join(src_dir, '*.png'))):
         group = GROUP; W, H = map(int, SIZE.lower().split('x')); bx, by, bw, bh = 0, 0, W * F, H * F
     else:
         print('НЕТ МЕСТА', name, '— новое имя: укажи --size 64x48 --group props'); continue
-    out, tw, th = fit(art, bw, bh)
-    canvas = Image.new('RGBA', (W * F, H * F), (0, 0, 0, 0))
-    canvas.alpha_composite(out, (bx + (bw - tw) // 2, by + bh - th))      # по центру, низом к низу места
+    if name.startswith('block_') and (W, H) == (64, 48):
+        canvas = block_fit(art)
+    else:
+        out, tw, th = fit(art, bw, bh)
+        canvas = Image.new('RGBA', (W * F, H * F), (0, 0, 0, 0))
+        canvas.alpha_composite(out, (bx + (bw - tw) // 2, by + bh - th))      # по центру, низом к низу места
     os.makedirs(os.path.join(OUT, group), exist_ok=True)
     dst = os.path.join(OUT, group, name + '@2x.png'); canvas.save(dst)
     low = ' (мало деталей: прислан %dx%d, нужно хотя бы %dx%d)' % (art.size + (bw, bh)) if art.size[0] < bw * 0.9 else ''

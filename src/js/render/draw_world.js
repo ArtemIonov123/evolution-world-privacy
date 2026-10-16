@@ -51,6 +51,16 @@ function drawStairsBack(c){
     poly([P(t0,-.5,z),P(t1,-.5,z),P(t1,.5,z),P(t0,.5,z)],k%2?"#c2b79e":"#b5aa92");       // ступень
   }
 }
+// у новых блоков (без контура по краю верха) тёмный край рисуется только там, где клетка выше соседней —
+// поэтому ровная земля сливается без «сетки», а обрывы читаются
+const CLIFF_DIRS=[[1,0,[1,2]],[0,1,[2,3]],[-1,0,[3,0]],[0,-1,[0,1]]];
+function drawCliffEdges(c,X,Y){
+  const Z=c.L, cr=[proj(X-.5,Y-.5,Z),proj(X+.5,Y-.5,Z),proj(X+.5,Y+.5,Z),proj(X-.5,Y+.5,Z)];
+  ctx.strokeStyle="rgba(24,16,10,.9)"; ctx.lineWidth=1;
+  for(const [dx,dy,[a,b]] of CLIFF_DIRS){
+    const n=cellAt(c.x+dx,c.y+dy); if(n&&n.L>=c.L&&!wet(n)) continue;
+    ctx.beginPath(); ctx.moveTo(cr[a][0],cr[a][1]); ctx.lineTo(cr[b][0],cr[b][1]); ctx.stroke(); }
+}
 function drawSprites(anchor){
   worldTransform(); ctx.imageSmoothingEnabled=false;
   const q=quarter();
@@ -63,6 +73,7 @@ function drawSprites(anchor){
       const name=top?TOP_SPRITE[c.t]:CAVE?"block_cave_wall":"block_rock";   // постапо: под верхом — бетонная кладка
       ctx.drawImage(img[name],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y));
     }
+    if(!wet(c)&&POSTAPO_ART.has(TOP_SPRITE[c.t])) drawCliffEdges(c,X,Y);
     if(c.st){ const sn=stairSprite(c.st,q); if(sn==="block_stone_path") drawStairsBack(c); else { const p=proj(X,Y,c.L+1); ctx.drawImage(img[sn],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y)); } }
     if(wet(c)){ drawWater(c); drawWaterFx(c); if(c.pier) drawMarketProp(c.pier,c); }
     if(c.leaves.length) drawLandedLeaves(c);
