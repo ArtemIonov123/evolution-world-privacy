@@ -92,10 +92,49 @@ def block_fit(art):
     return out
 
 done = 0
-for f in sorted(glob.glob(os.path.join(src_dir, '*.png'))):
+# --- кадры одной анимации (hero_ne_0..3): одинаковый масштаб и одна точка опоры (ноги), иначе герой «пульсирует» ---
+import re
+FILES = sorted(glob.glob(os.path.join(src_dir, '*.png')))
+KEYED = {os.path.basename(f)[:-4]: key_magenta(Image.open(f)) for f in FILES}
+ANIM = {}
+for n, im in KEYED.items():
+    base = re.sub(r'_\d+$', '', n)
+    if base != n and not n.startswith('block_'): ANIM.setdefault((base, im.size), []).append(n)
+ANIM_OF = {}
+for (base, size), names in ANIM.items():
+    if len(names) < 2: continue
+    olds = [glob.glob(os.path.join('sprites', '*', n + '.png')) for n in names]
+    if not all(olds): continue
+    tmpls = [Image.open(o[0]).convert('RGBA') for o in olds]
+    if len({t.size for t in tmpls}) != 1: continue
+    sbs = [bbox(KEYED[n]) for n in names]; tbs = [bbox(t) for t in tmpls]
+    if not all(sbs) or not all(tbs): continue
+    U = (min(b[0] for b in sbs), min(b[1] for b in sbs), max(b[2] for b in sbs), max(b[3] for b in sbs))
+    T = (min(b[0] for b in tbs), min(b[1] for b in tbs), max(b[2] for b in tbs), max(b[3] for b in tbs))
+    for n in names: ANIM_OF[n] = (U, T, tmpls[0].size, os.path.basename(os.path.dirname(olds[0][0])))
+
+def anim_fit(im, U, T, size):
+    W, H = size; uw, uh = U[2] - U[0], U[3] - U[1]
+    tx, ty, tw, th = T[0] * F, T[1] * F, (T[2] - T[0]) * F, (T[3] - T[1]) * F
+    k = min(tw / uw, th / uh); nw, nh = max(1, round(uw * k)), max(1, round(uh * k))
+    a = im.crop(U).convert('RGBa').resize((nw, nh), Image.LANCZOS).convert('RGBA')
+    a.putalpha(a.getchannel('A').point(lambda v: 255 if v >= 128 else 0)); px = a.load()
+    for y in range(nh):
+        for x in range(nw):
+            if px[x, y][3] == 0: px[x, y] = (0, 0, 0, 0)
+    c = Image.new('RGBA', (W * F, H * F), (0, 0, 0, 0))
+    c.alpha_composite(a, (tx + (tw - nw) // 2, ty + th - nh))        # общий центр и ноги на одной линии
+    return c
+
+for f in FILES:
     name = os.path.basename(f)[:-4]
     old = glob.glob(os.path.join('sprites', '*', name + '.png'))
-    im = key_magenta(Image.open(f))
+    im = KEYED[name]
+    if name in ANIM_OF:
+        U, T, size, group = ANIM_OF[name]; canvas = anim_fit(im, U, T, size)
+        os.makedirs(os.path.join(OUT, group), exist_ok=True)
+        dst = os.path.join(OUT, group, name + '@2x.png'); canvas.save(dst)
+        print('OK anim ', dst, '%dx%d' % canvas.size, 'из', '%dx%d' % im.size); done += 1; continue
     sb = bbox(im)
     if not sb: print('ПУСТО   ', name); continue
     art = im.crop(sb)
