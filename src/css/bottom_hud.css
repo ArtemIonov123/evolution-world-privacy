@@ -1,0 +1,64 @@
+/* ---- нижняя панель (арт GPT): кнопки окон в рамках, дуга скилов вокруг кнопки атаки ---- */
+body.bhud{--bh-r:max(8px,env(safe-area-inset-right,0px));--bh-l:max(8px,env(safe-area-inset-left,0px));--bh-b:calc(8px + env(safe-area-inset-bottom,0px));--atk:88px;--arc:128px}
+body.bhud .ctrl{position:absolute;inset:0;transform:none;display:block;pointer-events:none;z-index:3}
+body.bhud .ctrl>*{pointer-events:auto}
+body.bhud .round{background:var(--hud-round) center/100% 100% no-repeat;border:0;border-radius:50%;box-shadow:none;color:#ffd66b;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
+body.bhud .round svg{filter:drop-shadow(1px 1px 0 #1b1528)}
+body.bhud .round:active{transform:translateY(1px)}
+body.bhud #rotL,body.bhud #rotR{position:absolute;top:50%;width:48px;height:48px;opacity:.78;margin-top:-24px}
+body.bhud #rotL{left:var(--bh-l)} body.bhud #rotR{right:var(--bh-r)}
+body.bhud #rotL:active,body.bhud #rotR:active{transform:translateY(1px);opacity:1}
+body.bhud #chatBtn{position:absolute;left:var(--bh-l);bottom:calc(var(--bh-b) + 64px);width:50px;height:50px}
+body.bhud .round .dot{background:var(--hud-badge) center/100% 100% no-repeat;border:0;border-radius:0;min-width:22px;height:22px;top:-6px;right:-6px;padding:0;font-size:11px;line-height:22px;text-shadow:1px 1px 0 #6a0d0d;image-rendering:pixelated}
+body.bhud .hotbar{left:var(--bh-l);bottom:var(--bh-b);gap:4px}
+body.bhud .hb{width:52px;height:52px;background:#2b2340 var(--hud-slot) center/100% 100% no-repeat;border:0;box-shadow:none;image-rendering:pixelated}
+body.bhud .hb img{width:34px;height:34px}
+body.bhud .hb[aria-pressed="true"]{background-color:#4a3a6a;box-shadow:0 0 10px rgba(255,214,107,.55)}
+body.bhud .hb:active{transform:translateY(1px)}
+.skarc,.atkb{display:none}
+body.bhud .skarc{display:block;position:absolute;right:calc(var(--bh-r) + var(--atk)/2);bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2);width:var(--arc);height:var(--arc);
+  background:var(--hud-arc) center/100% 100% no-repeat;image-rendering:pixelated;pointer-events:none;z-index:2;opacity:.92}
+body.bhud .atkb{display:block;position:absolute;right:var(--bh-r);bottom:calc(var(--bh-b) + var(--lift,0px));width:var(--atk);height:var(--atk);padding:0;border:0;border-radius:50%;
+  background:var(--hud-atk) center/100% 100% no-repeat;image-rendering:pixelated;cursor:pointer;z-index:3;filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+body.bhud .atkb:active,body.bhud .atkb.press{background-image:var(--hud-atk-p);transform:translateY(1px)}
+body.bhud .atkb:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+body.bhud .skills{display:block;flex-direction:initial;position:absolute;right:calc(var(--bh-r) + var(--atk)/2);bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2);width:var(--arc);height:var(--arc);pointer-events:none;gap:0;z-index:3}
+body.bhud .skb{position:absolute;width:44px;height:44px;pointer-events:auto;background:#2b2340;border:0;box-shadow:none;overflow:visible}
+body.bhud .skb img{width:36px;height:36px;border-radius:50%}
+body.bhud .skb::before{content:"";position:absolute;inset:-2px;background:var(--hud-ring) center/100% 100% no-repeat;image-rendering:pixelated;z-index:2;pointer-events:none}
+body.bhud .skb::after{inset:4px;z-index:1}
+body.bhud .skb .sklv{z-index:3;bottom:-3px;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;font-size:10px}
+body.bhud .skb.active::before{filter:drop-shadow(0 0 4px #7cf07a)}
+body.bhud .win{z-index:9}
+body.bhud .toast{bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2 + var(--arc) + 10px)}
+body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2 + var(--arc) + 6px)}
+@media (max-width:720px){
+  body.bhud .chatbar{bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2 + var(--arc) + 8px)}
+  body.bhud .upd.pask{bottom:calc(var(--bh-b) + var(--lift,0px) + var(--atk)/2 + var(--arc) + 8px)}
+}
+/* узкие телефоны: кнопка атаки и дуга скилов поднимаются над рядом кнопок окон */
+@media (max-width:400px){
+  body.bhud{--atk:80px;--arc:122px;--lift:48px}
+  body.bhud .hb{width:46px;height:46px} body.bhud .hb img{width:31px;height:31px}
+  body.bhud .skb{width:42px;height:42px} body.bhud .skb img{width:34px;height:34px}
+  body.bhud #chatBtn{bottom:calc(var(--bh-b) + 56px);width:44px;height:44px}
+}
+@media (max-width:340px){
+  body.bhud{--atk:72px;--arc:112px;--lift:44px}
+  body.bhud .hb{width:42px;height:42px} body.bhud .hb img{width:28px;height:28px}
+  body.bhud .hotbar{gap:3px}
+  body.bhud .skb{width:38px;height:38px} body.bhud .skb img{width:30px;height:30px}
+}
+@media (max-height:500px) and (min-aspect-ratio:4/3){
+  body.bhud{--atk:76px;--arc:118px}
+  body.bhud #rotL,body.bhud #rotR{top:38%;width:44px;height:44px;margin-top:-22px}
+  body.bhud .hb{width:48px;height:48px} body.bhud .hb img{width:30px;height:30px}
+  body.bhud #chatBtn{bottom:calc(var(--bh-b) + 56px);width:44px;height:44px}
+  body.bhud .skb{width:40px;height:40px} body.bhud .skb img{width:32px;height:32px}
+  body.bhud .toast{bottom:calc(var(--bh-b) + 60px);left:50%;max-width:calc(100% - 420px)}
+  body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + 60px)}
+}
+body.bhud .firebtn{left:var(--bh-l);bottom:calc(var(--bh-b) + 122px);width:50px;height:50px}
+@media (max-width:400px){ body.bhud .firebtn{bottom:calc(var(--bh-b) + 106px);width:44px;height:44px} }
+@media (max-height:500px) and (min-aspect-ratio:4/3){ body.bhud .firebtn{bottom:calc(var(--bh-b) + 106px);width:44px;height:44px} }
+body.editing .firebtn{display:none!important}
