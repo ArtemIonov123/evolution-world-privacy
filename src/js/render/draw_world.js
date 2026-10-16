@@ -7,7 +7,9 @@ const dprNow=()=>window.devicePixelRatio||1;
 // Так между плитками не бывает щелей, и ничего не мерцает, когда камера едет.
 const buf=document.createElement("canvas"), bufCtx=buf.getContext("2d");
 let RS=1, ROX=0, ROY=0;
-const RENDER_SCALE=2;   // плотность буфера кадра (2 = поддержка картинок @2x)
+// плотность буфера кадра: столько точек экрана на один игровой пиксель (zoomK) — кадр собирается сразу в разрешении экрана,
+// поэтому картинки @2x/@4x показываются во всю свою детальность, а старые — чётко увеличиваются
+const renderScale=()=>Math.max(2,Math.min(8,zoomK|0));
 function worldTransform(){ctx.setTransform(RS,0,0,RS,ROX,ROY)}
 
 // порядок отрисовки: дальние клетки раньше; герой — после «своей» клетки

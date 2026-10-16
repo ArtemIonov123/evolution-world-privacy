@@ -1,4 +1,4 @@
-# Вставка картинок от GPT в игру в двойном качестве (@2x).
+# Вставка картинок от GPT в игру в повышенном качестве: блоки и предметы @2x, персонажи и звери @4x.
 #   python3 -I tools/import_art.py <папка с распакованными png> [--size 64x48] [--out sprites]
 #
 # Для каждого файла name.png ищет старую картинку sprites/<группа>/name.png и делает sprites/<группа>/name@2x.png:
@@ -20,7 +20,33 @@ def opt(name, default=None):
     return default
 SIZE = opt('--size'); GROUP = opt('--group'); OUT = opt('--out', 'sprites')
 src_dir = args[0]
-F = 2  # во сколько раз детальнее
+F = 2  # во сколько раз детальнее (меняется по группе, см. ниже)
+# персонажи и звери — в 4 раза детальнее (@4x): у GPT «пиксель» ~11 px, герой ~110 пикселей ростом —
+# @4x как раз сохраняет его родную детальность; блоки и предметы — @2x
+CHAR_GROUPS = {'hero', 'npc', 'animals'}
+def factor_for(group): return 4 if group in CHAR_GROUPS else 2
+
+import numpy as np
+def smart_resize(a, nw, nh):
+    """Сильное уменьшение пиксель-арта от GPT: берём середину каждой клетки (медиана 3×3 точек),
+    а не усредняем — так цвета остаются чистыми и контур не размывается. Небольшое — LANCZOS."""
+    a = a.convert('RGBA'); sw, sh = a.size
+    if sw / nw < 2.5 or sh / nh < 2.5:
+        return a.convert('RGBa').resize((nw, nh), Image.LANCZOS).convert('RGBA')
+    A = np.asarray(a)
+    offs = (0.3, 0.5, 0.7)
+    xs = np.array([[min(sw - 1, int((x + o) * sw / nw)) for o in offs] for x in range(nw)])
+    ys = np.array([[min(sh - 1, int((y + o) * sh / nh)) for o in offs] for y in range(nh)])
+    S = A[ys[:, :, None, None], xs[None, None, :, :]]          # nh,3,nw,3,4
+    S = S.transpose(0, 2, 1, 3, 4).reshape(nh, nw, 9, 4)
+    alpha = (S[..., 3] >= 128).sum(2) >= 5                     # большинство точек непрозрачны
+    rgb = np.zeros((nh, nw, 3), np.uint8)
+    for c in range(3):
+        v = S[..., c].astype(float); v[S[..., 3] < 128] = np.nan
+        with np.errstate(all='ignore'): m = np.nanmedian(v, axis=2)
+        rgb[..., c] = np.nan_to_num(m).astype(np.uint8)
+    out = np.dstack([rgb, alpha.astype(np.uint8) * 255])
+    return Image.fromarray(out, 'RGBA')
 
 def key_magenta(im):
     im = im.convert('RGBA'); px = im.load(); w, h = im.size
@@ -43,7 +69,7 @@ def fit(src, box_w, box_h):
         tw, th = box_w, box_h
     else:
         k = min(box_w / sw, box_h / sh); tw, th = max(1, round(sw * k)), max(1, round(sh * k))
-    out = src.convert('RGBa').resize((tw, th), Image.LANCZOS).convert('RGBA')
+    out = smart_resize(src, tw, th)
     a = out.getchannel('A').point(lambda v: 255 if v >= 128 else 0)
     out.putalpha(a); px = out.load()
     for y in range(th):
@@ -92,6 +118,11 @@ def block_fit(art):
     return out
 
 done = 0
+def save_out(group, name, canvas):
+    """name@Nx.png; старые варианты этой картинки с другим N удаляем, чтобы в сборку шёл один."""
+    d = os.path.join(OUT, group); os.makedirs(d, exist_ok=True)
+    for old in glob.glob(os.path.join(d, name + '@*x.png')): os.remove(old)
+    dst = os.path.join(d, '%s@%dx.png' % (name, F)); canvas.save(dst); return dst
 # --- кадры одной анимации (hero_ne_0..3): одинаковый масштаб и одна точка опоры (ноги), иначе герой «пульсирует» ---
 import re
 FILES = sorted(glob.glob(os.path.join(src_dir, '*.png')))
@@ -117,7 +148,7 @@ def anim_fit(im, U, T, size):
     W, H = size; uw, uh = U[2] - U[0], U[3] - U[1]
     tx, ty, tw, th = T[0] * F, T[1] * F, (T[2] - T[0]) * F, (T[3] - T[1]) * F
     k = min(tw / uw, th / uh); nw, nh = max(1, round(uw * k)), max(1, round(uh * k))
-    a = im.crop(U).convert('RGBa').resize((nw, nh), Image.LANCZOS).convert('RGBA')
+    a = smart_resize(im.crop(U), nw, nh)
     a.putalpha(a.getchannel('A').point(lambda v: 255 if v >= 128 else 0)); px = a.load()
     for y in range(nh):
         for x in range(nw):
@@ -131,19 +162,18 @@ for f in FILES:
     old = glob.glob(os.path.join('sprites', '*', name + '.png'))
     im = KEYED[name]
     if name in ANIM_OF:
-        U, T, size, group = ANIM_OF[name]; canvas = anim_fit(im, U, T, size)
-        os.makedirs(os.path.join(OUT, group), exist_ok=True)
-        dst = os.path.join(OUT, group, name + '@2x.png'); canvas.save(dst)
+        U, T, size, group = ANIM_OF[name]; F = factor_for(group); canvas = anim_fit(im, U, T, size)
+        dst = save_out(group, name, canvas)
         print('OK anim ', dst, '%dx%d' % canvas.size, 'из', '%dx%d' % im.size); done += 1; continue
     sb = bbox(im)
     if not sb: print('ПУСТО   ', name); continue
     art = im.crop(sb)
     if old:
-        group = os.path.basename(os.path.dirname(old[0])); tmpl = Image.open(old[0]).convert('RGBA')
+        group = os.path.basename(os.path.dirname(old[0])); F = factor_for(group); tmpl = Image.open(old[0]).convert('RGBA')
         W, H = tmpl.size; tb = bbox(tmpl) or (0, 0, W, H)
         bx, by, bw, bh = tb[0] * F, tb[1] * F, (tb[2] - tb[0]) * F, (tb[3] - tb[1]) * F
     elif SIZE and GROUP:
-        group = GROUP; W, H = map(int, SIZE.lower().split('x')); bx, by, bw, bh = 0, 0, W * F, H * F
+        group = GROUP; F = factor_for(group); W, H = map(int, SIZE.lower().split('x')); bx, by, bw, bh = 0, 0, W * F, H * F
     else:
         print('НЕТ МЕСТА', name, '— новое имя: укажи --size 64x48 --group props'); continue
     if name.startswith('block_') and (W, H) == (64, 48):
@@ -152,8 +182,7 @@ for f in FILES:
         out, tw, th = fit(art, bw, bh)
         canvas = Image.new('RGBA', (W * F, H * F), (0, 0, 0, 0))
         canvas.alpha_composite(out, (bx + (bw - tw) // 2, by + bh - th))      # по центру, низом к низу места
-    os.makedirs(os.path.join(OUT, group), exist_ok=True)
-    dst = os.path.join(OUT, group, name + '@2x.png'); canvas.save(dst)
+    dst = save_out(group, name, canvas)
     low = ' (мало деталей: прислан %dx%d, нужно хотя бы %dx%d)' % (art.size + (bw, bh)) if art.size[0] < bw * 0.9 else ''
     print('OK      ', dst, '%dx%d' % canvas.size, 'из', '%dx%d' % im.size + low); done += 1
 print('Готово:', done)

@@ -78,7 +78,7 @@ function render(now){
   assignEnts();
   const sky=SKY;
   // буфер в RS раз плотнее игровых пикселей: старые картинки увеличиваются чётко, HD (@2x) — рисуются во всю детальность
-  RS=RENDER_SCALE; const bw=(Math.ceil(r.width/scale)+3)*RS, bh=(Math.ceil(r.height/scale)+3)*RS;
+  RS=renderScale(); const bw=(Math.ceil(r.width/scale)+3)*RS, bh=(Math.ceil(r.height/scale)+3)*RS;
   if(buf.width!==bw||buf.height!==bh){buf.width=bw;buf.height=bh}
   // целая часть сдвига камеры — внутри буфера, дробная — при выводе на экран
   const offX=Math.floor(panX/scale)+1, offY=Math.floor(panY/scale)+1;

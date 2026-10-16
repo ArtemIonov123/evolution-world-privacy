@@ -16,7 +16,7 @@ function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.mi
 function hsl2rgb(h,s,l){h/=360;if(!s)return [l*255,l*255,l*255];const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;
   const f=t=>{t=(t+1)%1;return t<1/6?p+(q-p)*6*t:t<1/2?q:t<2/3?p+(q-p)*(2/3-t)*6:p;};return [f(h+1/3)*255,f(h)*255,f(h-1/3)*255];}
 function heroSprite(name,hueIdx){
-  const base=img[name]; const hue=PLAYER_HUES[hueIdx]; if(!base||hue===null||hue===undefined) return base;
+  const base=img[name]; const hue=PLAYER_HUES[hueIdx]; if(!base||hue===null||hue===undefined||base.__hd) return base;   // HD-картинки не перекрашиваем (иначе потеряют детальность)
   const key=name+"|"+hueIdx; if(tintCache[key]) return tintCache[key];
   const c=document.createElement("canvas"); c.width=base.width; c.height=base.height; const g=c.getContext("2d"); g.drawImage(base,0,0);
   const d=g.getImageData(0,0,c.width,c.height), a=d.data;

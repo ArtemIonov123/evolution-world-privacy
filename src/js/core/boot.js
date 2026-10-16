@@ -8,7 +8,7 @@ window.showGameError=(msg,where)=>{ try{ let el=document.getElementById("gameErr
 addEventListener("error",e=>showGameError(e.message,(e.filename?"строка "+e.lineno+":"+e.colno:"")+(e.error&&e.error.stack?"\n"+String(e.error.stack).split("\n").slice(1,3).join("\n"):"")));
 addEventListener("unhandledrejection",e=>showGameError(e.reason&&e.reason.message||e.reason,e.reason&&e.reason.stack?String(e.reason.stack).split("\n").slice(1,3).join("\n"):""));
 const SPRITES = /*SPRITES*/;
-const SPRITES_HD = new Set(/*SPRITES_HD*/[]);   // картинки в двойном качестве (name@2x.png)
+const SPRITES_HD = /*SPRITES_HD*/{};   // картинки в повышенном качестве: имя → во сколько раз детальнее (name@2x.png, name@4x.png)
 // зона: остров или пещера (общий данж). Пещера — отдельная карта; переход — перезагрузкой страницы
 const CMOBS={};   // свои мобы из админки (world/mobs)
 // свои острова/пещеры (список из админки, кэш браузера): id вида z<буквы/цифры>
