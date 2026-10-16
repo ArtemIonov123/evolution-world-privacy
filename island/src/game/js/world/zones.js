@@ -65,7 +65,10 @@ function drawLink(c){
   worldTransform(); ctx.imageSmoothingEnabled=false;
   const [px,py]=proj(c.x-MX,c.y-MY,c.L);
   const sprite=L.look==="cave"?img.cave_entrance:L.look==="ladder"?img.cave_exit:null;
-  if(sprite) ctx.drawImage(sprite,Math.round(px-sprite.width/2),Math.round(py-sprite.height+12));
+  const pf=L.look==="portal"&&img.link_portal_0&&img["link_portal_"+(Math.floor(T*6)%4)];   // 4 кадра от GPT: каменная арка с воронкой
+  if(pf) ctx.drawImage(pf,Math.round(px-pf.width/2),Math.round(py-78));
+  else if(sprite) ctx.drawImage(sprite,Math.round(px-sprite.width/2),Math.round(py-sprite.height+12));
+  else if(pf){}
   else if(L.look==="ladder"){ ctx.save(); ctx.globalAlpha=0.28+0.06*Math.sin(T*2); ctx.fillStyle="#fff2c8";
     ctx.beginPath(); ctx.moveTo(px-10,py-70); ctx.lineTo(px+10,py-70); ctx.lineTo(px+18,py+4); ctx.lineTo(px-18,py+4); ctx.closePath(); ctx.fill(); ctx.restore();
     ctx.fillStyle="#6a4422"; ctx.fillRect(Math.round(px-7),Math.round(py-62),2,64); ctx.fillRect(Math.round(px+5),Math.round(py-62),2,64); }
@@ -82,11 +85,11 @@ function drawLink(c){
   // подпись: куда ведёт
   const near=Math.hypot(hero.x-c.x,hero.y-c.y)<6||EDIT;
   if(near){ const txt="→ "+zoneName(L.to); ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
-    const yy=Math.round(py-(L.look==="portal"?46:58)); ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(px),yy); ctx.fillStyle="#ffe9a8"; ctx.fillText(txt,Math.round(px),yy); }
+    const yy=Math.round(py-(L.look==="portal"?(pf?58:46):58)); ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(px),yy); ctx.fillStyle="#ffe9a8"; ctx.fillText(txt,Math.round(px),yy); }
 }
 function pickLink(wx,wy){
   for(const [id,L] of Object.entries(LINKS)){ if(L.z!==ZONE) continue; const c=cellAt(L.x,L.y); if(!c||c.link!==id) continue;
-    const [fx,fy]=proj(c.x-MX,c.y-MY,c.L); if(Math.abs(wx-fx)<=20&&wy>=fy-(L.look==="portal"?44:56)&&wy<=fy+8) return c; }
+    const [fx,fy]=proj(c.x-MX,c.y-MY,c.L); if(Math.abs(wx-fx)<=22&&wy>=fy-(L.look==="portal"?(img.link_portal_0?56:44):56)&&wy<=fy+8) return c; }
   return null;
 }
 // редактор карты: поставить / убрать переход (сохраняется сразу)
