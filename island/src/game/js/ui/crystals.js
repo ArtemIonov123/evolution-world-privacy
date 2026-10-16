@@ -1,8 +1,9 @@
 // ---- кристаллы: обмен на золото и покупка за звёзды Telegram ----
 // Цены пакетов здесь только для показа — настоящую цену счёта ставит сервер (security/worker/src/index.js, PACKS).
 const CR_PACKS=[{id:"p1",cr:50,st:25},{id:"p2",cr:120,st:50},{id:"p3",cr:260,st:100},{id:"p4",cr:700,st:250},{id:"p5",cr:1500,st:500},{id:"p6",cr:3500,st:1000}];
-const CR_RATE=100;          // 1 кристалл = 100 золота
-let crEx=10, crMsg=null, crBusy=false;
+// обмен: только эти варианты (сервер тоже принимает только их)
+const CR_EX=[{cr:2,g:100},{cr:3,g:250},{cr:5,g:600}];
+let crAsk=null, crMsg=null, crBusy=false;
 const crServer=()=>String(window.__islandAuthUrl||"").replace(/\/$/,"");
 const crIcon=()=>{ try{ if(SPRITES.icon_crystal) return SPRITES.icon_crystal; }catch(e){}
   return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M8 0l6 5-6 11-6-11z" fill="#1b1528"/><path d="M8 1.5l4.6 3.8L8 13.8 3.4 5.3z" fill="#7a6cff"/><path d="M8 1.5l4.6 3.8H3.4z" fill="#b8a8ff"/><path d="M6 3h2v2H6z" fill="#fff"/></svg>'); };
@@ -12,26 +13,27 @@ async function crPost(path,body){
   let j={}; try{ j=await r.json(); }catch(e){} return {st:r.status,j};
 }
 function renderCrystals(body){
-  if(crEx>crystals) crEx=Math.max(1,crystals);
   // баланс
   const top=mkEl("div","crtop");
   const a=mkEl("span","crbal"); a.appendChild(crImg(crIcon())); a.appendChild(mkEl("b",null,shortNum(crystals))); top.appendChild(a);
   const g=mkEl("span","crbal gold"); g.appendChild(crImg(iconURL("coin"))); g.appendChild(mkEl("b",null,shortNum(inv.coin||0))); top.appendChild(g);
   body.appendChild(top);
-  // обмен
+  // обмен: кнопки на выбор → подтверждение
   const ex=mkEl("div","crbox"); ex.appendChild(mkEl("b","crh",tr("cr_ex_title")));
-  const rate=mkEl("p","crrate"); rate.appendChild(mkEl("span",null,"1")); rate.appendChild(crImg(crIcon())); rate.appendChild(mkEl("span",null,"= "+CR_RATE)); rate.appendChild(crImg(iconURL("coin"))); ex.appendChild(rate);
-  const row=mkEl("div","crrow");
-  const step=(t,fn)=>{ const b=mkEl("button","btn crstep",t); b.type="button"; b.onclick=()=>{ fn(); crMsg=null; renderWin(); }; return b; };
-  row.appendChild(step("−",()=>{ crEx=Math.max(1,crEx-(crEx>100?10:1)); }));
-  const inp=mkEl("input","crinp"); inp.type="number"; inp.min=1; inp.inputMode="numeric"; inp.value=crEx; inp.setAttribute("aria-label",tr("cr_ex_amount"));
-  inp.onchange=()=>{ crEx=Math.max(1,Math.min(Math.max(1,crystals),Math.floor(+inp.value)||1)); crMsg=null; renderWin(); }; row.appendChild(inp);
-  row.appendChild(step("+",()=>{ crEx=Math.min(Math.max(1,crystals),crEx+(crEx>=100?10:1)); }));
-  ex.appendChild(row);
-  const q=mkEl("div","crquick"); for(const v of [1,10,100]) q.appendChild(step(String(v),()=>{ crEx=Math.max(1,Math.min(v,crystals||1)); }));
-  q.appendChild(step(tr("cr_all"),()=>{ crEx=Math.max(1,crystals); })); ex.appendChild(q);
-  const res=mkEl("p","crres"); res.appendChild(document.createTextNode(tr("cr_you_get")+" ")); res.appendChild(crImg(iconURL("coin"))); res.appendChild(mkEl("b",null,(crEx*CR_RATE).toLocaleString("ru-RU"))); ex.appendChild(res);
-  const go=mkEl("button","btn bagbtn big crgo",tr(crBusy?"cr_wait":"cr_ex_btn")); go.type="button"; go.disabled=crBusy||crystals<1||crEx>crystals; go.onclick=()=>crExchange(crEx); ex.appendChild(go);
+  if(crAsk){ const o=crAsk, cf=mkEl("div","crconf");
+    const ln=mkEl("p","crres"); ln.appendChild(document.createTextNode(tr("cr_ex_ask")+" ")); ln.appendChild(mkEl("b","crv",String(o.cr))); ln.appendChild(crImg(crIcon()));
+    ln.appendChild(document.createTextNode(" \u2192 ")); ln.appendChild(mkEl("b",null,o.g.toLocaleString("ru-RU"))); ln.appendChild(crImg(iconURL("coin"))); ln.appendChild(document.createTextNode("?")); cf.appendChild(ln);
+    const bt=mkEl("div","crconfb");
+    const y=mkEl("button","btn bagbtn big",tr(crBusy?"cr_wait":"cr_yes")); y.type="button"; y.disabled=crBusy; y.onclick=()=>crExchange(o); bt.appendChild(y);
+    const n=mkEl("button","btn bagbtn",tr("cr_no")); n.type="button"; n.disabled=crBusy; n.onclick=()=>{ crAsk=null; renderWin(); }; bt.appendChild(n);
+    cf.appendChild(bt); ex.appendChild(cf);
+  } else { const g=mkEl("div","crexs");
+    for(const o of CR_EX){ const b=mkEl("button","btn crex"); b.type="button"; b.disabled=crystals<o.cr;
+      const t=mkEl("span","crexl"); t.appendChild(mkEl("b","crv",String(o.cr))); t.appendChild(crImg(crIcon())); b.appendChild(t);
+      b.appendChild(mkEl("span","crarr","\u25BC"));
+      const r=mkEl("span","crexl"); r.appendChild(mkEl("b",null,o.g.toLocaleString("ru-RU"))); r.appendChild(crImg(iconURL("coin"))); b.appendChild(r);
+      b.onclick=()=>{ crAsk=o; crMsg=null; renderWin(); }; g.appendChild(b); }
+    ex.appendChild(g); }
   if(crMsg&&crMsg[1]==="ex") ex.appendChild(mkEl("p","crmsg "+crMsg[2],tr(crMsg[0],crMsg[3])));
   body.appendChild(ex);
   // покупка
@@ -46,9 +48,10 @@ function renderCrystals(body){
   by.appendChild(mkEl("p","adnote",tr("cr_buy_note")));
   body.appendChild(by);
 }
-async function crExchange(n){
-  n=Math.floor(n); if(crBusy||n<1||n>crystals) return;
-  const gold=n*CR_RATE;
+async function crExchange(o){
+  if(crBusy||!o||!CR_EX.includes(o)) return;
+  const n=o.cr, gold=o.g;
+  if(n>crystals){ crAsk=null; crMsg=["cr_ex_no","ex","bad"]; renderWin(); return; }
   if(secureOn()&&crServer()){   // защищённый режим: кристаллы списывает только сервер
     crBusy=true; renderWin();
     try{ const r=await crPost("/exchange",{n}); crBusy=false;
@@ -60,7 +63,7 @@ async function crExchange(n){
     if(NET.db&&NET.myId) NET.db.doc("wallet/"+NET.myId).set({cr:crystals}).catch(()=>{});
     crMsg=["cr_ex_ok","ex","ok",{n,g:gold}];
   }
-  savedCr=crystals; renderInv(); saveNow(); if(winKind==="crystals") renderWin();
+  crAsk=null; savedCr=crystals; renderInv(); saveNow(); if(winKind==="crystals") renderWin();
 }
 async function crBuy(p){
   if(crBusy) return;

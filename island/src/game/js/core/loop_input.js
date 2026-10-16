@@ -170,7 +170,7 @@ loadAll.then(()=>{
     if(TOUCH){ const once=e=>{ if(e.target.closest&&e.target.closest("#nickWrap,#fsBtn")) return; document.removeEventListener("pointerup",once,true); goFull(); };
       document.addEventListener("pointerup",once,true); } }
   initUpdates(); applyHudArt();
-  document.getElementById("crPlus").onclick=()=>{ crMsg=null; openWin("crystals"); };
+  document.getElementById("crPlus").onclick=()=>{ crMsg=null; crAsk=null; openWin("crystals"); };
   document.getElementById("hudFace").onclick=()=>{ if(winKind==="hero") closeWin(); else openWin("hero"); }; renderSkills();
   document.getElementById("partyYes").onclick=acceptInvite; document.getElementById("partyNo").onclick=declineInvite;
   const chatbar=document.getElementById("chatbar"), chatIn=document.getElementById("chatIn");

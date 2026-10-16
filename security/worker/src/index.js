@@ -100,6 +100,8 @@ const PAID = { ru: (n, c) => `💎 +${n} кристаллов! Теперь у �
 const SUPPORT = { ru: "Вопросы по оплате: напиши сюда, в этот чат, — ответим. Кристаллы приходят в игру сразу; если не пришли — пришли номер платежа.",
   pl: "Pytania o płatność: napisz tutaj, w tym czacie. Kryształy przychodzą od razu; jeśli nie — wyślij numer płatności.",
   en: "Payment questions: write here in this chat. Crystals arrive instantly; if not, send the payment ID." };
+// обмен на золото: сколько кристаллов можно списать за раз (2→100, 3→250, 5→600 золота — золото начисляет игра)
+export const EXCHANGE = [2, 3, 5];
 // payload счёта: "<tgId>|<pack>" — проверяем, что пакет и сумма совпадают
 export function checkPay(payload, fromId, currency, amount) {
   const m = /^(\d{3,15})\|(p\d)$/.exec(String(payload || "")); if (!m) return null;
@@ -158,7 +160,7 @@ export default {
         if (!r.ok) return json({ error: "tg" }, 502, h);
         return json({ link: r.result }, 200, h);
       }
-      const n = Math.floor(+b.n); if (!(n >= 1 && n <= 1e6)) return json({ error: "n" }, 400, h);
+      const n = +b.n; if (!EXCHANGE.includes(n)) return json({ error: "n" }, 400, h);
       try { const cr = await walletAdd(env, u.id, -n); if (cr === null) return json({ error: "no_crystals" }, 409, h); return json({ ok: true, cr, n }, 200, h); }
       catch (e) { console.error(e); return json({ error: "db" }, 502, h); }
     }

@@ -8,8 +8,8 @@ const r=await p.evaluate(async()=>{ if(!heroClass) setClass('warrior'); const c=
   window.__islandAuthUrl="https://srv.test"; window.__islandAuth={ok:true,uid:NET.myId};
   const calls=[]; window.fetch=async(u,o)=>{ calls.push([u,JSON.parse(o.body)]); const pth=u.split("/").pop();
     if(pth==="invoice") return new Response(JSON.stringify({link:"https://t.me/$x"}));
-    if(pth==="exchange") return new Response(JSON.stringify({ok:true,cr:3,n:7})); };
-  crystals=10; inv.coin=0; openWin("crystals"); crEx=7; await crExchange(7);
+    if(pth==="exchange") return new Response(JSON.stringify({ok:true,cr:5,n:5})); };
+  crystals=10; inv.coin=0; openWin("crystals"); await crExchange(CR_EX[2]);
   const ex={crystals,coin:inv.coin};
   await crBuy(CR_PACKS[2]); await new Promise(r=>setTimeout(r,200));
   return {ex,calls:calls.map(c=>[c[0],c[1].n||c[1].pack]),inv:window.__inv,msg:[...document.querySelectorAll('.crmsg')].map(x=>x.textContent)}; });

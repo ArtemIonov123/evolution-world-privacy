@@ -71,8 +71,10 @@ const paid = { message: { chat: { id: 777001 }, from: { id: 777001, language_cod
 r = await hook(paid); ok(r.status === 200 && crOf() === 120, "оплата прошла: +120 кристаллов");
 r = await hook(paid); ok(crOf() === 120, "повтор того же платежа не начисляет второй раз");
 ok(DB["pay/ch_1"] && DB["pay/ch_1"].done === true && DB["pay/ch_1"].tg === "777001", "платёж записан (вне мира, игрокам не виден)");
-r = await post("/exchange", { init: other, n: 20 }); j = await r.json();
-ok(r.status === 200 && j.cr === 100 && crOf() === 100, "/exchange: списано 20 кристаллов");
-r = await post("/exchange", { init: other, n: 500 }); ok(r.status === 409 && crOf() === 100, "/exchange: больше, чем есть — отказ");
-r = await post("/exchange", { init: other, n: -5 }); ok(r.status === 400 && crOf() === 100, "/exchange: отрицательное число — отказ");
+r = await post("/exchange", { init: other, n: 5 }); j = await r.json();
+ok(r.status === 200 && j.cr === 115 && crOf() === 115, "/exchange: списано 5 кристаллов");
+r = await post("/exchange", { init: other, n: 20 }); ok(r.status === 400 && crOf() === 115, "/exchange: не из списка (20) — отказ");
+r = await post("/exchange", { init: other, n: -5 }); ok(r.status === 400 && crOf() === 115, "/exchange: отрицательное число — отказ");
+DB[W] = { j: JSON.stringify({ cr: 1 }) };
+r = await post("/exchange", { init: other, n: 2 }); ok(r.status === 409 && crOf() === 1, "/exchange: больше, чем есть — отказ");
 console.log(fail ? `\n${fail} FAILED` : "\nALL PASSED"); process.exit(fail ? 1 : 0);
