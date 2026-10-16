@@ -58,3 +58,7 @@ body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + var(--lift,0px) 
   body.bhud .toast{bottom:calc(var(--bh-b) + 60px);left:50%;max-width:calc(100% - 420px)}
   body.bhud .actions,body.bhud .fishbar{bottom:calc(var(--bh-b) + 60px)}
 }
+body.bhud .firebtn{left:var(--bh-l);bottom:calc(var(--bh-b) + 122px);width:50px;height:50px}
+@media (max-width:400px){ body.bhud .firebtn{bottom:calc(var(--bh-b) + 106px);width:44px;height:44px} }
+@media (max-height:500px) and (min-aspect-ratio:4/3){ body.bhud .firebtn{bottom:calc(var(--bh-b) + 106px);width:44px;height:44px} }
+body.editing .firebtn{display:none!important}

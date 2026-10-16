@@ -116,7 +116,7 @@ function syncActions(){
   const canBuild=(inv.wood||0)>=FIRE_COST&&!placing&&!fishing&&!dialogOpen&&!building&&fires.filter(f=>f.fuel>0).length<3;
   const st=(placing?"p":"")+(canBuild?"b":"");
   if(st===actState) return; actState=st;
-  document.getElementById("actions").hidden=!st;
+  document.getElementById("actions").hidden=!placing;
   document.getElementById("buildFire").hidden=!canBuild;
   document.getElementById("cancelPlace").hidden=!placing;
 }
