@@ -66,6 +66,14 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .hplus{width:20px;height:20px;margin-right:-4px;padding:0;border:2px solid var(--edge);background:#ffd66b;color:#1b1528;font:700 14px/14px var(--f-body);cursor:pointer}
 .hplus:active{transform:translateY(1px)}
 .hp{display:none!important}
+.hface.art{border:0;box-shadow:none;background:radial-gradient(circle,#4a3c70 55%,transparent 56%);width:58px;height:58px}
+.hface.art canvas{position:absolute;left:9px;top:9px;width:40px;height:40px}
+.hface .hframe{position:absolute;left:-1px;top:-1px;width:60px;height:60px;image-rendering:pixelated;pointer-events:none}
+.hface b.art{border:0;background:center/100% 100% no-repeat;width:22px;height:22px;min-width:0;padding:0;line-height:22px;right:-4px;bottom:-3px;z-index:1;text-shadow:1px 1px 0 #1b1528}
+.hpill img{width:20px;height:20px;image-rendering:pixelated}
+.hplus.art{border:0;background:center/100% 100% no-repeat;width:24px;height:24px;image-rendering:pixelated}
+#menuBtn.art{background:none;border:0;box-shadow:none;padding:0;min-width:0}
+#menuBtn.art img{width:44px;height:44px;image-rendering:pixelated;display:block}
 
 /* сцена */
 .stage{position:relative;flex:1;min-height:0}
@@ -355,6 +363,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 @media (max-width:720px){
   .hud{gap:7px}
   .hface{width:46px;height:46px} .hface canvas{width:40px;height:40px}
+  .hface.art{width:52px;height:52px} .hface.art canvas{left:8px;top:8px;width:36px;height:36px} .hface .hframe{width:54px;height:54px}
   .hpill{min-width:70px}
   .toast{bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:13px;padding:5px 10px;left:max(10px,env(safe-area-inset-left,0px));transform:none;max-width:calc(100% - 140px)}
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:52px;padding:6px 8px}
@@ -384,6 +393,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .bar{padding-block:3px}
   .btn{min-height:30px;padding:4px 8px}
   .hface{width:40px;height:40px} .hface canvas{width:34px;height:34px}
+  .hface.art{width:44px;height:44px} .hface.art canvas{left:7px;top:7px;width:30px;height:30px} .hface .hframe{width:46px;height:46px} #menuBtn.art img{width:36px;height:36px}
   .hmid{flex-direction:row;align-items:center;gap:8px} .hrow{flex:none;max-width:130px} .hbar{flex:1}
   .hcur{flex-direction:row}
   .menu .btn{min-height:36px}
@@ -2586,6 +2596,16 @@ function spriteBox(sp){ if(spriteBoxCache.has(sp)) return spriteBoxCache.get(sp)
   let s=0,c=0; for(let y=y0;y<Math.min(sp.height,y0+12);y++)for(let x=0;x<sp.width;x++) if(d[(y*sp.width+x)*4+3]>128){ s+=x; c++; }
   const r={x:x0,y:Math.max(0,y0-1),w:x1-x0+1,cx:c?s/c:(x0+x1)/2}; spriteBoxCache.set(sp,r); return r; }
 setInterval(()=>{ try{ updateHud(); }catch(e){} },400);
+// нарисованные детали панели (если есть картинки от GPT)
+function applyHudArt(){
+  if(typeof SPRITES==="undefined") return; const S=SPRITES;
+  const face=document.getElementById("hudFace");
+  if(S.hud_portrait_frame&&face&&!face.querySelector(".hframe")){ const f=document.createElement("img"); f.className="hframe"; f.src=S.hud_portrait_frame; f.alt=""; face.appendChild(f); face.classList.add("art"); }
+  if(S.hud_level_badge){ const b=document.getElementById("hudLv"); b.style.backgroundImage=`url(${S.hud_level_badge})`; b.classList.add("art"); }
+  if(S.icon_crystal){ const cr=document.getElementById("hudCr"), sv=cr.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.icon_crystal; i.alt=""; i.width=i.height=20; sv.replaceWith(i); } }
+  if(S.hud_btn_plus){ const p=document.getElementById("crPlus"); p.style.backgroundImage=`url(${S.hud_btn_plus})`; p.classList.add("art"); p.textContent=""; }
+  if(S.hud_btn_menu){ const m=document.getElementById("menuBtn"), sv=m.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.hud_btn_menu; i.alt=""; i.width=i.height=40; sv.replaceWith(i); m.classList.add("art"); } }
+}
 function renderHP(){
   try{ updateHud(); }catch(e){}
   const el=document.getElementById("hp"); let h="";
@@ -4884,7 +4904,7 @@ loadAll.then(()=>{
     document.addEventListener("fullscreenchange",syncFs); document.addEventListener("webkitfullscreenchange",syncFs);
     if(TOUCH){ const once=e=>{ if(e.target.closest&&e.target.closest("#nickWrap,#fsBtn")) return; document.removeEventListener("pointerup",once,true); goFull(); };
       document.addEventListener("pointerup",once,true); } }
-  initUpdates();
+  initUpdates(); applyHudArt();
   document.getElementById("crPlus").onclick=()=>say("cr_soon","cr_soon_sub");
   document.getElementById("hudFace").onclick=()=>{ if(winKind==="hero") closeWin(); else openWin("hero"); }; renderSkills();
   document.getElementById("partyYes").onclick=acceptInvite; document.getElementById("partyNo").onclick=declineInvite;
