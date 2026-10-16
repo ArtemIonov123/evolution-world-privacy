@@ -29,7 +29,7 @@ function updateAnimals(dt){
     for(const p of P){ if(p.hp<=0||(p.fw&&a&&a.kind==="wolf")) continue; const dd=Math.hypot(p.x-x,p.y-y); if(p.tn&&dd<4) return [p,dd]; if(dd<bd){bd=dd;b=p;} } return [b,bd]; };
   const farFromAll=(c,r)=>P.every(p=>Math.hypot(c.x-p.x,c.y-p.y)>r);
   spawnT-=dt;
-  if(spawnT<=0){ spawnT=1;
+  if(spawnT<=0){ spawnT=1; customBossSpawn(farFromAll);
     if(CAVE) caveSpawn(farFromAll); else {
     const hares=animals.filter(a=>a.kind==="hare"&&!a.leaving), wolves=animals.filter(a=>a.kind==="wolf"&&!a.leaving&&!(a.dying>0));
     if(day){ if(hares.length<3){ const z=zonePick("hare",c=>freeCell(c)&&farFromAll(c,4)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&GRASSY.includes(c.t)&&farFromAll(c,5)); if(c) spawnAnimal("hare",c); }
@@ -55,7 +55,7 @@ function updateAnimals(dt){
     if(a.leaving){ if(!a.path.length) a.alpha-=dt*1.2; if(a.alpha<=0&&!a.path.length){ animals.splice(i,1); continue; } }
     else a.alpha=Math.min(1,a.alpha+dt*0.8);
     if(a.bleedT>0){ a.bleedT-=dt; a.bleedTick=(a.bleedTick||0)+dt; if(a.bleedTick>=1){ a.bleedTick=0; applyHit(a,a.bleedBy,a.x,a.y,1); if(a.dying>0) continue; } }
-    if(a.stunT>0){ a.stunT-=dt; a.path=[]; a.moving=false; a.lunge=0; if(a.kind==="golem") a.slamT=0; continue; }
+    if(a.stunT>0){ a.stunT-=dt; a.path=[]; a.moving=false; a.lunge=0; if(isBossA(a)) a.slamT=0; continue; }
     a.think-=dt; a.howlT=Math.max(0,a.howlT-dt); a.lunge=Math.max(0,a.lunge-dt);
     const [tp,dh]=nearestP(a.x,a.y,a);
     if(a.kind==="hare"&&!a.leaving){
@@ -87,6 +87,7 @@ function updateAnimals(dt){
       } else if(a.state!=="wander"||(a.think<=0&&!a.path.length)){ a.state="wander"; a.think=3+Math.random()*3; setPath(a,fleeCell(a,a.x,a.y,2,4)); a.speed=1.3; }
     }
     if(a.kind==="spider"){ updateSpider(a,dt,tp,dh); moveAnimal(a,dt); continue; }
+    if(CMOBS[a.kind]&&CMOBS[a.kind].boss){ updateCBoss(a,dt,tp,dh,P); moveAnimal(a,dt); continue; }
     if(CMOBS[a.kind]){ if(!a.leaving) updateCMob(a,dt,tp,dh,night); moveAnimal(a,dt); continue; }
     if(a.kind==="golem"){ updateGolem(a,dt,tp,dh,P); moveAnimal(a,dt); continue; }
     if(a.kind==="bat"){ if(a.aggro&&(!tp||dh>8)) a.aggro=false; updateBat(a,dt,tp,dh); continue; }

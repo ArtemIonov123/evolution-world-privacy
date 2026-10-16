@@ -83,18 +83,18 @@ function dealHit(a,dmg,crit,o={}){
 // урон зверю — считает только хозяин зверей (или одиночная игра)
 function applyHit(a,peer,fromX,fromY,dmg=1,crit=false,o={}){
   if(a.dying>0) return;
-  if(o.stun) a.stunT=Math.max(a.stunT||0,a.kind==="golem"?o.stun/2:o.stun);
+  if(o.stun) a.stunT=Math.max(a.stunT||0,isBossA(a)?o.stun/2:o.stun);
   if(o.bleed){ a.bleedT=3; a.bleedBy=peer; }
   a.hp=(a.hp??mobHp(a.kind))-dmg; a.hurtT=0.3; a.lunge=0;
   hitFx.push({x:a.x,y:a.y,z:a.z,t:0,txt:"-"+dmg+(crit?"!":""),col:crit?"#ff8a2a":"#ffd66b"});
   (a.hitters||(a.hitters=new Set())).add(peer||"me");
-  if(a.kind!=="golem"){
+  if(!isBossA(a)){
     const dx=a.x-fromX, dy=a.y-fromY, dd=Math.hypot(dx,dy)||1, nx=a.x+dx/dd*0.4, ny=a.y+dy/dd*0.4, c=cellAt(Math.round(nx),Math.round(ny));
     if(c&&!c.blocked&&Math.abs(walkZ(c)-a.z)<1.2){ a.x=nx; a.y=ny; }
     a.path=[]; a.state="chase"; a.attackT=Math.max(a.attackT,0.25); }
   a.aggro=true; a.aggroT=0; a.think=0.2;
-  if(a.hp<=0&&a.kind==="golem"){ a.dying=3; a.path=[]; a.slamT=0; bossDeadAt=Date.now();
-    if(NET.db) NET.db.doc("world/cave_boss").set({dead:bossDeadAt}).catch(()=>{});
+  if(a.hp<=0&&isBossA(a)){ a.dying=3; a.path=[]; a.slamT=0;
+    if(a.kind==="golem"){ bossDeadAt=Date.now(); if(NET.db) NET.db.doc("world/cave_boss").set({dead:bossDeadAt}).catch(()=>{}); } else customBossKilled(a);
     for(const pr of a.hitters){ if(!NET.room||pr===NET.myPeer||pr==="me") giveLoot(a); else { kills.push({i:a.nid,p:pr,s:++killSeq,k:a.kind}); if(kills.length>6) kills.shift(); } }
     return; }
   if(a.hp<=0){ a.dying=2.4; a.path=[]; a.howlT=0;
@@ -109,6 +109,7 @@ function giveLoot(a){
   if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; }
   else if(kind==="spider"){ say("spider_killed","bat_killed_sub"); prog.st.spiders=(prog.st.spiders||0)+1; }
   else if(kind==="golem"){ say("boss_killed","boss_killed_sub"); prog.st.bosses=(prog.st.bosses||0)+1; }
+  else if(CMOBS[kind]&&CMOBS[kind].boss){ say("boss_killed2","boss_killed_sub",{m:LANG==="ru"?CMOBS[kind].ru:CMOBS[kind].pl}); prog.st.bosses=(prog.st.bosses||0)+1; }
   else if(CMOBS[kind]){ say("mob_killed","bat_killed_sub",{m:LANG==="ru"?CMOBS[kind].ru:CMOBS[kind].pl}); prog.st.mobs=(prog.st.mobs||0)+1; }
   else { say("wolf_killed","wolf_killed_sub"); prog.st.wolves++; }
   addXP(xpOf(kind),"fight");

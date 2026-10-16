@@ -22,7 +22,7 @@ function mbSanitize(id,o){
 let mobsRaw={};
 function applyMobs(d){
   const list=d&&d.list&&typeof d.list==="object"?d.list:{}; mobsRaw={};
-  for(const k of Object.keys(CMOBS)){ const i=MOBS.indexOf(k); if(i>=0) MOBS.splice(i,1); delete I18N.ru["ed_src_"+k]; delete I18N.pl["ed_src_"+k]; delete CMOBS[k]; }
+  for(const k of Object.keys(CMOBS)){ if(CMOBS[k].boss) continue; const i=MOBS.indexOf(k); if(i>=0) MOBS.splice(i,1); delete I18N.ru["ed_src_"+k]; delete I18N.pl["ed_src_"+k]; delete CMOBS[k]; }
   mobTintCache.clear();
   for(const [id,o] of Object.entries(list).slice(0,60)){ const m=mbSanitize(id,o); if(!m) continue;
     CMOBS[id]=m; mobsRaw[id]=m; MOBS.push(id); I18N.ru["ed_src_"+id]=m.ru; I18N.pl["ed_src_"+id]=m.pl;

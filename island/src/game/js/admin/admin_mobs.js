@@ -9,7 +9,7 @@ function renderAdminMobs(body){
   const nb=adBtn(tr("mb_new"),()=>{ mbSel=mbRid(); mbDelAsk=false; adMsg="";
     mbDraft={id:mbSel,ru:"",pl:"",b:"wolf",hue:0,sz:100,zn:CAVE?"cave":"island",ai:"night",hp:6,dmg:1,spd:2,range:5,xp:15,d:1,dn:2,n:1,nn:3,cn:3,isNew:true}; renderWin(); },"big");
   nb.style.width="100%"; nb.style.marginBottom="8px"; body.appendChild(nb);
-  const ids=Object.keys(CMOBS);
+  const ids=Object.keys(CMOBS).filter(k=>!CMOBS[k].boss);
   body.appendChild(mkEl("b","sub",tr("mb_custom")));
   if(!ids.length) body.appendChild(mkEl("p","muted",tr("mb_none")));
   const l=mkEl("div","pllist");
@@ -28,7 +28,7 @@ function renderAdminMobs(body){
     nm.appendChild(mkEl("small",null,"HP "+mobHp(k)+" \u00B7 "+tr("mb_dmg").split(" ")[0]+" "+(CFG.mobDmg[k]||1)+" \u00B7 "+xpOf(k)+" XP"+t)); b.appendChild(nm);
     b.onclick=()=>{ mbSel="b:"+k; adMsg=""; mbDraft={id:k,builtin:true,hp:mobHp(k),dmg:CFG.mobDmg[k]||1,spd:CFG.mobSpd[k]||2,xp:xpOf(k)??0,d:mobT(k,"d")?1:0,dn:mobCount(k,"d"),n:mobT(k,"n")?1:0,nn:mobCount(k,"n")}; renderWin(); }; l2.appendChild(b); }
   body.appendChild(l2);
-  body.appendChild(mkEl("p","adnote",tr("mb_boss_later")));
+
 }
 function renderBuiltinMob(body){
   const E=mbDraft, k=E.id;

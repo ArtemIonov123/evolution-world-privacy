@@ -38,7 +38,7 @@ function renderWin(){
   if(!winKind) return;
   document.getElementById("winTitle").textContent=tr("win_"+winKind);
   const body=document.getElementById("winBody"); body.textContent="";
-  if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else
+  if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else if(winKind==="admin_bosses") renderAdminBosses(body); else
   if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
 }
 function renderBag(body){

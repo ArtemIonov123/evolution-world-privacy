@@ -106,6 +106,9 @@ async function initNet(){
     db.doc("world/items").onSnapshot(s=>applyItems(s.exists?s.data():null),()=>{});
     try{ const s=await db.doc("world/mobs").get(); applyMobs(s.exists?s.data():null); }catch(e){}
     db.doc("world/mobs").onSnapshot(s=>applyMobs(s.exists?s.data():null),()=>{});
+    try{ const s=await db.doc("world/bosses").get(); applyBosses(s.exists?s.data():null); }catch(e){}
+    db.doc("world/bosses").onSnapshot(s=>applyBosses(s.exists?s.data():null),()=>{});
+    db.doc("world/boss_dead").onSnapshot(s=>applyBossDead(s.exists?s.data():null),()=>{});
     if(NET.myId) await loadSave();
     classLoaded=true;
     if(NET.myId){

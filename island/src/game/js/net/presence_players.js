@@ -15,7 +15,7 @@ function sendPresence(now){
   const p={v:1,x:+hero.x.toFixed(2),y:+hero.y.toFixed(2),z:+hero.z.toFixed(2),f:convF(hero.facing,quarter(),0),m:hero.moving?1:0,c:myHueIdx,hp:hero.hp,
     id:NET.myId,n:myNick,act:myAct(),chat:myChat,zn:ZONE,hm:HP_MAX,cl:heroClass,fm:form?form[0]:null,sh:shieldT>0?1:0,hl:healOut.length?healOut.slice(-6):null,pj:partyLead,pk:myPartyKey(),pd:myDisband&&Date.now()-myDisband<60000?myDisband:0,kk:myKicks.length?myKicks.map(k=>k.u):null,inv:myInvite&&Date.now()-myInvite.ts<30000?myInvite:null,xs:NET.host&&xsList.length?xsList.slice(-8):null,hurt:hero.hurtAt||0,an:null,bt:null,ak:hero.atk?1:0,ht:myHits.length?myHits.slice(-6):null,kl:null,lv:heroLevel(),afk:isAfk()?1:0};
   if(NET.host&&remotes.size){
-    p.an=animals.filter(a=>!a.dead).slice(0,16).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||(CMOBS[a.kind]?a.kind:"h"),sn:a.stunT>0?1:0,tg:a.slamT>0?+a.slamT.toFixed(2):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
+    p.an=animals.filter(a=>!a.dead).slice(0,16).map(a=>({i:a.nid,k:KIND_CODE[a.kind]||(CMOBS[a.kind]?a.kind:"h"),sn:a.stunT>0?1:0,tg:a.slamT>0?+a.slamT.toFixed(2):0,rg:a.rage?1:0,sr:a.slamR?+a.slamR.toFixed(1):0,fy:+(a.fly||0).toFixed(2),x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),
       f:convF(a.facing,quarter(),0),m:a.moving?1:0,a:+a.alpha.toFixed(2),l:a.lunge>0?1:0,h:a.howlT>0?1:0,lv:a.leaving?1:0,hp:a.hp??mobHp(a.kind),hu:a.hurtT>0?1:0,dy:a.dying>0?1:0}));
     p.bt=bites.slice(-6); p.kl=kills.length?kills.slice(-6):null;
   }
@@ -89,10 +89,10 @@ function mirrorAnimals(h,dt){
     a.alpha+=(num(e.a,0,1,1)-a.alpha)*Math.min(1,dt*6); a.leaving=e.lv===1;
     if(e.l===1&&a.lunge<=0){ a.lunge=0.25; }
     if(e.h===1) a.howlT=Math.max(a.howlT,0.5);
-    a.hp=num(e.hp,0,999,mobHp(a.kind)); if(a.kind==="bat") a.fly=num(e.fy,0,6,1.5); if(e.hu===1) a.hurtT=Math.max(a.hurtT||0,0.12);
+    a.hp=num(e.hp,0,99999,mobHp(a.kind)); if(a.kind==="bat") a.fly=num(e.fy,0,6,1.5); if(e.hu===1) a.hurtT=Math.max(a.hurtT||0,0.12);
     if(e.dy===1){ if(!(a.dying>0)) a.dying=2.4; } else a.dying=0;
     a.stunT=e.sn===1?Math.max(a.stunT||0,0.25):0;
-    if(a.kind==="golem"){ const tg=num(e.tg,0,3,0); if(a.slamT>0&&tg<=0) a.slamFx=0.5; a.slamT=tg; }
+    if(isBossA(a)){ const tg=num(e.tg,0,3,0); if(a.slamT>0&&tg<=0) a.slamFx=0.5; a.slamT=tg; a.rage=e.rg===1; if(e.sr) a.slamR=num(e.sr,1,5,2.3); }
   }
   for(let i=animals.length-1;i>=0;i--){ const a=animals[i]; if(!ids.has(a.nid)) animals.splice(i,1); }
   const k=Math.min(1,dt*8);
@@ -119,7 +119,7 @@ function playersForAI(){
   return L;
 }
 function biteTarget(tp,a,n=1){
-  if(a&&!CMOBS[a.kind]&&a.kind!=="golem"&&CFG.mobDmg&&CFG.mobDmg[a.kind]>0) n=CFG.mobDmg[a.kind];
+  if(a&&!CMOBS[a.kind]&&!isBossA(a)&&CFG.mobDmg&&CFG.mobDmg[a.kind]>0) n=CFG.mobDmg[a.kind];
   if(tp.me){ hurtHero(n,a); return; }
   biteSeq++; bites.push({p:tp.peer,s:biteSeq,n}); if(bites.length>6) bites.shift();
 }

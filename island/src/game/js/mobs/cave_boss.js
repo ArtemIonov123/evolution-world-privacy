@@ -46,7 +46,7 @@ function updateGolem(a,dt,tp,dh,P){
   const max=mobHp("golem"); a.speed=1.0; a.slamCd=(a.slamCd??4)-dt; a.slamFx=Math.max(0,(a.slamFx||0)-dt);
   if(a.slamT>0){ a.path=[]; a.slamT-=dt;
     if(a.slamT<=0){ a.slamT=0; a.slamFx=0.5;
-      for(const p of P) if(p.hp>0&&Math.hypot(p.x-a.x,p.y-a.y)<GOLEM_SLAM_R) biteTarget(p,a,2);
+      for(const p of P) if(p.hp>0&&Math.hypot(p.x-a.x,p.y-a.y)<GOLEM_SLAM_R) biteTarget(p,a,CFG.mobDmg&&CFG.mobDmg.golem||2);
       for(let i=0;i<28;i++){ const an=i/28*Math.PI*2; chips.push({x:a.x+Math.cos(an)*0.6,y:a.y+Math.sin(an)*0.6,z:a.z*LH+2,vx:Math.cos(an)*2.4,vy:Math.sin(an)*2.4,vz:12+Math.random()*16,t:0,life:0.6,col:i%2?"#b0a890":"#8a8270"}); } }
     return; }
   if(!tp||dh>9){ a.idleT=(a.idleT||0)+dt;
@@ -81,9 +81,9 @@ function drawGolemP(g,frame,moving,raise,glow){
 function drawBeast(a){
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
-  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const cm=CMOBS[a.kind], pre=cm?cm.b:a.kind, big=a.kind==="golem", sc=cm?cm.sz/100:1;
-  if(big&&(a.slamT>0||a.slamFx>0)){   // красный круг — куда ударит голем; белая волна — удар
-    const k=a.slamT>0?1-a.slamT/GOLEM_SLAM_T:1, rr=a.slamT>0?GOLEM_SLAM_R:GOLEM_SLAM_R*(1.2-a.slamFx*0.4);
+  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const cm=CMOBS[a.kind], pre=cm?cm.b:a.kind, big=a.kind==="golem", boss=big||!!(cm&&cm.boss), sc=cm?cm.sz/100:1;
+  if(boss&&(a.slamT>0||a.slamFx>0)){   // красный круг — куда ударит голем; белая волна — удар
+    const k=a.slamT>0?1-a.slamT/GOLEM_SLAM_T:1, SR=a.slamR||(cm&&cm.boss?cm.slamR/10:GOLEM_SLAM_R), rr=a.slamT>0?SR:SR*(1.2-a.slamFx*0.4);
     ctx.beginPath(); for(let i=0;i<=32;i++){ const an=i/32*Math.PI*2, q=proj(a.x-MX+Math.cos(an)*rr,a.y-MY+Math.sin(an)*rr,a.z); i?ctx.lineTo(...q):ctx.moveTo(...q); }
     if(a.slamT>0){ ctx.fillStyle=`rgba(255,60,40,${0.12+0.3*k})`; ctx.fill(); ctx.strokeStyle=`rgba(255,120,90,${0.5+0.5*k})`; ctx.lineWidth=1; ctx.stroke(); }
     else { ctx.strokeStyle=`rgba(255,255,255,${a.slamFx*1.6})`; ctx.lineWidth=2; ctx.stroke(); } }
@@ -95,22 +95,24 @@ function drawBeast(a){
   if(!sp&&a.facing[1]==="w"){ sp=img[`${pre}_${a.facing[0]}e_${frame}`]; mirror=true; }
   if(a.dying>0&&img[pre+"_dead"]){ sp=img[pre+"_dead"]; mirror=a.facing[1]==="w"; }
   if(cm&&sp) sp=mobTint(a.kind,sp);
-  if(big&&a.slamT>0) fx+=Math.round(Math.sin(T*60)*(1-a.slamT/GOLEM_SLAM_T)*2);   // дрожит перед ударом
+  if(boss&&a.slamT>0) fx+=Math.round(Math.sin(T*60)*(1-a.slamT/GOLEM_SLAM_T)*2);   // дрожит перед ударом
   a.drawn={x:Math.round(fx),y:Math.round(fy),sp,name:null,mirror};
   ctx.save(); ctx.translate(Math.round(fx),Math.round(fy)+(a.dying>0&&!img[pre+"_dead"]?Math.round((3-a.dying)*3):0)); if(sc!==1) ctx.scale(sc,sc);
   if(a.hurtT>0) ctx.filter="brightness(2.2)";
-  else if(big&&a.slamT>0&&sp) ctx.filter=`sepia(1) saturate(${2+3*(1-a.slamT/GOLEM_SLAM_T)}) hue-rotate(-35deg)`;
+  else if(cm&&cm.boss&&a.rage&&sp&&!(a.slamT>0)) ctx.filter=`drop-shadow(0 0 ${2+Math.round(Math.sin(T*8)*1.5+1.5)}px #ff3a2a)`;
+  else if(boss&&a.slamT>0&&sp) ctx.filter=`sepia(1) saturate(${2+3*(1-a.slamT/GOLEM_SLAM_T)}) hue-rotate(-35deg)`;
   if(sp){ if(mirror) ctx.scale(-1,1); ctx.drawImage(sp,-Math.round(sp.width/2),-sp.height+(big?4:3)); }
   else { if(a.facing[1]==="w") ctx.scale(-1,1);
     if(big) drawGolemP(ctx,frame,a.moving,a.slamT>0,a.slamT>0?"#ff6a4a":"#7ae0ff"); else drawSpiderP(ctx,frame,a.moving); }
   ctx.filter="none"; ctx.restore(); ctx.globalAlpha=1;
-  if(!big) drawMobHP(a,fx,fy-(sc>1?Math.round((sc-1)*26):0));
+  if(!boss) drawMobHP(a,fx,fy-(sc>1?Math.round((sc-1)*26):0));
 }
 function updateBossBar(){
   const el=document.getElementById("bossBar"); if(!el) return;
-  const g=CAVE&&animals.find(a=>a.kind==="golem"&&!(a.dying>0)&&a.alpha>0.3&&Math.hypot(a.x-hero.x,a.y-hero.y)<11);
+  const g=animals.find(a=>((a.kind==="golem"&&CAVE)||(CMOBS[a.kind]&&CMOBS[a.kind].boss))&&!(a.dying>0)&&a.alpha>0.3&&Math.hypot(a.x-hero.x,a.y-hero.y)<11);
   if(!g){ if(!el.hidden) el.hidden=true; return; }
-  if(el.hidden){ el.hidden=false; document.getElementById("bossName").textContent=tr("boss_name"); }
-  const max=mobHp("golem"), hp=Math.max(0,g.hp??max); document.getElementById("bossHp").style.width=(100*hp/max).toFixed(1)+"%";
+  const nmB=g.kind==="golem"?tr("boss_name"):String(LANG==="ru"?CMOBS[g.kind].ru:CMOBS[g.kind].pl).toUpperCase()+(g.rage?" \u{1F525}":"");
+  if(el.hidden||el.dataset.k!==nmB){ el.hidden=false; el.dataset.k=nmB; document.getElementById("bossName").textContent=nmB; }
+  const max=mobHp(g.kind), hp=Math.max(0,g.hp??max); document.getElementById("bossHp").style.width=(100*hp/max).toFixed(1)+"%";
   document.getElementById("bossNum").textContent=hp+" / "+max;
 }

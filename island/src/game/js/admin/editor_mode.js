@@ -6,7 +6,7 @@ function edEnter(sec){
   const zk=z=>Object.fromEntries((MAP.zones&&Array.isArray(MAP.zones[z])?MAP.zones[z]:[]).map(p=>[p[0]+","+p[1],1]));
   edDraft={start:MAP.start,hut:MAP.hut||null,npc:MAP.npc||null,merchant:MERCH_POS,stall:STALL_POS,pier:PIER_POS,cave:CAVE?null:(PORTAL?[PORTAL.x,PORTAL.y]:null),exit:CAVE&&PORTAL?[PORTAL.x,PORTAL.y]:null,boss:CAVE?(MAP.boss||null):null,
     zones:{hare:zk("hare"),wolf:zk("wolf"),bat:zk("bat"),spider:zk("spider")}};
-  for(const k of Object.keys(CMOBS)) if(CMOBS[k].zn===ZONE) edDraft.zones[k]=zk(k);
+  for(const k of Object.keys(CMOBS)) if(!CMOBS[k].boss&&CMOBS[k].zn===ZONE) edDraft.zones[k]=zk(k);
   edTab=sec; edCfg=edCfgFrom(); cfgDirty=false; edTxtLang=LANG; edDropSel=null;
   edPrevGrid=showGrid; showGrid=true; follow=false; document.getElementById("follow").setAttribute("aria-pressed","false");
   document.body.classList.add("editing"); document.getElementById("edPanel").hidden=false; edRender(); say("ed_hint","ed_hint_sub"); dirty=true;
@@ -48,7 +48,7 @@ function edRender(){
   const tools=mkEl("div","edtools");
   for(const [gk,items0,cat] of ED_GROUPS){ if(cat!==edCat) continue; const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
     const row=mkEl("div","edrow");
-    const items=gk==="ed_g_zones"?[...items0.slice(0,-1),...Object.keys(CMOBS).filter(k=>CMOBS[k].zn===ZONE).map(k=>["zone_"+k,"mob:"+k]),items0[items0.length-1]]:items0;
+    const items=gk==="ed_g_places"?[...items0,...Object.keys(CMOBS).filter(k=>CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["bpos_"+k,"mob:"+k])]:gk==="ed_g_zones"?[...items0.slice(0,-1),...Object.keys(CMOBS).filter(k=>!CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["zone_"+k,"mob:"+k]),items0[items0.length-1]]:items0;
     for(const [id,spr] of items){
       if(spr&&spr.startsWith("mob:")){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; const k=spr.slice(4), im=mkEl("img"); im.src=mobPreview(k,40); im.alt=""; b.appendChild(im);
         b.appendChild(mkEl("small",null,LANG==="ru"?CMOBS[k].ru:CMOBS[k].pl)); b.onclick=()=>{ edTool=id; edRender(); }; row.appendChild(b); continue; } const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=edLabel(id);
@@ -116,4 +116,8 @@ function edDrawMarks(){
     const [x,y]=proj(c.x-MX+(k==="hut"?0.5:0),c.y-MY+(k==="hut"?0.5:0),walkZ(c)), txt=tr("ed_t_"+k), yy=Math.round(y-(k==="hut"?70:56));
     ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#9fe0ff"; ctx.fillText(txt,Math.round(x),yy);
     ctx.fillStyle="rgba(159,224,255,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
+  for(const [k,m] of Object.entries(CMOBS)){ if(!m.boss||m.zn!==ZONE||!m.pos) continue; const c=cellAt(m.pos[0],m.pos[1]); if(!c) continue;
+    const [x,y]=proj(c.x-MX,c.y-MY,walkZ(c)), txt="\u2620 "+(LANG==="ru"?m.ru:m.pl), yy=Math.round(y-56);
+    ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(x),yy); ctx.fillStyle="#ff8a7a"; ctx.fillText(txt,Math.round(x),yy);
+    ctx.fillStyle="rgba(255,90,70,.35)"; ctx.beginPath(); const q=cellQuad(c); ctx.moveTo(...q[0]); for(const pt of q.slice(1)) ctx.lineTo(...pt); ctx.closePath(); ctx.fill(); }
 }

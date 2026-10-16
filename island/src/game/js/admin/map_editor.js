@@ -21,7 +21,7 @@ const ED_GROUPS=[
 if(typeof SPRITES!=="undefined"){ const dec=ED_GROUPS.find(g=>g[0]==="ed_g_objects")[1];
   for(const k of Object.keys(SPRITES).sort()) if(k.startsWith("prop_")&&!isWaterProp(k)&&!dec.some(e=>e[0]===k)) dec.splice(dec.length-1,0,[k,k]); }
 const ED_CATS=["land","water","decor","places"]; let edCat="land";
-const edLabel=id=>{ if(/^zone_m/.test(id)&&CMOBS[id.slice(5)]) return LANG==="ru"?CMOBS[id.slice(5)].ru:CMOBS[id.slice(5)].pl; const t=tr("ed_t_"+id); return t==="ed_t_"+id?id.replace(/^prop_/,"").replace(/_/g," "):t; };
+const edLabel=id=>{ if(/^bpos_/.test(id)&&CMOBS[id.slice(5)]) return "\u2620 "+(LANG==="ru"?CMOBS[id.slice(5)].ru:CMOBS[id.slice(5)].pl); if(/^zone_m/.test(id)&&CMOBS[id.slice(5)]) return LANG==="ru"?CMOBS[id.slice(5)].ru:CMOBS[id.slice(5)].pl; const t=tr("ed_t_"+id); return t==="ed_t_"+id?id.replace(/^prop_/,"").replace(/_/g," "):t; };
 let edCellCtx=null;   // клетка, к которой сейчас применяется инструмент
 const PLACE_TOOLS=["start","hut","npc","merchant","stall","pier","cave","exit","boss"];
 const snapCell=c=>c?{L:c.L,t:c.t,st:c.st||null,props:[...c.props]}:null;
@@ -97,6 +97,7 @@ function edCommit(stroke,draftBefore){
 function edTap(mx,my){
   const g=gridUnder(mx,my); if(!g) return;
   const draftBefore=JSON.stringify(edDraft);
+  if(edTool.startsWith("bpos_")){ if(!bsPlaceAt(edTool.slice(5),cellAt(g.x,g.y))) say("ed_bad_place"); dirty=true; return; }
   if(PLACE_TOOLS.includes(edTool)){ if(!edPlace(edTool,g.x,g.y)){ say("ed_bad_place"); return; }
     edCommit({changes:[]},draftBefore); dirty=true; say("ed_placed","ed_placed_sub"); return; }
   // тап забором по забору — повернуть его на 90°
@@ -106,7 +107,7 @@ function edTap(mx,my){
   const stroke={changes:[],seen:new Set()}; edApplyAt(mx,my,stroke); edCommit(stroke,draftBefore);
 }
 // рисование проведением пальца
-function edStrokeStart(mx,my){ if(PLACE_TOOLS.includes(edTool)||edTool==="stairs"||edBrush==="fill") return false;
+function edStrokeStart(mx,my){ if(PLACE_TOOLS.includes(edTool)||edTool.startsWith("bpos_")||edTool==="stairs"||edBrush==="fill") return false;
   edStroke={changes:[],seen:new Set(),draft:JSON.stringify(edDraft),last:[mx,my]}; edApplyAt(mx,my,edStroke); return true; }
 function edStrokeMove(mx,my){
   if(!edStroke) return; const [lx,ly]=edStroke.last, n=Math.max(1,Math.ceil(Math.hypot(mx-lx,my-ly)/6));
