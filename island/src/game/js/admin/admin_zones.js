@@ -21,22 +21,9 @@ function renderAdminZones(body){
     if(ZID.test(z)) acts.appendChild(adBtn("⚙",()=>{ znSel=z; znDelAsk=false; adMsg=""; znDraft={...ZONES[z],id:z}; renderWin(); },"mini"));
     row.appendChild(acts); l.appendChild(row); }
   body.appendChild(l);
-  // переходы
-  body.appendChild(mkEl("b","sub",tr("zn_links")));
-  const ids=Object.keys(LINKS);
-  if(!ids.length) body.appendChild(mkEl("p","muted",tr("zn_links_none")));
-  const ll=mkEl("div","pllist");
-  for(const id of ids){ const L=LINKS[id], row=mkEl("div","btn itrow znrow");
-    const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,zoneName(L.z)+" → "+zoneName(L.to)));
-    const back=Object.values(LINKS).some(x=>x.z===L.to&&x.to===L.z);
-    nm.appendChild(mkEl("small",null,tr("zn_at",{x:L.x,y:L.y})+(back?"":" · ⚠ "+tr("zn_noback")))); row.appendChild(nm);
-    const sel=mkEl("select","znlook"); for(const lk of LINK_LOOKS){ const o=mkEl("option",null,tr("zn_look_"+lk)); o.value=lk; o.selected=L.look===lk; sel.appendChild(o); }
-    sel.onchange=()=>{ const list={...LINKS,[id]:{...L,look:sel.value}}; lkWrite(list); };
-    row.appendChild(sel);
-    row.appendChild(adBtn("✕",()=>{ const list={...LINKS}; delete list[id]; lkWrite(list); },"mini warn"));
-    ll.appendChild(row); }
-  body.appendChild(ll);
-  body.appendChild(mkEl("p","adnote",tr("zn_links_how")));
+  // порталы — в своём разделе
+  const pb=adBtn(tr("zn_portals_btn",{n:Object.keys(LINKS).length}),()=>{ ptSel=null; adMsg=""; winKind="admin_portals"; renderWin(); }); pb.style.width="100%"; pb.style.marginTop="8px"; body.appendChild(pb);
+  body.appendChild(mkEl("p","adnote",tr("pt_how")));
   if(adMsg) body.appendChild(mkEl("div","adok",adMsg));
 }
 function renderZoneCard(body){

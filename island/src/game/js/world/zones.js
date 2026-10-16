@@ -15,10 +15,15 @@ function znSanitize(id,o){
   if(!ZID.test(id)||!o||typeof o!=="object") return null; const ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
   return {ru:ru||pl,pl,k:o.k==="cave"?"cave":"island",w:Math.max(12,Math.min(32,itNum(o.w,32)||20)),d:Math.max(12,Math.min(32,itNum(o.d,32)||20))};
 }
+// портал: где стоит (z,x,y), куда ведёт (to, пусто — никуда), где появится игрок (arr: link — у портала ap / обратного,
+// start — в точке старта, cell — в клетке ac), подпись name, вид look, уровень lv, включён on
 function lkSanitize(id,o){
-  if(!LID.test(id)||!o||typeof o!=="object"||!zoneOk(o.z)||!zoneOk(o.to)||o.z===o.to) return null;
+  if(!LID.test(id)||!o||typeof o!=="object"||!zoneOk(o.z)) return null;
   if(!Number.isInteger(o.x)||!Number.isInteger(o.y)||o.x<0||o.y<0||o.x>60||o.y>60) return null;
-  return {z:o.z,x:o.x,y:o.y,to:o.to,look:LINK_LOOKS.includes(o.look)?o.look:"portal"};
+  const to=zoneOk(o.to)&&o.to!==o.z?o.to:"";
+  const ac=Array.isArray(o.ac)&&o.ac.length===2&&o.ac.every(v=>Number.isInteger(v)&&v>=0&&v<60)?[o.ac[0],o.ac[1]]:null;
+  return {z:o.z,x:o.x,y:o.y,to,look:LINK_LOOKS.includes(o.look)?o.look:"portal",name:itClean(o.name).slice(0,28),
+    arr:["link","start","cell"].includes(o.arr)?o.arr:"link",ap:typeof o.ap==="string"&&LID.test(o.ap)?o.ap:"",ac,on:o.on===0?0:1,lv:itNum(o.lv,60)};
 }
 let zonesLoaded=false;
 function applyZones(d){
@@ -42,7 +47,10 @@ function markLinks(){
 markLinks();
 // появление после перехода: у обратного перехода
 { const sp=window.__spawnReq||"";
-  if(sp.startsWith("link:")){ const from=sp.slice(5), L=Object.values(LINKS).find(l=>l.z===ZONE&&l.to===from), t=L&&cellAt(L.x,L.y);
+  if(sp.startsWith("cell:")){ const [x,y]=sp.slice(5).split(",").map(Number), c=cellAt(x,y);
+    const spot=c&&!c.blocked&&!wet(c)?c:c&&[...Array(9)].map((_,i)=>cellAt(c.x+(i%3)-1,c.y+((i/3)|0)-1)).find(n=>n&&!n.blocked&&!wet(n));
+    if(spot){ hero.x=spot.x; hero.y=spot.y; hero.z=walkZ(spot); SPAWN_FIXED=true; } }
+  else if(sp.startsWith("link:")||sp.startsWith("lid:")){ const L=sp.startsWith("lid:")?(LINKS[sp.slice(4)]&&LINKS[sp.slice(4)].z===ZONE?LINKS[sp.slice(4)]:null):Object.values(LINKS).find(l=>l.z===ZONE&&l.to===sp.slice(5)), t=L&&cellAt(L.x,L.y);
     const spot=t&&[...Array(9)].map((_,i)=>cellAt(t.x+(i%3)-1,t.y+((i/3)|0)-1)).filter(n=>n&&!n.blocked&&!wet(n)&&Math.abs(walkZ(n)-walkZ(t))<=1)
       .sort((a,b)=>depthOf(b.x-MX,b.y-MY)-depthOf(a.x-MX,a.y-MY))[0];
     if(spot){ hero.x=spot.x; hero.y=spot.y; hero.z=walkZ(spot); SPAWN_FIXED=true; }
@@ -58,7 +66,13 @@ async function travelTo(z,spawn,reedit){
   try{ sessionStorage.setItem("island_zone",z); sessionStorage.setItem("island_spawn",spawn||""); if(reedit) sessionStorage.setItem("island_reedit","map"); }catch(e){}
   setTimeout(()=>location.reload(),700);
 }
-function useLink(id){ const L=LINKS[id]; if(!L) return; travelTo(L.to,"link:"+ZONE); }
+function linkSpawn(L){ if(L.arr==="start") return "start"; if(L.arr==="cell"&&L.ac) return "cell:"+L.ac[0]+","+L.ac[1];
+  if(L.ap&&LINKS[L.ap]&&LINKS[L.ap].z===L.to) return "lid:"+L.ap; return "link:"+ZONE; }
+function useLink(id){ const L=LINKS[id]; if(!L) return;
+  if(!L.to){ say("pt_nowhere"); return; }
+  if(!L.on&&!isAdmin){ say("pt_closed"); return; }
+  if(L.lv>1&&heroLevel()<L.lv&&!isAdmin){ say("need_lv",null,{n:L.lv}); return; }
+  travelTo(L.to,linkSpawn(L)); }
 // отрисовка перехода: портал (кодом), вход в пещеру, лестница наверх (спрайты пещеры, если есть)
 function drawLink(c){
   const L=LINKS[c.link]; if(!L) return;
@@ -66,7 +80,7 @@ function drawLink(c){
   const [px,py]=proj(c.x-MX,c.y-MY,c.L);
   const sprite=L.look==="cave"?img.cave_entrance:L.look==="ladder"?img.cave_exit:null;
   const pf=L.look==="portal"&&img.link_portal_0&&img["link_portal_"+(Math.floor(T*6)%4)];   // 4 кадра от GPT: каменная арка с воронкой
-  if(pf) ctx.drawImage(pf,Math.round(px-pf.width/2),Math.round(py-78));
+  if(pf){ if(!L.on||!L.to) ctx.globalAlpha=0.55; ctx.drawImage(pf,Math.round(px-pf.width/2),Math.round(py-78)); ctx.globalAlpha=1; }
   else if(sprite) ctx.drawImage(sprite,Math.round(px-sprite.width/2),Math.round(py-sprite.height+12));
   else if(pf){}
   else if(L.look==="ladder"){ ctx.save(); ctx.globalAlpha=0.28+0.06*Math.sin(T*2); ctx.fillStyle="#fff2c8";
@@ -83,9 +97,8 @@ function drawLink(c){
     ctx.save(); ctx.globalAlpha=0.35+0.25*k; ctx.fillStyle="#9a7bff"; ctx.beginPath(); ctx.ellipse(px,cy,9,17,0,0,Math.PI*2); ctx.fill(); ctx.restore();
     for(let i=0;i<5;i++){ const a=T*1.7+i*1.26, r=13+((T*9+i*3)%6); ctx.fillStyle=i%2?"#e8e0ff":"#b8a0ff"; ctx.fillRect(Math.round(px+Math.cos(a)*r*0.7),Math.round(cy+Math.sin(a)*r),2,2); } }
   // подпись: куда ведёт
-  const near=Math.hypot(hero.x-c.x,hero.y-c.y)<6||EDIT;
-  if(near){ const txt="→ "+zoneName(L.to); ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
-    const yy=Math.round(py-(L.look==="portal"?(pf?58:46):58)); ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(px),yy); ctx.fillStyle="#ffe9a8"; ctx.fillText(txt,Math.round(px),yy); }
+  { const txt=(L.name||(L.to?"\u2192 "+zoneName(L.to):tr("pt_nowhere_short")))+(L.lv>1?" \u00B7 "+L.lv+"+":"")+(L.on?"":" \u{1F512}"); ctx.font="8px Silkscreen, monospace"; ctx.textAlign="center"; ctx.textBaseline="bottom";
+    const yy=Math.round(py-(L.look==="portal"?(pf?58:46):58)); ctx.lineWidth=3; ctx.strokeStyle="#1b1528"; ctx.strokeText(txt,Math.round(px),yy); ctx.fillStyle=L.on&&L.to?"#ffe9a8":"#b8b0c8"; ctx.fillText(txt,Math.round(px),yy); }
 }
 function pickLink(wx,wy){
   for(const [id,L] of Object.entries(LINKS)){ if(L.z!==ZONE) continue; const c=cellAt(L.x,L.y); if(!c||c.link!==id) continue;
@@ -95,11 +108,12 @@ function pickLink(wx,wy){
 // редактор карты: поставить / убрать переход (сохраняется сразу)
 function lkWrite(list){ applyLinks({list}); if(NET.db) NET.db.doc("world/links").set({list}).catch(()=>{}); }
 function lkAddAt(c,to){
-  if(!c||wet(c)||c.portal||c.hutPart||c.npcHere||c.merchHere||c.stall||c.st||c.props.some(n=>BLOCKING.has(n))||!zoneOk(to)||to===ZONE) return false;
+  if(!c||wet(c)||c.portal||c.hutPart||c.npcHere||c.merchHere||c.stall||c.st||c.props.some(n=>BLOCKING.has(n))||(to&&(!zoneOk(to)||to===ZONE))) return false;
   const list={}; for(const [k,v] of Object.entries(LINKS)) if(!(v.z===ZONE&&v.x===c.x&&v.y===c.y)) list[k]=v;
-  const look=zoneKind(to)==="cave"&&zoneKind(ZONE)!=="cave"?"cave":zoneKind(ZONE)==="cave"&&zoneKind(to)!=="cave"?"ladder":"portal";
-  list["l"+Math.random().toString(36).slice(2,10).replace(/[^a-z0-9]/g,"x")]={z:ZONE,x:c.x,y:c.y,to,look};
-  lkWrite(list); say("zn_link_placed",null,{z:zoneName(to)}); return true;
+  const look=!to?"portal":zoneKind(to)==="cave"&&zoneKind(ZONE)!=="cave"?"cave":zoneKind(ZONE)==="cave"&&zoneKind(to)!=="cave"?"ladder":"portal";
+  const nid="l"+Math.random().toString(36).slice(2,10).replace(/[^a-z0-9]/g,"x");
+  list[nid]={z:ZONE,x:c.x,y:c.y,to,look,on:1,arr:"link"};
+  lkWrite(list); say(to?"zn_link_placed":"pt_placed",null,{z:to?zoneName(to):""}); return nid;
 }
 function lkDelAt(c){ const list={}; let hit=false; for(const [k,v] of Object.entries(LINKS)){ if(v.z===ZONE&&v.x===c.x&&v.y===c.y){ hit=true; continue; } list[k]=v; }
   if(hit) lkWrite(list); return hit; }
