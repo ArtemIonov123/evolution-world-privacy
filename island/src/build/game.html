@@ -63,12 +63,14 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .hpill img{width:18px;height:18px;image-rendering:pixelated}
 .hpill b{font-family:var(--f-display);font-weight:400;font-size:12px;color:#ffd66b;flex:1}
 .hcr b{color:#b8a8ff}
-.hplus{width:20px;height:20px;margin-right:-4px;padding:0;border:2px solid var(--edge);background:#ffd66b;color:#1b1528;font:700 14px/14px var(--f-body);cursor:pointer}
+.hplus{width:24px;height:24px;margin-right:-5px;padding:0;border:2px solid #1b1528;background:linear-gradient(#ffe680,#ffb820);color:#1b1528;font:900 18px/18px var(--f-body);cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 6px rgba(255,214,107,.6)}
 .hplus:active{transform:translateY(1px)}
 .hp{display:none!important}
-.hface.art{border:0;box-shadow:none;background:radial-gradient(circle,#4a3c70 55%,transparent 56%);width:58px;height:58px}
-.hface.art canvas{position:absolute;left:9px;top:9px;width:40px;height:40px}
-.hface .hframe{position:absolute;left:-1px;top:-1px;width:60px;height:60px;image-rendering:pixelated;pointer-events:none}
+.hface.art{border:0;box-shadow:none;background:radial-gradient(circle,#4a3c70 62%,transparent 63%);width:66px;height:66px;margin-bottom:8px}
+.hface.art canvas{position:absolute;left:9px;top:9px;width:48px;height:48px}
+.hface .hframe{position:absolute;left:-2px;top:-2px;width:70px;height:70px;image-rendering:pixelated;pointer-events:none}
+.hface b{left:50%;right:auto!important;bottom:-12px!important;transform:translateX(-50%);border-radius:0!important;height:18px!important;min-width:30px!important;padding:0 5px!important;
+  background:#1b1528!important;border:2px solid #ffd66b!important;font:400 12px/14px var(--f-display)!important;color:#ffd66b;z-index:2;box-shadow:0 2px 0 rgba(0,0,0,.4)}
 .hface b.art{border:0;background:center/100% 100% no-repeat;width:22px;height:22px;min-width:0;padding:0;line-height:22px;right:-4px;bottom:-3px;z-index:1;text-shadow:1px 1px 0 #1b1528}
 .hpill img{width:20px;height:20px;image-rendering:pixelated}
 .hplus.art{border:0;background:center/100% 100% no-repeat;width:24px;height:24px;image-rendering:pixelated}
@@ -363,7 +365,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 @media (max-width:720px){
   .hud{gap:7px}
   .hface{width:46px;height:46px} .hface canvas{width:40px;height:40px}
-  .hface.art{width:52px;height:52px} .hface.art canvas{left:8px;top:8px;width:36px;height:36px} .hface .hframe{width:54px;height:54px}
+  .hface.art{width:62px;height:62px} .hface.art canvas{left:8px;top:8px;width:46px;height:46px} .hface .hframe{width:66px;height:66px}
   .hpill{min-width:70px}
   .toast{bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:13px;padding:5px 10px;left:max(10px,env(safe-area-inset-left,0px));transform:none;max-width:calc(100% - 140px)}
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:52px;padding:6px 8px}
@@ -393,7 +395,8 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .bar{padding-block:3px}
   .btn{min-height:30px;padding:4px 8px}
   .hface{width:40px;height:40px} .hface canvas{width:34px;height:34px}
-  .hface.art{width:44px;height:44px} .hface.art canvas{left:7px;top:7px;width:30px;height:30px} .hface .hframe{width:46px;height:46px} #menuBtn.art img{width:36px;height:36px}
+  .hface.art{width:48px;height:48px;margin-bottom:6px} .hface.art canvas{left:6px;top:6px;width:36px;height:36px} .hface .hframe{width:52px;height:52px} #menuBtn.art img{width:36px;height:36px}
+  .hface.art{margin-bottom:0} .hface b{bottom:-3px!important;height:15px!important;font-size:10px!important;line-height:11px!important;min-width:24px!important}
   .hmid{flex-direction:row;align-items:center;gap:8px} .hrow{flex:none;max-width:130px} .hbar{flex:1}
   .hcur{flex-direction:row}
   .menu .btn{min-height:36px}
@@ -2585,7 +2588,7 @@ function updateHud(){
   const key=(heroClass||"")+"|"+myHueIdx+"|"+(img.druid_se_0?1:0);
   if(key!==hudFaceKey&&typeof heroSprite==="function"){ const sp=heroSprite(heroClass==="druid"&&img.druid_se_0?"druid_se_0":"hero_se_0",myHueIdx);
     if(sp){ hudFaceKey=key; const c=document.getElementById("hudFaceCv"), g=c.getContext("2d"); g.imageSmoothingEnabled=false; g.clearRect(0,0,48,48);
-      const b=spriteBox(sp); const side=Math.min(b.w,24); g.drawImage(sp,Math.round(b.cx-side/2),b.y,side,side,0,0,48,48); } }
+      const b=spriteBox(sp); const side=24; g.drawImage(sp,Math.round(b.cx-side/2),b.y,side,side,0,0,48,48); } }
 }
 const spriteBoxCache=new WeakMap();
 function spriteBox(sp){ if(spriteBoxCache.has(sp)) return spriteBoxCache.get(sp);
@@ -2601,9 +2604,9 @@ function applyHudArt(){
   if(typeof SPRITES==="undefined") return; const S=SPRITES;
   const face=document.getElementById("hudFace");
   if(S.hud_portrait_frame&&face&&!face.querySelector(".hframe")){ const f=document.createElement("img"); f.className="hframe"; f.src=S.hud_portrait_frame; f.alt=""; face.appendChild(f); face.classList.add("art"); }
-  if(S.hud_level_badge){ const b=document.getElementById("hudLv"); b.style.backgroundImage=`url(${S.hud_level_badge})`; b.classList.add("art"); }
+
   if(S.icon_crystal){ const cr=document.getElementById("hudCr"), sv=cr.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.icon_crystal; i.alt=""; i.width=i.height=20; sv.replaceWith(i); } }
-  if(S.hud_btn_plus){ const p=document.getElementById("crPlus"); p.style.backgroundImage=`url(${S.hud_btn_plus})`; p.classList.add("art"); p.textContent=""; }
+
   if(S.hud_btn_menu){ const m=document.getElementById("menuBtn"), sv=m.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.hud_btn_menu; i.alt=""; i.width=i.height=40; sv.replaceWith(i); m.classList.add("art"); } }
 }
 function renderHP(){
