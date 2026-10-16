@@ -705,6 +705,8 @@ const I18N={
     ad_me:"To ty", ad_bannedby:"Zbanowany: {r}", ad_nf_note:"Słowa oddzielaj przecinkami. Wbudowana lista działa zawsze.",
     ad_nf_save:"Zapisz", ad_id:"ID: {id}", adm_changed:"Administrator zmienił twoje dane",
     atk_btn:"Atak (najbliższy wróg)", atk_none:"Nie ma wrogów w pobliżu",
+    it_custom:"Twoje", it_builtin:"Wbudowane w grę", it_reset:"Przywróć", it_reset_ok:"Na pewno przywrócić?", it_type_fixed:"typu wbudowanej rzeczy nie da się zmienić", it_t_rod:"Wędka",
+    it_edited:"zmieniona", mb_builtin:"Wbudowane", mb_custom:"Twoje", mb_spdm:"Szybkość", mb_cave_only:"Pająki żyją w jaskini — tam liczy się «nocą».", mb_boss_later:"Golem (boss) — w sekcji «Bossy».",
     ad_mobs:"Potwory", ad_mobs_d:"Własne potwory, ich siła i strefy", win_admin_mobs:"Potwory",
     mb_new:"+ Nowy potwór", mb_none:"Brak własnych potworów. Stwórz pierwszego!", mb_look:"Wygląd", mb_size:"Rozmiar %", mb_where:"Gdzie żyje", mb_island:"Wyspa", mb_cave:"Jaskinia",
     mb_ai:"Zachowanie", mb_ai_aggr:"Agresywny", mb_ai_night:"Agresywny nocą", mb_ai_passive:"Spokojny", mb_ai_aggr_d:"atakuje każdego, kto podejdzie", mb_ai_night_d:"w dzień spokojny, nocą atakuje", mb_ai_passive_d:"oddaje tylko, gdy go uderzysz",
@@ -872,6 +874,8 @@ const I18N={
     ad_me:"Это ты", ad_bannedby:"Забанен: {r}", ad_nf_note:"Слова через запятую. Встроенный список работает всегда.",
     ad_nf_save:"Сохранить", ad_id:"ID: {id}", adm_changed:"Админ изменил твои данные",
     atk_btn:"Атака (ближайший враг)", atk_none:"Рядом нет врагов",
+    it_custom:"Твои", it_builtin:"Встроенные в игру", it_reset:"Вернуть как было", it_reset_ok:"Точно вернуть?", it_type_fixed:"тип встроенной вещи не меняется", it_t_rod:"Удочка",
+    it_edited:"изменена", mb_builtin:"Встроенные", mb_custom:"Твои", mb_spdm:"Скорость", mb_cave_only:"Пауки живут в пещере — там считается «ночью».", mb_boss_later:"Голем (босс) — будет в разделе «Боссы».",
     ad_mobs:"Мобы", ad_mobs_d:"Свои монстры, сила и зоны", win_admin_mobs:"Мобы",
     mb_new:"+ Новый моб", mb_none:"Своих мобов пока нет. Создай первого!", mb_look:"Вид", mb_size:"Размер %", mb_where:"Где живёт", mb_island:"Остров", mb_cave:"Пещера",
     mb_ai:"Поведение", mb_ai_aggr:"Агрессивный", mb_ai_night:"Злой ночью", mb_ai_passive:"Мирный", mb_ai_aggr_d:"нападает на всех, кто подойдёт", mb_ai_night_d:"днём мирный, ночью нападает", mb_ai_passive_d:"бьёт только в ответ",
@@ -980,7 +984,7 @@ try{ const v=localStorage.getItem("island_lang"); if(v==="ru"||v==="pl") LANG=v;
 // перевод; параметр вида "#ключ" тоже переводится (например, название рыбы)
 const TOUCH=matchMedia("(pointer: coarse)").matches;
 // тексты и цены, которые админ поменял в редакторе (world/config)
-const CFG={texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{},mobHp:{},rods:{},mobTime:{}};
+const CFG={mobDmg:{},mobSpd:{},texts:{pl:{},ru:{}},buy:{},sell:{},off:{},drops:{},xp:{},xpFish:{},fishW:{},logs:{},fisher:{},mobHp:{},rods:{},mobTime:{}};
 function tr(k,p){
   const ck=CFG.texts[LANG]&&CFG.texts[LANG][k];
   if(TOUCH&&I18N.pl[k+"_t"]) k=k+"_t";   // на телефоне — подсказки для пальцев вместо клавиш
@@ -1666,9 +1670,9 @@ function applyMobs(d){
 const CUSTOM={}, CUSTOM_SHOP=[], IT_TYPES=["weapon","head","body","feet","neck","potion","mat"];
 const itClean=v=>String(v||"").replace(/[<>&"'`\u0000-\u001f]/g,"").replace(/\s+/g," ").trim();
 const itNum=(v,hi)=>Math.max(0,Math.min(hi,Math.round(+v||0)));
-function itSanitize(id,o){
-  if(!/^c[A-Za-z0-9]{4,12}$/.test(id)||!o||typeof o!=="object") return null;
-  const t=IT_TYPES.includes(o.t)?o.t:"mat", ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
+function itSanitize(id,o,builtin){
+  if(!(builtin||/^c[A-Za-z0-9]{4,12}$/.test(id))||!o||typeof o!=="object") return null;
+  const t=builtin?baseType(id):IT_TYPES.includes(o.t)?o.t:"mat", ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
   const gear=["weapon","head","body","feet","neck"].includes(t);
   return {id,t,ru:ru||pl,pl,d:itClean(o.d).slice(0,120),atk:t==="weapon"?itNum(o.atk,99):0,def:gear&&t!=="weapon"?itNum(o.def,99):0,hp:gear?itNum(o.hp,99):0,heal:t==="potion"?itNum(o.heal,99):0,
     lv:gear?itNum(o.lv,60):0,cl:gear&&CLASSES.includes(o.cl)?o.cl:"",seller:["merchant","npc"].includes(o.seller)?o.seller:(o.shop===true?"merchant":""),price:itNum(o.price,999999),sell:itNum(o.sell,999999),
@@ -1686,7 +1690,7 @@ function hueShift(cv,deg){
 function customIcon(it,done){
   const cv2=document.createElement("canvas"); cv2.width=cv2.height=32; const g=cv2.getContext("2d"); g.imageSmoothingEnabled=false;
   if(it.img){ const im=new Image(); im.onload=()=>{ g.clearRect(0,0,32,32); g.drawImage(im,0,0,32,32); hueShift(cv2,it.hue); done&&done(); }; im.src=it.img; return cv2; }
-  const base=ICONS[it.b]||ICONS[{weapon:"sword_iron",head:"helm_iron",body:"armor_leather",feet:"boots_leather",neck:"amulet_fang",potion:"potion",mat:"fang"}[it.t]];
+  const base=(BASE&&BASE.icons[it.b])||ICONS[it.b]||(it.builtin&&BASE&&BASE.icons[it.id])||(BASE&&BASE.icons[it.id])||ICONS[{weapon:"sword_iron",head:"helm_iron",body:"armor_leather",feet:"boots_leather",neck:"amulet_fang",potion:"potion",mat:"fang"}[it.t]];
   if(base) g.drawImage(base,0,0,32,32); return hueShift(cv2,it.hue);
 }
 function customDesc(it){
@@ -1695,13 +1699,45 @@ function customDesc(it){
   out.push(tr("ci_sell",{c:it.sell||Math.max(1,Math.round(it.price*0.4))}));
   return (it.d?it.d+" · ":"")+out.join(" · ");
 }
+// встроенные вещи: снимок «как было» и правки из админки (те же world/items, ключ = id вещи)
+let BASE=null; const OVR={};
+function baseSnap(){
+  if(BASE) return BASE;
+  const ids=ITEMS.map(f=>f.id).filter(id=>id!=="coin"&&!/^c[A-Za-z0-9]{4,12}$/.test(id));
+  BASE={ids,gear:JSON.parse(JSON.stringify(GEAR)),edible:{...EDIBLE},sell:{...SELL_P},shop:SHOP.map(x=>({...x})),icons:{},ru:{},pl:{}};
+  for(const id of ids){ BASE.icons[id]=ICONS[id]; BASE.ru[id]=I18N.ru["fish_"+id]; BASE.pl[id]=I18N.pl["fish_"+id]; }
+  return BASE;
+}
+const isBuiltin=id=>!!baseSnap().ids.includes(id);
+function baseType(id){ const g=BASE.gear[id]; if(g) return g.slot==="rod"?"rod":g.slot; if(BASE.edible[id]) return "potion"; return "mat"; }
+function baseDraft(id){ baseSnap(); const g=BASE.gear[id]||{}, sh=BASE.shop.find(x=>x.id===id);
+  return {id,t:baseType(id),ru:BASE.ru[id]||id,pl:BASE.pl[id]||BASE.ru[id]||id,d:"",atk:g.atk||0,def:g.def||0,hp:g.hp||0,heal:BASE.edible[id]||0,lv:0,cl:"",
+    seller:sh?"merchant":"",price:sh?sh.p:0,sell:BASE.sell[id]||0,b:"",hue:0,img:"",builtin:true}; }
 let itemsRaw={};
 function applyItems(d){
+  baseSnap();
+  // встроенные — вернуть как было, потом наложить правки
+  for(const id of BASE.ids){ if(BASE.gear[id]) GEAR[id]=JSON.parse(JSON.stringify(BASE.gear[id])); if(BASE.edible[id]!=null) EDIBLE[id]=BASE.edible[id]; else delete EDIBLE[id];
+    if(BASE.sell[id]!=null) SELL_P[id]=BASE.sell[id]; else delete SELL_P[id]; ICONS[id]=BASE.icons[id]; I18N.ru["fish_"+id]=BASE.ru[id]; I18N.pl["fish_"+id]=BASE.pl[id]; delete OVR[id]; }
+  SHOP.length=0; for(const x of BASE.shop) SHOP.push({...x});
   const list=d&&d.list&&typeof d.list==="object"?d.list:{}; itemsRaw={};
   for(const id of Object.keys(CUSTOM)){ const i=ITEMS.findIndex(f=>f.id===id); if(i>=0) ITEMS.splice(i,1);
     delete GEAR[id]; delete EDIBLE[id]; delete SELL_P[id]; delete I18N.ru["fish_"+id]; delete I18N.pl["fish_"+id]; delete ICONS[id]; delete CUSTOM[id]; }
   CUSTOM_SHOP.length=0;
-  for(const [id,o] of Object.entries(list).slice(0,300)){ const it=itSanitize(id,o); if(!it) continue;
+  for(const [id,o] of Object.entries(list).slice(0,400)){
+    if(BASE.ids.includes(id)){ const it=itSanitize(id,o,true); if(!it) continue; itemsRaw[id]=it; OVR[id]=it;
+      I18N.ru["fish_"+id]=it.ru; I18N.pl["fish_"+id]=it.pl;
+      const g=GEAR[id]; if(g&&g.slot!=="rod"){ if(g.slot==="weapon") g.atk=it.atk; else { if(it.def) g.def=it.def; else delete g.def; } if(it.hp) g.hp=it.hp; else delete g.hp;
+        if(it.lv>1) g.lv=it.lv; else delete g.lv; if(it.cl) g.cl=it.cl; else delete g.cl; }
+      if(it.t==="potion") EDIBLE[id]=Math.max(1,it.heal);
+      SELL_P[id]=it.sell||Math.max(1,Math.round(it.price*0.4));
+      const si=SHOP.findIndex(x=>x.id===id), bn=(BASE.shop.find(x=>x.id===id)||{}).n;
+      if(si>=0) SHOP.splice(si,1);
+      if(it.seller==="merchant"&&it.price>0) SHOP.push({id,p:it.price,n:bn,ovr:1}); else if(it.seller==="npc"&&it.price>0) CUSTOM_SHOP.push({id,p:it.price,by:"npc",n:bn});
+      if(it.img||it.b) ICONS[id]=customIcon(it,()=>{ renderInv(); if(winKind) renderWin(); });
+      else if(it.hue&&BASE.icons[id]){ const c=document.createElement("canvas"); c.width=c.height=32; c.getContext("2d").drawImage(BASE.icons[id],0,0); ICONS[id]=hueShift(c,it.hue); }
+      continue; }
+    const it=itSanitize(id,o); if(!it) continue;
     CUSTOM[id]=it; itemsRaw[id]=it; ITEMS.push({id,custom:true});
     I18N.ru["fish_"+id]=it.ru; I18N.pl["fish_"+id]=it.pl;
     if(["weapon","head","body","feet","neck"].includes(it.t)){ const gg={slot:it.t}; if(it.atk) gg.atk=it.atk; if(it.def) gg.def=it.def; if(it.hp) gg.hp=it.hp; if(it.lv>1) gg.lv=it.lv; if(it.cl) gg.cl=it.cl; GEAR[id]=gg; }
@@ -1858,7 +1894,7 @@ if(MERCHC){ MERCHC.merchHere=true; MERCHC.props=[]; MERCHC.blocked=true; }
 const SHOP=[{id:"potion",p:8},{id:"potion_big",p:18},{id:"bait",p:3,n:5},{id:"rod_wood",p:6},{id:"rod_bamboo",p:25},{id:"rod_steel",p:70},{id:"sword_iron",p:45},{id:"helm_iron",p:30}];
 const SELL_P={spider_silk:4,golem_core:40,sword_steel:30,rod_wood:2,rod_bamboo:10,rod_steel:30,bat_wing:3,club:2,sword_wood:6,cap_leather:3,boots_leather:4,armor_leather:7,amulet_fang:8,sword_iron:22,helm_iron:15,potion:4,potion_big:9,wood:1,
   pelt:4,fang:3,meat_raw:2,meat_cooked:5};
-const sellPrice=id=>CFG.sell[id]!=null?CFG.sell[id]:(SELL_P[id]??PRICE[id]??0);
+const sellPrice=id=>OVR[id]?SELL_P[id]:CFG.sell[id]!=null?CFG.sell[id]:(SELL_P[id]??PRICE[id]??0);
 let shopTab="buy", shopMsg=null;
 // левый/правый вариант пропа меняется при повороте камеры на 90°
 const swapLR=n=>n.endsWith("_left")?n.slice(0,-5)+"_right":n.endsWith("_right")?n.slice(0,-6)+"_left":n;
@@ -3065,7 +3101,7 @@ function nearestFire(x,y){ let best=null,d=1e9; for(const f of fires) if(f.fuel>
 function moveAnimal(a,dt){
   a.moving=false;
   if(a.path.length){
-    const [tx,ty]=a.path[0], dx=tx-a.x, dy=ty-a.y, dist=Math.hypot(dx,dy), step=a.speed*dt;
+    const [tx,ty]=a.path[0], dx=tx-a.x, dy=ty-a.y, dist=Math.hypot(dx,dy), step=a.speed*dt*spdMul(a.kind);
     if(dist<=step){a.x=tx;a.y=ty;a.path.shift();} else {a.x+=dx/dist*step;a.y+=dy/dist*step;}
     if(dist>1e-3){ a.moving=true; const u=dx*ca-dy*sa, v=dx*sa+dy*ca; a.facing=((u+v)>=0?"s":"n")+((u-v)>=0?"e":"w"); }
   }
@@ -3523,6 +3559,7 @@ function applyConfig(d){ lastCfgDoc=d;
   const ids=new Set(ITEMS.map(i=>i.id)), nmap=(src,hi)=>{ const o={}; if(src&&typeof src==="object") for(const [k,v] of Object.entries(src)) if(typeof v==="number"&&isFinite(v)&&v>=0) o[k]=Math.min(hi,Math.round(v)); return o; };
   CFG.mobTime={}; if(d&&d.mobTime&&typeof d.mobTime==='object') for(const k of MOBS){ const o=d.mobTime[k]; if(o&&typeof o==='object') CFG.mobTime[k]={d:o.d?1:0,n:o.n?1:0,dn:Math.max(0,Math.min(20,o.dn|0)),nn:Math.max(0,Math.min(20,o.nn|0))}; }
   CFG.mobHp=nmap(d&&d.mobHp,999); CFG.rods={}; if(d&&d.rods&&typeof d.rods==='object') for(const id of RODS){ const o=nmap(d.rods[id],1000); if(o.dur===0) delete o.dur; if(Object.keys(o).length) CFG.rods[id]=o; }
+  CFG.mobDmg=nmap(d&&d.mobDmg,10); CFG.mobSpd=nmap(d&&d.mobSpd,4);
   CFG.xp=nmap(d&&d.xp,5000); CFG.xpFish=nmap(d&&d.xpFish,5000); CFG.fishW=nmap(d&&d.fishW,1000); CFG.logs=nmap(d&&d.logs,20); CFG.fisher=nmap(d&&d.fisher,9999);
   CFG.drops={}; const dr=d&&d.drops&&typeof d.drops==="object"?d.drops:{};
   for(const [m,list] of Object.entries(dr)) if(Array.isArray(list)) CFG.drops[m]=list.filter(r=>r&&ids.has(r.id)).slice(0,12).map(r=>{
@@ -3531,14 +3568,14 @@ function applyConfig(d){ lastCfgDoc=d;
   if(winKind) renderWin(); if(dialogOpen) renderDialog(); if(EDIT&&edTab!=="map"&&!cfgDirty) edRender();
 }
 let shopNpc="merchant";
-const shopList=()=>(shopNpc==="npc"?CUSTOM_SHOP.filter(s=>s.by==="npc"):SHOP.concat(CUSTOM_SHOP.filter(s=>s.by!=="npc"))).filter(s=>!CFG.off[s.id]).map(s=>({...s,p:CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
+const shopList=()=>(shopNpc==="npc"?CUSTOM_SHOP.filter(s=>s.by==="npc"):SHOP.concat(CUSTOM_SHOP.filter(s=>s.by!=="npc"))).filter(s=>OVR[s.id]||!CFG.off[s.id]).map(s=>({...s,p:!OVR[s.id]&&CFG.buy[s.id]!=null?CFG.buy[s.id]:s.p}));
 function zonePick(kind,filter){
   const z=MAP.zones&&MAP.zones[kind]; if(!Array.isArray(z)||!z.length) return undefined;   // зон нет — по всему острову
   for(let i=0;i<30;i++){ const p=z[(Math.random()*z.length)|0], c=Array.isArray(p)&&cellAt(p[0],p[1]); if(c&&filter(c)) return c; }
   return null;
 }
 function edCfgFrom(){ return {texts:{pl:{...CFG.texts.pl},ru:{...CFG.texts.ru}},buy:{...CFG.buy},sell:{...CFG.sell},off:{...CFG.off},
-  drops:JSON.parse(JSON.stringify(CFG.drops)),mobTime:JSON.parse(JSON.stringify(CFG.mobTime)),mobHp:{...CFG.mobHp},rods:JSON.parse(JSON.stringify(CFG.rods)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher}}; }
+  drops:JSON.parse(JSON.stringify(CFG.drops)),mobTime:JSON.parse(JSON.stringify(CFG.mobTime)),mobHp:{...CFG.mobHp},rods:JSON.parse(JSON.stringify(CFG.rods)),xp:{...CFG.xp},xpFish:{...CFG.xpFish},fishW:{...CFG.fishW},logs:{...CFG.logs},fisher:{...CFG.fisher},mobDmg:{...CFG.mobDmg},mobSpd:{...CFG.mobSpd}}; }
 async function saveConfig(){
   if(!NET.db||!edCfg) return; const d=JSON.parse(JSON.stringify(edCfg));
   await NET.db.doc("world/config").set(d).catch(()=>{});
@@ -3955,13 +3992,22 @@ function renderAdminItems(body){
   const nb=adBtn(tr("it_new"),()=>{ itSel=itRid(); itDelAsk=false; adMsg=""; itDraft={id:itSel,t:"weapon",ru:"",pl:"",d:"",atk:3,def:0,hp:0,heal:0,lv:1,cl:"",seller:"merchant",price:50,sell:0,b:"",hue:0,img:"",isNew:true}; renderWin(); },"big");
   nb.style.width="100%"; nb.style.marginBottom="8px"; body.appendChild(nb);
   const ids=Object.keys(CUSTOM);
-  if(!ids.length){ body.appendChild(mkEl("p","muted",tr("it_none"))); return; }
+  body.appendChild(mkEl("b","sub",tr("it_custom")));
+  if(!ids.length) body.appendChild(mkEl("p","muted",tr("it_none")));
   const l=mkEl("div","pllist");
   for(const id of ids){ const it=CUSTOM[id], b=mkEl("button","btn itrow"); b.type="button";
     const im=mkEl("img"); im.src=iconURL(id); im.alt=""; b.appendChild(im);
     const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,itLabel(it))); nm.appendChild(mkEl("small",null,tr("it_t_"+it.t)+" · "+customDesc(it))); b.appendChild(nm);
     b.onclick=()=>{ itSel=id; itDelAsk=false; adMsg=""; itDraft={...it}; renderWin(); }; l.appendChild(b); }
   body.appendChild(l);
+  body.appendChild(mkEl("b","sub",tr("it_builtin")));
+  const l2=mkEl("div","pllist");
+  for(const id of baseSnap().ids){ const b=mkEl("button","btn itrow"); b.type="button";
+    const im=mkEl("img"); im.src=iconURL(id); im.alt=""; b.appendChild(im);
+    const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,tr("fish_"+id))); const ds=itemDesc(id);
+    nm.appendChild(mkEl("small",null,(BASE.gear[id]&&ds?ds:tr("it_t_"+baseType(id))+(ds?" · "+ds:""))+(OVR[id]?" · \u270E "+tr("it_edited"):""))); b.appendChild(nm);
+    b.onclick=()=>{ itSel=id; itDelAsk=false; adMsg=""; itDraft=OVR[id]?{...OVR[id],id,builtin:true}:baseDraft(id); renderWin(); }; l2.appendChild(b); }
+  body.appendChild(l2);
 }
 function renderItemCard(body){
   const E=itDraft; if(!E){ itSel=null; return renderAdminItems(body); }
@@ -3973,7 +4019,7 @@ function renderItemCard(body){
   const txt=(k,max)=>{ const i=mkEl("input"); i.maxLength=max; i.value=E[k]; i.spellcheck=false; i.oninput=()=>{ E[k]=i.value; prev(); }; return i; };
   const num=(k,hi)=>{ const i=mkEl("input"); i.type="number"; i.min="0"; i.max=String(hi); i.inputMode="numeric"; i.value=String(E[k]); i.oninput=()=>{ E[k]=itNum(i.value,hi); }; return i; };
   field("it_name_ru",txt("ru",24)); field("it_name_pl",txt("pl",24)); field("it_desc",txt("d",120));
-  const ts=mkEl("select"); for(const t of IT_TYPES){ const o=mkEl("option",null,tr("it_t_"+t)); o.value=t; o.selected=E.t===t; ts.appendChild(o); }
+  const ts=mkEl("select"); if(E.builtin){ const o=mkEl("option",null,tr("it_t_"+E.t)+" \u2014 "+tr("it_type_fixed")); ts.appendChild(o); ts.disabled=true; } else for(const t of IT_TYPES){ const o=mkEl("option",null,tr("it_t_"+t)); o.value=t; o.selected=E.t===t; ts.appendChild(o); }
   ts.onchange=()=>{ E.t=ts.value; if(!E.img&&!E.b) prev(); renderWin(); }; field("it_type",ts);
   const gear=["weapon","head","body","feet","neck"].includes(E.t);
   if(E.t==="weapon") field("it_atk",num("atk",99));
@@ -3995,8 +4041,8 @@ function renderItemCard(body){
   // иконка: готовая из игры (+ сдвиг цвета) или своя картинка
   body.appendChild(mkEl("b",null,tr("it_icon")));
   const grid=mkEl("div","itgrid");
-  for(const it of ITEMS){ if(it.custom||!ICONS[it.id]) continue; const b=mkEl("button","btn"+(!E.img&&E.b===it.id?" on":"")); b.type="button"; b.title=tr("fish_"+it.id);
-    const im=mkEl("img"); im.src=iconURL(it.id); im.alt=""; b.appendChild(im); b.onclick=()=>{ E.b=it.id; E.img=""; renderWin(); }; grid.appendChild(b); }
+  for(const it of ITEMS){ if(it.custom||!ICONS[it.id]) continue; const ic=BASE&&BASE.icons[it.id]||ICONS[it.id]; const b=mkEl("button","btn"+(!E.img&&E.b===it.id?" on":"")); b.type="button"; b.title=tr("fish_"+it.id);
+    const im=mkEl("img"); im.src=ic.toDataURL(); im.alt=""; b.appendChild(im); b.onclick=()=>{ E.b=it.id; E.img=""; renderWin(); }; grid.appendChild(b); }
   body.appendChild(grid);
   const f2=mkEl("div","plform");
   const hue=mkEl("input"); hue.type="range"; hue.min="0"; hue.max="359"; hue.value=String(E.hue); hue.oninput=()=>{ E.hue=+hue.value; prev(); }; f2.appendChild(mkEl("label",null,tr("it_hue"))); f2.appendChild(hue);
@@ -4010,7 +4056,8 @@ function renderItemCard(body){
   const bt=mkEl("div","plbtns");
   bt.appendChild(adBtn(tr("it_save"),itSave,"big"));
   if(!E.isNew){ bt.appendChild(adBtn(tr("it_give"),()=>{ giveItem(E.id); saveNow(); adMsg=tr("it_given"); renderWin(); }));
-    bt.appendChild(adBtn(tr(itDelAsk?"it_del_ok":"it_del"),()=>{ if(!itDelAsk){ itDelAsk=true; renderWin(); return; } itWrite(E.id,null); itSel=null; itDraft=null; renderWin(); },"warn")); }
+    if(E.builtin){ if(OVR[E.id]) bt.appendChild(adBtn(tr(itDelAsk?"it_reset_ok":"it_reset"),()=>{ if(!itDelAsk){ itDelAsk=true; renderWin(); return; } itWrite(E.id,null); itDelAsk=false; itDraft=baseDraft(E.id); adMsg=""; renderWin(); },"warn")); }
+    else bt.appendChild(adBtn(tr(itDelAsk?"it_del_ok":"it_del"),()=>{ if(!itDelAsk){ itDelAsk=true; renderWin(); return; } itWrite(E.id,null); itSel=null; itDraft=null; renderWin(); },"warn")); }
   body.appendChild(bt);
   if(adMsg) body.appendChild(mkEl("div","adok",adMsg));
 }
@@ -4020,21 +4067,23 @@ function itWrite(id,val){
   applyItems({list}); if(NET.db) NET.db.doc("world/items").set({list}).catch(()=>{});
 }
 function itSave(){
-  const E=itDraft; const it=itSanitize(E.id,E); if(!it){ adMsg=tr("it_noname"); renderWin(); return; }
-  delete it.id; itWrite(E.id,it); itDraft={...CUSTOM[E.id]}; adMsg=tr("it_saved"); renderWin();
+  const E=itDraft; const it=itSanitize(E.id,E,!!E.builtin); if(!it){ adMsg=tr("it_noname"); renderWin(); return; }
+  delete it.id; itWrite(E.id,it); itDraft=E.builtin?{...OVR[E.id],id:E.id,builtin:true}:{...CUSTOM[E.id]}; adMsg=tr("it_saved"); renderWin();
 }
 let mbSel=null, mbDraft=null, mbDelAsk=false;
 const mbRid=()=>"m"+Math.random().toString(36).slice(2,9).replace(/[^a-z0-9]/g,"x");
 const mbName=m=>LANG==="ru"?m.ru:m.pl;
 function renderAdminMobs(body){
   if(!isAdmin){ closeWin(); return; }
+  if(mbSel&&mbDraft&&mbDraft.builtin){ renderBuiltinMob(body); return; }
   if(mbSel){ renderMobCard(body); return; }
   adHead(body);
   const nb=adBtn(tr("mb_new"),()=>{ mbSel=mbRid(); mbDelAsk=false; adMsg="";
     mbDraft={id:mbSel,ru:"",pl:"",b:"wolf",hue:0,sz:100,zn:CAVE?"cave":"island",ai:"night",hp:6,dmg:1,spd:2,range:5,xp:15,d:1,dn:2,n:1,nn:3,cn:3,isNew:true}; renderWin(); },"big");
   nb.style.width="100%"; nb.style.marginBottom="8px"; body.appendChild(nb);
   const ids=Object.keys(CMOBS);
-  if(!ids.length){ body.appendChild(mkEl("p","muted",tr("mb_none"))); return; }
+  body.appendChild(mkEl("b","sub",tr("mb_custom")));
+  if(!ids.length) body.appendChild(mkEl("p","muted",tr("mb_none")));
   const l=mkEl("div","pllist");
   for(const id of ids){ const m=CMOBS[id], b=mkEl("button","btn itrow"); b.type="button";
     const im=mkEl("img"); im.src=mobPreview(id,32); im.alt=""; b.appendChild(im);
@@ -4043,6 +4092,40 @@ function renderAdminMobs(body){
     nm.appendChild(mkEl("small",null,tr("mb_ai_"+m.ai)+" \u00B7 HP "+m.hp+" \u00B7 "+tr("mb_dmg").split(" ")[0]+" "+m.dmg+" \u00B7 "+when)); b.appendChild(nm);
     b.onclick=()=>{ mbSel=id; mbDelAsk=false; adMsg=""; mbDraft={...m}; renderWin(); }; l.appendChild(b); }
   body.appendChild(l);
+  body.appendChild(mkEl("b","sub",tr("mb_builtin")));
+  const l2=mkEl("div","pllist");
+  for(const k of ["wolf","bat","spider"]){ const b=mkEl("button","btn itrow"); b.type="button"; const im=mkEl("img"); im.src=SPRITES[k+"_se_0"]||""; im.alt=""; b.appendChild(im);
+    const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,tr("ed_src_"+k)));
+    const t=k==="spider"?" \u26F0"+mobCount(k,"n"):(mobT(k,"d")&&mobCount(k,"d")?" \u2600"+mobCount(k,"d"):"")+(mobT(k,"n")&&mobCount(k,"n")?" \u263E"+mobCount(k,"n"):"");
+    nm.appendChild(mkEl("small",null,"HP "+mobHp(k)+" \u00B7 "+tr("mb_dmg").split(" ")[0]+" "+(CFG.mobDmg[k]||1)+" \u00B7 "+xpOf(k)+" XP"+t)); b.appendChild(nm);
+    b.onclick=()=>{ mbSel="b:"+k; adMsg=""; mbDraft={id:k,builtin:true,hp:mobHp(k),dmg:CFG.mobDmg[k]||1,spd:CFG.mobSpd[k]||2,xp:xpOf(k)??0,d:mobT(k,"d")?1:0,dn:mobCount(k,"d"),n:mobT(k,"n")?1:0,nn:mobCount(k,"n")}; renderWin(); }; l2.appendChild(b); }
+  body.appendChild(l2);
+  body.appendChild(mkEl("p","adnote",tr("mb_boss_later")));
+}
+function renderBuiltinMob(body){
+  const E=mbDraft, k=E.id;
+  adHead(body,()=>{ mbSel=null; mbDraft=null; adMsg=""; renderWin(); });
+  const pv=mkEl("div","itprev"), im=mkEl("img"); im.src=SPRITES[k+"_se_0"]||""; im.alt=""; pv.appendChild(im); pv.appendChild(mkEl("b",null,tr("ed_src_"+k))); body.appendChild(pv);
+  const f=mkEl("div","plform"); const fd=(lab,el)=>{ f.appendChild(mkEl("label",null,tr(lab))); f.appendChild(el); };
+  const num=(key,lo,hi)=>{ const i=mkEl("input"); i.type="number"; i.min=String(lo); i.max=String(hi); i.inputMode="numeric"; i.value=String(E[key]); i.oninput=()=>{ E[key]=Math.max(lo,Math.min(hi,Math.round(+i.value||0))); }; return i; };
+  fd("mb_hp",num("hp",1,999)); fd("mb_dmg",num("dmg",1,10));
+  const sg=mkEl("div","mbseg"); for(const v of [1,2,3,4]) sg.appendChild(adBtn(tr("mb_spd_"+v),()=>{ E.spd=v; renderWin(); },E.spd===v?"on":"")); fd("mb_spdm",sg);
+  fd("mb_xp",num("xp",0,5000));
+  if(k==="spider") fd("mb_count",num("nn",0,20));
+  else { const dl=mkEl("label","chk"), dc=mkEl("input"); dc.type="checkbox"; dc.checked=!!E.d; dc.onchange=()=>{ E.d=dc.checked?1:0; }; dl.append(dc,document.createTextNode(tr("mb_day"))); f.appendChild(dl); f.appendChild(num("dn",0,20));
+    const nl=mkEl("label","chk"), nc=mkEl("input"); nc.type="checkbox"; nc.checked=!!E.n; nc.onchange=()=>{ E.n=nc.checked?1:0; }; nl.append(nc,document.createTextNode(tr("mb_night"))); f.appendChild(nl); f.appendChild(num("nn",0,20)); }
+  body.appendChild(f);
+  if(k==="spider") body.appendChild(mkEl("p","adnote",tr("mb_cave_only")));
+  const bt=mkEl("div","plbtns");
+  bt.appendChild(adBtn(tr("it_save"),()=>{
+    const c=JSON.parse(JSON.stringify(lastCfgDoc||{})); for(const f2 of ["mobHp","xp","mobDmg","mobSpd","mobTime"]) if(!c[f2]||typeof c[f2]!=="object") c[f2]={};
+    c.mobHp[k]=E.hp; c.xp[k]=E.xp; c.mobDmg[k]=E.dmg; c.mobSpd[k]=E.spd;
+    c.mobTime[k]={d:k==="spider"?0:E.d,n:k==="spider"?1:E.n,dn:k==="spider"?0:E.dn,nn:E.nn};
+    applyConfig(c); if(NET.db) NET.db.doc("world/config").set(c).catch(()=>{}); adMsg=tr("mb_saved"); renderWin(); },"big"));
+  bt.appendChild(adBtn(tr("mb_loot"),()=>{ closeWin(); edEnter("drop"); edDropSel="mob:"+k; edRender(); }));
+  if(k!=="spider"||CAVE) bt.appendChild(adBtn(tr("mb_zone"),()=>{ closeWin(); edEnter("map"); edCat="places"; edTool="zone_"+k; edRender(); }));
+  body.appendChild(bt);
+  if(adMsg) body.appendChild(mkEl("div","adok",adMsg));
 }
 function renderMobCard(body){
   const E=mbDraft; if(!E){ mbSel=null; return renderAdminMobs(body); }
@@ -4257,7 +4340,8 @@ function updateSpider(a,dt,tp,dh){
   else { a.aggro=false; if(a.think<=0&&!a.path.length){ a.state="wander"; a.think=2+Math.random()*3; const h=a.home||{x:a.x,y:a.y}; setPath(a,fleeCell({x:h.x,y:h.y},h.x,h.y,0.5,2.5)); } }
 }
 // свой моб: агрессивный / злой ночью / мирный (бьёт в ответ)
-const MB_SPD=[0,1.6,2.3,3.0,3.6];
+const MB_SPD=[0,1.6,2.3,3.0,3.6], SPD_MUL=[1,0.7,1,1.3,1.6];
+const spdMul=k=>!CMOBS[k]&&CFG.mobSpd&&CFG.mobSpd[k]?SPD_MUL[CFG.mobSpd[k]]||1:1;
 function updateCMob(a,dt,tp,dh,night){
   const m=CMOBS[a.kind], run=MB_SPD[m.spd]||2.3, angry=m.ai==="aggr"||(m.ai==="night"&&night);
   a.speed=run*0.45;
@@ -4383,7 +4467,7 @@ function updateBat(a,dt,tp,dh){
   else { if(!a.wp||a.think<=0||Math.hypot(a.wp[0]-a.x,a.wp[1]-a.y)<0.3){ a.think=2+Math.random()*2; const an=Math.random()*Math.PI*2, r=Math.random()*3; a.wp=[home.x+Math.cos(an)*r,home.y+Math.sin(an)*r]; }
     [tx,ty]=a.wp; sp=1.3; }
   const dx=tx-a.x, dy=ty-a.y, d=Math.hypot(dx,dy);
-  if(d>0.05){ const st=Math.min(d,sp*dt); a.x+=dx/d*st+Math.sin(a.flap*7)*0.004; a.y+=dy/d*st; const u=dx*ca-dy*sa, v=dx*sa+dy*ca; a.facing=((u+v)>=0?"s":"n")+((u-v)>=0?"e":"w"); }
+  if(d>0.05){ const st=Math.min(d,sp*dt*spdMul(a.kind)); a.x+=dx/d*st+Math.sin(a.flap*7)*0.004; a.y+=dy/d*st; const u=dx*ca-dy*sa, v=dx*sa+dy*ca; a.facing=((u+v)>=0?"s":"n")+((u-v)>=0?"e":"w"); }
   a.x=Math.max(0,Math.min(W-1,a.x)); a.y=Math.max(0,Math.min(D-1,a.y));
   const c=cellAt(Math.round(a.x),Math.round(a.y)); if(c) a.z+=(walkZ(c)-a.z)*Math.min(1,dt*4);
   const target=(tp&&dh<1.6&&!(a.retreatT>0))?0.8:1.5+Math.sin(a.flap*1.7)*0.25; a.fly=(a.fly??target)+(target-(a.fly??target))*Math.min(1,dt*3);
@@ -4641,6 +4725,7 @@ function playersForAI(){
   return L;
 }
 function biteTarget(tp,a,n=1){
+  if(a&&!CMOBS[a.kind]&&a.kind!=="golem"&&CFG.mobDmg&&CFG.mobDmg[a.kind]>0) n=CFG.mobDmg[a.kind];
   if(tp.me){ hurtHero(n,a); return; }
   biteSeq++; bites.push({p:tp.peer,s:biteSeq,n}); if(bites.length>6) bites.shift();
 }
