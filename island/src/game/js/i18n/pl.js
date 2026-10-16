@@ -65,7 +65,7 @@ I18N.pl={
     ad_nf:"Filtr nicków", ad_nf_d:"Zakazane słowa", ad_back:"← Sekcje", ad_search:"Nick lub ID…",
     ad_all:"Wszyscy", ad_online:"Online", ad_banned:"Bany", ad_none:"Nikogo nie znaleziono", ad_count:"{n} graczy",
     ad_tg:"Telegram", ad_web:"Przeglądarka", ad_now:"teraz w grze", ad_lv:"Poz. {n}", ad_noclass:"bez klasy",
-    ad_nick:"Nick", ad_coins:"Monety", ad_cr:"Kryształy", ad_xp:"XP", ad_class:"Klasa", ad_inv:"Ekwipunek", ad_add:"+ przedmiot",
+    ad_nick:"Nick", ad_coins:"Monety", ad_cr:"Kryształy", ad_lv:"Poziom", ad_bak:"Kopia z {d}: poz. {l}, monet {c}", ad_bak_use:"Weź z kopii", ad_bak_done:"Dane z kopii wstawione — naciśnij „Zapisz zmiany”", ad_xp:"XP", ad_class:"Klasa", ad_inv:"Ekwipunek", ad_add:"+ przedmiot",
     ad_apply:"Zapisz zmiany", ad_ban:"Zbanuj", ad_unban:"Odbanuj", ad_ban_r:"Powód bana", ad_rename:"Reset nicka",
     ad_saved:"Zapisano. Gracz online dostanie zmiany od razu.", ad_loading:"Ładowanie…", ad_nosave:"Brak zapisu gracza",
     ad_me:"To ty", ad_bannedby:"Zbanowany: {r}", ad_nf_note:"Słowa oddzielaj przecinkami. Wbudowana lista działa zawsze.",

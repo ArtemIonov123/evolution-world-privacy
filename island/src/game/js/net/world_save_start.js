@@ -40,15 +40,20 @@ function applyFires(docs){
 }
 // ---- личное сохранение ----
 let saveT=3, saving=false, lastSaveJSON="", forcedNick=null, savedCr=0;
+// сохранять можно только после того, как старое сохранение точно прочитано — иначе пустой прогресс затрёт настоящий
+let saveReady=false, saveRetryT=null;
 // вход через сервер (подпись Telegram проверена): правила базы защищают кошелёк, баны и настройки мира
 const secureOn=()=>!!(window.__islandAuth&&window.__islandAuth.ok);
 const INV_MAX_COIN=2e9, INV_MAX=1e6;   // сколько можно хранить: монет/кристаллов и любой другой вещи
 async function loadSave(){
+  let s=null;
+  for(let a=0;a<5&&!s;a++){ try{ s=await Promise.race([NET.db.doc(`data/users/${NET.myId}/save`).get(),new Promise((_,no)=>setTimeout(()=>no("timeout"),12000))]); }
+    catch(e){ s=null; await new Promise(r=>setTimeout(r,1000*(a+1))); } }
+  if(!s){ clearTimeout(saveRetryT); saveRetryT=setTimeout(loadSave,15000); return; }   // не прочитали — не сохраняем, пробуем ещё
   try{
-    let s=await NET.db.doc(`data/users/${NET.myId}/save`).get();
     // первый вход через Telegram: переносим прогресс, который был в этом браузере
     if(!s.exists&&window.__islandOldUid){ const o=await NET.db.doc(`data/users/${window.__islandOldUid}/save`).get(); if(o.exists){ s=o; lastSaveJSON=""; saveT=0; } }
-    if(!s.exists) return;
+    if(!s.exists){ saveReady=true; return; }
     const d=s.data()||{};
     if(d.inv&&typeof d.inv==="object") for(const [k,v] of Object.entries(d.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0&&isFinite(v)) inv[k]=Math.min(k==="coin"?INV_MAX_COIN:INV_MAX,Math.floor(v));
     if(["none","active","done"].includes(d.quest)) quest=d.quest;
@@ -70,10 +75,18 @@ async function loadSave(){
     const c=cellAt(num(d.x,0,W-1,-1)|0,num(d.y,0,D-1,-1)|0);
     if(c&&!c.blocked&&!SPAWN_FIXED&&(d.zn||"island")===ZONE){ hero.x=c.x; hero.y=c.y; hero.z=walkZ(c); hero.path=[]; }
     renderInv(); renderHP(); say(CAVE?"cave_hello":"loaded");
+    saveReady=true; backupSave(d);
+  }catch(e){ console.warn("save parse",e); }
+}
+// резервная копия: раз в сутки, и только если опыта не меньше, чем в прошлой копии (опыт не убывает)
+async function backupSave(d){
+  try{ const ref=NET.db.doc(`data/users/${NET.myId}/bak`), b=await ref.get(), o=b.exists?b.data():null;
+    const xp=(d.pg&&d.pg.xp)|0, oxp=o&&o.s&&o.s.pg?(o.s.pg.xp|0):-1;
+    if(!o||(xp>=oxp&&Date.now()-(o.t||0)>20*3600e3)) await ref.set({t:Date.now(),s:d});
   }catch(e){}
 }
 function tickSave(dt){
-  if(!NET.db||!NET.myId||saving) return;
+  if(!NET.db||!NET.myId||saving||!saveReady) return;
   saveT-=dt; if(saveT>0) return; saveT=4;
   const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,zn:ZONE,cl:heroClass,cr:crystals,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick}; if(forcedNick) s.nf=forcedNick;
   const j=JSON.stringify(s); if(j===lastSaveJSON) return;

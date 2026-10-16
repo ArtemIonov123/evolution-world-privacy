@@ -22,7 +22,8 @@
             "users": {
               "$uid": {
                 ".write": "auth.token.admin === true || (auth.uid === $uid && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists())",
-                "save": { ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 30000)" }
+                "save": { ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 30000)" },
+                "bak": { ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 40000)" }
               }
             }
           },

@@ -1,5 +1,6 @@
 // ---- админка: разделы ----
-let BANS={}, adQ="", adFilter="all", adSel=null, adSave=null, adMsg="", adEdit=null;
+let BANS={}, adQ="", adFilter="all", adSel=null, adSave=null, adMsg="", adEdit=null, adBak=null;
+const lvXp=l=>10*l*(l-1);   // сколько всего опыта нужно на уровень l (20+40+…)
 function adBtn(label,fn,cls){ const b=mkEl("button","btn"+(cls?" "+cls:""),label); b.type="button"; b.onclick=fn; return b; }
 function renderAdminHub(body){
   if(!isAdmin){ closeWin(); return; }
@@ -71,7 +72,8 @@ function renderAdminPlayers(body){
   adRenderList();
 }
 async function adOpen(id){
-  adSel=id; adSave=null; adMsg=""; adEdit=null; renderWin();
+  adSel=id; adSave=null; adMsg=""; adEdit=null; adBak=null; renderWin();
+  try{ const b=await NET.db.doc(`data/users/${id}/bak`).get(); if(adSel!==id) return; adBak=b.exists&&b.data()&&b.data().s?b.data():null; }catch(e){}
   try{ const s=await NET.db.doc(`data/users/${id}/save`).get(); if(adSel!==id) return; adSave=s.exists?(s.data()||{}):false; }catch(e){ adSave=false; }
   try{ const w=await NET.db.doc("wallet/"+id).get(); if(w.exists&&adSave&&typeof w.data().cr==="number") adSave.cr=w.data().cr; }catch(e){}
   const p=adPlayers.find(x=>x.id===id)||(id===NET.myId?adMine():{d:{}});
@@ -95,10 +97,20 @@ function adRenderCard(body){
   const numIn=(k,max)=>{ const i=mkEl("input"); i.type="number"; i.min="0"; i.max=String(max); i.inputMode="numeric"; i.value=String(E[k]); i.oninput=()=>{ E[k]=Math.max(0,Math.min(max,Math.floor(+i.value||0))); }; return i; };
   const ni=mkEl("input"); ni.maxLength=16; ni.value=E.nick; ni.spellcheck=false; ni.oninput=()=>{ E.nick=ni.value; }; field("ad_nick",ni);
   field("ad_coins",numIn("coin",INV_MAX_COIN)); field("ad_cr",numIn("cr",INV_MAX_COIN));
-  const xi=numIn("xp",9999999); field("ad_xp",xi);
+  const li=mkEl("input"); li.type="number"; li.min="1"; li.max="60"; li.inputMode="numeric"; li.value=String(lvlInfo(E.xp).l);
+  const xi=numIn("xp",9999999);
+  li.oninput=()=>{ const l=Math.max(1,Math.min(60,Math.floor(+li.value||1))); E.xp=lvXp(l); xi.value=String(E.xp); };
+  xi.addEventListener("input",()=>{ li.value=String(lvlInfo(E.xp).l); });
+  field("ad_lv",li); field("ad_xp",xi);
   const sel=mkEl("select"); for(const c of ["",...CLASSES]){ const o=mkEl("option",null,c?tr("cl_"+c):tr("ad_noclass")); o.value=c; if(E.cl===c) o.selected=true; sel.appendChild(o); }
   sel.onchange=()=>{ E.cl=sel.value; }; field("ad_class",sel);
   body.appendChild(f);
+  if(adBak){ const s=adBak.s, bx=mkEl("div","adbak"), bxp=(s.pg&&s.pg.xp)|0, bc=Math.floor((s.inv&&s.inv.coin)||0);
+    bx.appendChild(mkEl("span",null,tr("ad_bak",{d:new Date(adBak.t).toLocaleString(LANG==="ru"?"ru-RU":"pl-PL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}),l:lvlInfo(bxp).l,c:shortNum(bc)})));
+    bx.appendChild(adBtn(tr("ad_bak_use"),()=>{ const iv=s.inv&&typeof s.inv==="object"?s.inv:{};
+      E.xp=bxp; E.coin=bc; if(CLASSES.includes(s.cl)) E.cl=s.cl;
+      E.inv=Object.fromEntries(Object.entries(iv).filter(([k,v])=>k!=="coin"&&typeof v==="number"&&v>0)); adMsg=tr("ad_bak_done"); renderWin(); },"mini"));
+    body.appendChild(bx); }
   body.appendChild(mkEl("b",null,tr("ad_inv")));
   const il=mkEl("div","plinv");
   for(const [k,v] of Object.entries(E.inv)){ if(!ITEMS.some(it=>it.id===k)) continue;
