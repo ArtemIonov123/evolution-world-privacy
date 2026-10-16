@@ -66,6 +66,11 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .hplus{width:24px;height:24px;margin-right:-5px;padding:0;border:2px solid #1b1528;background:linear-gradient(#ffe680,#ffb820);color:#1b1528;font:900 18px/18px var(--f-body);cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 6px rgba(255,214,107,.6)}
 .hplus:active{transform:translateY(1px)}
 .hp{display:none!important}
+.hbar.art{border:0;background:none;box-shadow:none;height:22px;image-rendering:pixelated;overflow:visible}
+.hbar.art i{left:6px;top:5px;bottom:5px;background:none;border-style:solid;image-rendering:pixelated}
+.hbar.art span{line-height:22px;font-size:12px}
+.hhp.art .hheart{left:6px;top:4px}
+.hxp.art em{left:6px;top:5px;bottom:5px;line-height:12px;border-right:0;background:rgba(27,21,40,.75)}
 .hface.art{border:0;box-shadow:none;background:radial-gradient(circle,#4a3c70 62%,transparent 63%);width:66px;height:66px;margin-bottom:8px}
 .hface.art canvas{position:absolute;left:9px;top:9px;width:48px;height:48px}
 .hface .hframe{position:absolute;left:-2px;top:-2px;width:70px;height:70px;image-rendering:pixelated;pointer-events:none}
@@ -2573,6 +2578,7 @@ function updateFireflies(){
 let HP_MAX=5; hero.hp=HP_MAX; hero.hurtT=0;
 let fadeT=0, fainting=false;
 const HEART='<svg viewBox="0 0 9 8" width="18" height="16" aria-hidden="true" shape-rendering="crispEdges"><path d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z" fill="#1b1528"/><path d="M1 1h2v1h1v1h1V2h1V1h2v3H7v1H6v1H5v1H4V6H3V5H2V4H1z" fill="FILL"/><path d="M2 1h1v1H2z" fill="HL"/></svg>';
+let hudBarArt=false;
 let crystals=0;   // донат-валюта (пока только счётчик)
 let hudFaceKey="";
 function updateHud(){
@@ -2580,9 +2586,10 @@ function updateHud(){
   const L=lvlInfo(prog.xp), nm=myNick||tr("hero");
   if(n.textContent!==nm) n.textContent=nm;
   document.getElementById("hudLv").textContent=String(L.l); document.getElementById("hudLvTag").textContent="Lv "+L.l;
-  document.getElementById("hudHpFill").style.width=Math.round(100*Math.max(0,hero.hp)/Math.max(1,HP_MAX))+"%";
+  const setW=(el,f)=>{ f=Math.max(0,Math.min(1,f)); el.style.width=hudBarArt?`calc((100% - 12px) * ${f.toFixed(3)})`:Math.round(100*f)+"%"; el.style.visibility=f>0?"":"hidden"; };
+  setW(document.getElementById("hudHpFill"),hero.hp/Math.max(1,HP_MAX));
   document.getElementById("hudHpTxt").textContent=hero.hp+" / "+HP_MAX; document.getElementById("hudHp").setAttribute("aria-label",tr("hp_label")+": "+hero.hp+"/"+HP_MAX);
-  document.getElementById("hudXpFill").style.width=Math.round(100*L.into/Math.max(1,L.need))+"%";
+  setW(document.getElementById("hudXpFill"),L.into/Math.max(1,L.need));
   document.getElementById("hudXpTxt").textContent=L.into+" / "+L.need+" XP";
   const cn=document.getElementById("hudCrN"); if(cn.textContent!==String(crystals)){ cn.textContent=String(crystals); document.getElementById("hudCr").setAttribute("aria-label",tr("cr_name")+": "+crystals); }
   const key=(heroClass||"")+"|"+myHueIdx+"|"+(img.druid_se_0?1:0);
@@ -2607,6 +2614,10 @@ function applyHudArt(){
 
   if(S.icon_crystal){ const cr=document.getElementById("hudCr"), sv=cr.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.icon_crystal; i.alt=""; i.width=i.height=20; sv.replaceWith(i); } }
 
+  if(S.hud_bar_frame&&S.hud_bar_hp&&S.hud_bar_xp){ hudBarArt=true;
+    for(const [id,fill] of [["hudHp",S.hud_bar_hp],["hudXp",S.hud_bar_xp]]){ const b=document.getElementById(id); b.classList.add("art");
+      b.style.borderImage=`url(${S.hud_bar_frame}) 6 7 fill / 7px 9px stretch`;
+      const i=b.querySelector("i"); i.style.borderImage=`url(${fill}) 0 5 fill / 0 6px stretch`; } }
   if(S.hud_btn_menu){ const m=document.getElementById("menuBtn"), sv=m.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.hud_btn_menu; i.alt=""; i.width=i.height=40; sv.replaceWith(i); m.classList.add("art"); } }
 }
 function renderHP(){
