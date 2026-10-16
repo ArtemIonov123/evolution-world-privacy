@@ -20,7 +20,7 @@
   window.__islandTG=null;
   if(tgUser&&/^\d{3,15}$/.test(String(tgUser.id))){
     const tid="utg"+tgUser.id; if(uid!==tid){ window.__islandOldUid=uid; } uid=tid;
-    window.__islandTG={id:String(tgUser.id),first:String(tgUser.first_name||""),last:String(tgUser.last_name||""),user:String(tgUser.username||""),lang:String(tgUser.language_code||"")};
+    window.__islandTG={sp:String((TG.initDataUnsafe&&TG.initDataUnsafe.start_param)||""),id:String(tgUser.id),first:String(tgUser.first_name||""),last:String(tgUser.last_name||""),user:String(tgUser.username||""),lang:String(tgUser.language_code||"")};
     try{ TG.ready(); TG.expand(); if(TG.disableVerticalSwipes) TG.disableVerticalSwipes(); if(TG.setHeaderColor) TG.setHeaderColor("#2b2340"); if(TG.setBackgroundColor) TG.setBackgroundColor("#2b2340"); }catch(e){}
   }
   const peer="p"+rnd(10);

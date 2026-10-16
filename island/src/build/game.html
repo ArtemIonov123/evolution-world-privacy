@@ -599,7 +599,7 @@ const I18N={
     opt_craft:"Zrób mi coś (rzemiosło)", npc_craft:"Ze skór, kłów i drewna zrobię ci porządny sprzęt. Co robimy?", craft_opt:"{item} — {cost}",
     npc_crafted:"Gotowe! {item} — trzymaj. Załóż w oknie Ekwipunek.", coins:"monet",
     xp:"+{n} XP", lvl_float:"POZIOM {n}!", lvl_up:"Nowy poziom: {n}!", lvl_up_sub:"zdrowie odnowione", blocked_bite:"Unik!",
-    ed_open:"Edytor mapy", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
+    ed_open:"Panel admina", ed_g_terrain:"Teren", ed_g_height:"Wysokość", ed_g_objects:"Obiekty", ed_g_places:"Miejsca",
     ed_t_g:"Trawa", ed_t_G:"Trawa 2", ed_t_d:"Ciemna trawa", ed_t_s:"Ścieżka", ed_t_e:"Ziemia", ed_t_w:"Głęboka woda", ed_t_v:"Płycizna", ed_g_cave:"Jaskinia", ed_t_k:"Skała", ed_t_K:"Skała z mchem", ed_t_x:"Ściana", ed_t_q:"Kryształy", ed_t_l:"Lawa", ed_t_j:"Błoto jaskini", go_cave:"Idziesz do jaskini", go_exit:"Idziesz do wyjścia", cave_enter:"Schodzisz do jaskini…", cave_leave:"Wychodzisz na wyspę…",
     cave_hello:"Jesteś w jaskini", where_cave:"w jaskini", where_island:"na wyspie", spider_killed:"Pająk pokonany!", boss_killed:"Golem pokonany!", boss_killed_sub:"skarb w torbie · golem wróci za kilka minut",
     boss_name:"KAMIENNY GOLEM", boss_summon:"Golem wzywa nietoperze!", fish_spider_silk:"Pajęczyna", fish_golem_core:"Serce golema", fish_sword_steel:"Stalowy miecz",
@@ -736,7 +736,7 @@ const I18N={
     opt_craft:"Сделай мне вещь (ремесло)", npc_craft:"Из шкур, клыков и дерева сделаю тебе добрую снасть. Что делаем?", craft_opt:"{item} — {cost}",
     npc_crafted:"Готово! {item} — держи. Надень в окне Снаряжение.", coins:"монет",
     xp:"+{n} XP", lvl_float:"УРОВЕНЬ {n}!", lvl_up:"Новый уровень: {n}!", lvl_up_sub:"здоровье восстановлено", blocked_bite:"Увернулся!",
-    ed_open:"Редактор карты", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
+    ed_open:"Админка", ed_g_terrain:"Земля", ed_g_height:"Высота", ed_g_objects:"Объекты", ed_g_places:"Места",
     ed_t_g:"Трава", ed_t_G:"Трава 2", ed_t_d:"Тёмная трава", ed_t_s:"Тропа", ed_t_e:"Земля", ed_t_w:"Глубокая вода", ed_t_v:"Мелководье", ed_g_cave:"Пещера", ed_t_k:"Камень", ed_t_K:"Камень со мхом", ed_t_x:"Стена", ed_t_q:"Кристаллы", ed_t_l:"Лава", ed_t_j:"Грязь пещеры", go_cave:"Идёшь к пещере", go_exit:"Идёшь к выходу", cave_enter:"Спускаешься в пещеру…", cave_leave:"Выходишь на остров…",
     cave_hello:"Ты в пещере", where_cave:"в пещере", where_island:"на острове", spider_killed:"Паук повержен!", boss_killed:"Голем повержен!", boss_killed_sub:"сокровища в сумке · голем вернётся через несколько минут",
     boss_name:"КАМЕННЫЙ ГОЛЕМ", boss_summon:"Голем зовёт летучих мышей!", fish_spider_silk:"Паутина", fish_golem_core:"Сердце голема", fish_sword_steel:"Стальной меч",
@@ -3504,13 +3504,16 @@ async function initAdmin(){
   let code=(/[#&]admin=([^&]+)/.exec(location.hash)||[])[1];
   if(code){ code=decodeURIComponent(code); try{ sessionStorage.setItem("island_admin",code); }catch(e){}
     try{ history.replaceState(null,"",location.pathname+location.search+location.hash.replace(/[&]?admin=[^&]*/,"")); }catch(e){} }
-  else { try{ code=sessionStorage.getItem("island_admin"); }catch(e){} }
+  // в Telegram: ссылка t.me/<бот>?startapp=<код админа>
+  if(!code&&window.__islandTG&&/^[A-Za-z0-9_-]{6,64}$/.test(window.__islandTG.sp)) code=window.__islandTG.sp;
+  if(!code){ try{ code=sessionStorage.getItem("island_admin")||localStorage.getItem("island_admin_"+(window.__islandWorld||"c")); }catch(e){} }
   let ok=false;
   if(code&&NET.db&&window.crypto&&crypto.subtle){
     const h=await sha256(code+"|wyspa");
     try{ const s=await NET.db.doc("world/admin").get();
       if(!s.exists){ await NET.db.doc("world/admin").set({h}); ok=true; } else ok=(s.data()||{}).h===h; }catch(e){}
-    if(!ok) say("admin_bad");
+    if(!ok){ say("admin_bad"); try{ localStorage.removeItem("island_admin_"+(window.__islandWorld||"c")); }catch(e){} }
+    else { try{ localStorage.setItem("island_admin_"+(window.__islandWorld||"c"),code); }catch(e){} }   // запоминаем на этом устройстве
   } else if(!window.__islandWorld&&NET.user&&NET.user.isOwner){ try{ ok=!!(await NET.user.isOwner()); }catch(e){} }
   isAdmin=ok; const b=document.getElementById("editBtn"); if(b) b.hidden=!ok;
   if(ok){ let re=null; try{ re=sessionStorage.getItem("island_reedit"); sessionStorage.removeItem("island_reedit"); }catch(e){} if(re) setTimeout(edEnter,300); }
