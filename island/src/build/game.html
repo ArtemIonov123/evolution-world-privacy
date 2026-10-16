@@ -33,8 +33,39 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .lang{display:flex}
 .lang .btn{padding:6px 9px}
 .lang .btn+.btn{border-left:0}
-.menu{display:flex;gap:8px}
-#menuBtn{display:none;line-height:0;padding:6px 9px}
+.menu{position:absolute;top:100%;right:max(10px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:stretch;
+  background:var(--panel);border:2px solid var(--edge);padding:8px;gap:8px;min-width:200px;max-height:calc(100dvh - 80px);overflow-y:auto}
+.menu:not(.open){display:none}
+.menu .btn{min-height:42px;font-size:12px;text-align:left}
+.menu .lang .btn{flex:1;text-align:center}
+#menuBtn{display:block;line-height:0;padding:8px 10px;align-self:stretch;min-width:44px}
+/* HUD: портрет, здоровье, опыт, золото, кристаллы */
+.hud{gap:10px;padding-block:6px;align-items:center}
+.hface{position:relative;flex:none;width:52px;height:52px;padding:0;border-radius:50%;border:3px solid #c8a040;background:radial-gradient(circle at 40% 35%,#5a4a84,#2b2340);cursor:pointer;
+  box-shadow:0 0 0 2px var(--edge),inset 0 -3px 0 rgba(0,0,0,.35);overflow:visible}
+.hface canvas{width:46px;height:46px;border-radius:50%;image-rendering:pixelated;display:block}
+.hface b{position:absolute;right:-5px;bottom:-4px;min-width:17px;height:17px;padding:0 3px;border-radius:9px;background:var(--panel);border:2px solid #c8a040;
+  font:400 10px/13px var(--f-display);color:#ffd66b;text-align:center;box-sizing:border-box}
+.hmid{flex:1;min-width:0;max-width:440px;display:flex;flex-direction:column;gap:3px}
+.hcur{margin-left:auto}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0}
+.hrow b{font-family:var(--f-display);font-weight:400;font-size:13px;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hud .clock{margin:0;padding:1px 6px;font-size:11px;flex:none}
+.hbar{position:relative;height:16px;border:2px solid var(--edge);background:#2b2340;overflow:hidden;box-shadow:inset 0 2px 0 rgba(0,0,0,.35)}
+.hbar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .25s}
+.hhp i{background:linear-gradient(#ff6a5a,#d8302a)}
+.hxp i{background:linear-gradient(#a890ff,#6a4ed8)}
+.hbar span{position:relative;display:block;text-align:center;font:700 11px/12px var(--f-body);color:#fff;text-shadow:1px 1px 0 #1b1528}
+.hhp .hheart{position:absolute;left:2px;top:0;z-index:1}
+.hxp em{position:absolute;left:0;top:0;bottom:0;z-index:1;padding:0 5px;background:#3d2e7a;border-right:2px solid var(--edge);font:400 10px/12px var(--f-display);font-style:normal;color:#e8dcff}
+.hcur{flex:none;display:flex;flex-direction:column;gap:4px}
+.hpill{display:flex;align-items:center;gap:5px;height:22px;padding:0 6px;background:var(--panel-2);border:2px solid var(--edge);min-width:78px}
+.hpill img{width:18px;height:18px;image-rendering:pixelated}
+.hpill b{font-family:var(--f-display);font-weight:400;font-size:12px;color:#ffd66b;flex:1}
+.hcr b{color:#b8a8ff}
+.hplus{width:20px;height:20px;margin-right:-4px;padding:0;border:2px solid var(--edge);background:#ffd66b;color:#1b1528;font:700 14px/14px var(--f-body);cursor:pointer}
+.hplus:active{transform:translateY(1px)}
+.hp{display:none!important}
 
 /* сцена */
 .stage{position:relative;flex:1;min-height:0}
@@ -145,7 +176,7 @@ canvas.drag{cursor:grabbing}
 .clpic{width:72px;height:90px;image-rendering:pixelated}
 @media (max-width:720px){ .skills{right:calc(max(10px,env(safe-area-inset-right,0px)) + 60px);bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-direction:column-reverse;gap:6px} .skb{width:48px;height:48px} }
 @media (max-height:500px){ .skills{right:calc(max(10px,env(safe-area-inset-right,0px)) + 166px);bottom:calc(8px + env(safe-area-inset-bottom,0px));flex-direction:row} .skb{width:42px;height:42px} }
-.party{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:52px;z-index:3;padding:5px 8px;font-size:12px;min-width:150px;max-width:220px}
+.party{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:12px;z-index:3;padding:5px 8px;font-size:12px;min-width:150px;max-width:220px}
 .party b{display:block;font-family:var(--f-display);font-weight:400;font-size:11px;color:var(--accent);letter-spacing:.05em;margin-bottom:2px}
 .party .pm{display:flex;align-items:center;gap:6px;line-height:1.6;min-width:0}
 .party .pm i{width:9px;height:9px;flex:none;border:1px solid var(--edge)}
@@ -159,8 +190,8 @@ canvas.drag{cursor:grabbing}
 .players .pmenu .btn{min-height:28px;padding:2px 7px;font-size:11px}
 .upd.pask{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));flex-wrap:wrap;justify-content:center;max-width:min(520px,calc(100% - 20px))}
 .upd.pask span{white-space:normal;text-align:center}
-@media (max-width:720px){ .party{left:max(10px,env(safe-area-inset-left,0px));top:46px;font-size:11px;min-width:130px;max-width:170px} .upd.pask{bottom:calc(66px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)} }
-@media (max-height:500px){ .party{top:40px;padding:3px 6px} .upd.pask{bottom:calc(56px + env(safe-area-inset-bottom,0px))} }
+@media (max-width:720px){ .party{left:max(10px,env(safe-area-inset-left,0px));top:10px;font-size:11px;min-width:130px;max-width:170px} .upd.pask{bottom:calc(66px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)} }
+@media (max-height:500px){ .party{top:8px;padding:3px 6px} .upd.pask{bottom:calc(56px + env(safe-area-inset-bottom,0px))} }
 .bossbar{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;width:min(320px,calc(100% - 360px));min-width:200px;padding:5px 10px;text-align:center}
 .bossbar b{display:block;font-family:var(--f-display);font-weight:400;font-size:12px;color:#ff9a7a;letter-spacing:.05em}
 .bossbar i{display:block;height:10px;margin-top:4px;border:2px solid var(--edge);background:#3d3257}
@@ -322,12 +353,9 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 .dlg-opts .btn{text-align:left;font-family:var(--f-body);font-size:14px;font-weight:700;min-height:40px;padding:8px 12px;letter-spacing:0}
 /* телефоны */
 @media (max-width:720px){
-  .bar h1{font-size:13px}
-  #menuBtn{display:block}
-  .menu{position:absolute;top:100%;right:max(16px,env(safe-area-inset-right,0px));flex-direction:column;align-items:stretch;
-    background:var(--panel);border:2px solid var(--edge);padding:8px;gap:8px;min-width:200px}
-  .menu:not(.open){display:none}
-  .menu .btn{min-height:44px;font-size:13px;text-align:left}
+  .hud{gap:7px}
+  .hface{width:46px;height:46px} .hface canvas{width:40px;height:40px}
+  .hpill{min-width:70px}
   .toast{bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:13px;padding:5px 10px;left:max(10px,env(safe-area-inset-left,0px));transform:none;max-width:calc(100% - 140px)}
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:52px;padding:6px 8px}
   .hp{left:max(10px,env(safe-area-inset-left,0px));top:10px}
@@ -353,14 +381,12 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 }
 /* телефон боком: низкий экран */
 @media (max-height:500px){
-  .bar{padding-block:4px}
-  .bar h1{font-size:12px}
+  .bar{padding-block:3px}
   .btn{min-height:30px;padding:4px 8px}
-  #menuBtn{display:block}
-  .menu{position:absolute;top:100%;right:max(10px,env(safe-area-inset-right,0px));flex-direction:column;align-items:stretch;
-    background:var(--panel);border:2px solid var(--edge);padding:6px;gap:6px;min-width:200px;max-height:calc(100dvh - 50px);overflow-y:auto}
-  .menu:not(.open){display:none}
-  .menu .btn{min-height:38px;font-size:12px;text-align:left}
+  .hface{width:40px;height:40px} .hface canvas{width:34px;height:34px}
+  .hmid{flex-direction:row;align-items:center;gap:8px} .hrow{flex:none;max-width:130px} .hbar{flex:1}
+  .hcur{flex-direction:row}
+  .menu .btn{min-height:36px}
   .hp{left:max(10px,env(safe-area-inset-left,0px));top:8px;padding:3px 5px}
   .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:44px;padding:5px 7px}
   .inv .slot{width:34px;height:34px} .inv .slot img{width:26px;height:26px}
@@ -396,14 +422,23 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
 @media (prefers-reduced-motion:reduce){.upd{animation:none}}
 </style>
 
-<div class="bar">
-  <h1 data-i18n="title_h">Wyspa</h1>
-  <span class="clock" aria-live="off"><svg id="clkIcon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"></svg><span id="clkTime">08:00</span><span class="hdcoin" id="hdCoins" role="img" aria-label="0"><img id="hdCoinIcon" alt="" width="16" height="16"><b id="hdCoinN">0</b></span></span>
-  <div class="lang" role="group" aria-label="Język / Язык">
-    <button class="btn" data-lang="pl" aria-pressed="true">PL</button><button class="btn" data-lang="ru" aria-pressed="false">RU</button>
+<div class="bar hud">
+  <h1 data-i18n="title_h" hidden>Wyspa</h1>
+  <button class="hface" id="hudFace" type="button" data-i18n-label="win_hero" aria-label="Postać"><canvas id="hudFaceCv" width="48" height="48" aria-hidden="true"></canvas><b id="hudLv">1</b></button>
+  <div class="hmid">
+    <div class="hrow"><b id="hudName">—</b><span class="clock" aria-live="off"><svg id="clkIcon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"></svg><span id="clkTime">12:00</span></span></div>
+    <div class="hbar hhp" role="img" id="hudHp" aria-label="HP"><i id="hudHpFill"></i><svg class="hheart" viewBox="0 0 9 8" width="14" height="13" aria-hidden="true" shape-rendering="crispEdges"><path d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z" fill="#1b1528"/><path d="M1 1h2v1h1v1h1V2h1V1h2v3H7v1H6v1H5v1H4V6H3V5H2V4H1z" fill="#e8402c"/><path d="M2 1h1v1H2z" fill="#ff9a8a"/></svg><span id="hudHpTxt">5 / 5</span></div>
+    <div class="hbar hxp" role="img" id="hudXp" aria-label="XP"><i id="hudXpFill"></i><em id="hudLvTag">Lv 1</em><span id="hudXpTxt">0 / 20 XP</span></div>
+  </div>
+  <div class="hcur">
+    <div class="hpill" id="hdCoins" role="img" aria-label="0"><img id="hdCoinIcon" alt="" width="18" height="18"><b id="hdCoinN">0</b></div>
+    <div class="hpill hcr" id="hudCr" role="img" aria-label="0"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" shape-rendering="crispEdges"><path d="M8 0l6 5-6 11-6-11z" fill="#1b1528"/><path d="M8 1.5l4.6 3.8L8 13.8 3.4 5.3z" fill="#7a6cff"/><path d="M8 1.5l4.6 3.8H3.4z" fill="#b8a8ff"/><path d="M6 3h2v2H6z" fill="#fff"/></svg><b id="hudCrN">0</b><button class="hplus" id="crPlus" type="button" data-i18n-label="cr_buy" aria-label="+">+</button></div>
   </div>
   <button class="btn" id="menuBtn" aria-expanded="false" aria-controls="menu" data-i18n-label="menu" aria-label="Menu"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <div class="menu" id="menu">
+    <div class="lang" role="group" aria-label="Język / Язык">
+    <button class="btn" data-lang="pl" aria-pressed="true">PL</button><button class="btn" data-lang="ru" aria-pressed="false">RU</button>
+  </div>
     <button class="btn" id="grid" aria-pressed="false" data-i18n="grid">Siatka</button>
     <button class="btn" id="wind" aria-pressed="true" data-i18n="wind">Wiatr</button>
     <button class="btn" id="follow" aria-pressed="true" data-i18n="follow">Kamera za bohaterem</button>
@@ -608,7 +643,7 @@ const I18N={
     heal:"+{n} zdrowia", minus_hp:"-{n}", ate:"Mniam! Zdrowie: {hp}/5", full_hp:"Nie jestem głodny",
     hurt:"Wilk gryzie!", hurt_sub:"uciekaj do ogniska", wolf_chase:"Wilk cię wyczuł!", wolf_near:"Słychać wycie wilków…",
     fainted:"Obudziłeś się rano przy chacie Bogdana. Zgubione monety: {c}.", hp_label:"Zdrowie",
-    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", players_title_cave:"W jaskini", cl_title:"Klasa", cl_warrior:"Wojownik", cl_druid:"Druid", cl_warrior_d:"Walczy wręcz, trzyma bossa na sobie, dużo zdrowia.", cl_druid_d:"Zmienia się w niedźwiedzia i wilka, strzela cierniami z daleka, leczy drużynę.",
+    fainted_net:"Ocknąłeś się przy chacie Bogdana. Zgubione monety: {c}.", players_title:"Na wyspie", players_title_cave:"W jaskini", cr_name:"Kryształy", cr_buy:"Kup kryształy", cr_soon:"Kryształy — wkrótce", cr_soon_sub:"tu będzie można kupić kryształy", cl_title:"Klasa", cl_warrior:"Wojownik", cl_druid:"Druid", cl_warrior_d:"Walczy wręcz, trzyma bossa na sobie, dużo zdrowia.", cl_druid_d:"Zmienia się w niedźwiedzia i wilka, strzela cierniami z daleka, leczy drużynę.",
     cl_pick_title:"Kim chcesz grać?", cl_pick_sub:"Klasę można później zmienić w oknie postaci.", cl_change_title:"Zmień klasę", cl_change_sub:"Zmiana kosztuje {c} monet.", cl_change:"Zmień klasę · {c} monet",
     cl_no_money:"Za mało monet", cl_chosen:"Jesteś: {c}!", cl_chosen_sub:"umiejętności — przyciski w prawym dolnym rogu (klawisze 1–4)",
     sk_n_rush:"Szarża", sk_n_shield:"Tarcza", sk_n_whirl:"Wir", sk_n_thorn:"Cierń", sk_n_heal:"Leczenie", sk_n_bear:"Postać niedźwiedzia", sk_n_wolf:"Postać wilka", sk_n_temper:"Zahartowanie", sk_n_forest:"Zew lasu",
@@ -745,7 +780,7 @@ const I18N={
     heal:"+{n} здоровья", minus_hp:"-{n}", ate:"Ням! Здоровье: {hp}/5", full_hp:"Я не голоден",
     hurt:"Волк кусает!", hurt_sub:"беги к костру", wolf_chase:"Волк тебя учуял!", wolf_near:"Слышен вой волков…",
     fainted:"Ты очнулся утром у хижины Богдана. Потеряно монет: {c}.", hp_label:"Здоровье",
-    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", players_title_cave:"В пещере", cl_title:"Класс", cl_warrior:"Воин", cl_druid:"Друид", cl_warrior_d:"Ближний бой, держит босса на себе, много здоровья.", cl_druid_d:"Превращается в медведя и волка, бьёт шипами издалека, лечит группу.",
+    fainted_net:"Ты очнулся у хижины Богдана. Потеряно монет: {c}.", players_title:"На острове", players_title_cave:"В пещере", cr_name:"Кристаллы", cr_buy:"Купить кристаллы", cr_soon:"Кристаллы — скоро", cr_soon_sub:"здесь можно будет купить кристаллы", cl_title:"Класс", cl_warrior:"Воин", cl_druid:"Друид", cl_warrior_d:"Ближний бой, держит босса на себе, много здоровья.", cl_druid_d:"Превращается в медведя и волка, бьёт шипами издалека, лечит группу.",
     cl_pick_title:"Кем будешь играть?", cl_pick_sub:"Класс можно потом сменить в окне героя.", cl_change_title:"Сменить класс", cl_change_sub:"Смена стоит {c} монет.", cl_change:"Сменить класс · {c} монет",
     cl_no_money:"Не хватает монет", cl_chosen:"Ты — {c}!", cl_chosen_sub:"скилы — кнопки справа внизу (клавиши 1–4)",
     sk_n_rush:"Рывок", sk_n_shield:"Щит", sk_n_whirl:"Вихрь", sk_n_thorn:"Шип", sk_n_heal:"Лечение", sk_n_bear:"Облик медведя", sk_n_wolf:"Облик волка", sk_n_temper:"Закалка", sk_n_forest:"Зов леса",
@@ -1536,7 +1571,7 @@ function renderQuests(body){
     r.appendChild(mkEl("b",null,(q.done?"✓ ":q.ready?"! ":"")+tr(q.t))); r.appendChild(mkEl("p",null,q.done?tr("q_done"):q.ready?tr("q_ready"):q.d)); body.appendChild(r); }
   if(quest==="none"||quest2==="none") body.appendChild(mkEl("p","muted",tr("q_more")));
 }
-function refreshUI(){
+function refreshUI(){ try{ updateHud(); }catch(e){}
   const qb=document.getElementById("qDot"); if(qb) qb.hidden=!questReady();
   if(winKind) renderWin();
 }
@@ -2525,7 +2560,34 @@ function updateFireflies(){
 let HP_MAX=5; hero.hp=HP_MAX; hero.hurtT=0;
 let fadeT=0, fainting=false;
 const HEART='<svg viewBox="0 0 9 8" width="18" height="16" aria-hidden="true" shape-rendering="crispEdges"><path d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z" fill="#1b1528"/><path d="M1 1h2v1h1v1h1V2h1V1h2v3H7v1H6v1H5v1H4V6H3V5H2V4H1z" fill="FILL"/><path d="M2 1h1v1H2z" fill="HL"/></svg>';
+let crystals=0;   // донат-валюта (пока только счётчик)
+let hudFaceKey="";
+function updateHud(){
+  const n=document.getElementById("hudName"); if(!n) return;
+  const L=lvlInfo(prog.xp), nm=myNick||tr("hero");
+  if(n.textContent!==nm) n.textContent=nm;
+  document.getElementById("hudLv").textContent=String(L.l); document.getElementById("hudLvTag").textContent="Lv "+L.l;
+  document.getElementById("hudHpFill").style.width=Math.round(100*Math.max(0,hero.hp)/Math.max(1,HP_MAX))+"%";
+  document.getElementById("hudHpTxt").textContent=hero.hp+" / "+HP_MAX; document.getElementById("hudHp").setAttribute("aria-label",tr("hp_label")+": "+hero.hp+"/"+HP_MAX);
+  document.getElementById("hudXpFill").style.width=Math.round(100*L.into/Math.max(1,L.need))+"%";
+  document.getElementById("hudXpTxt").textContent=L.into+" / "+L.need+" XP";
+  const cn=document.getElementById("hudCrN"); if(cn.textContent!==String(crystals)){ cn.textContent=String(crystals); document.getElementById("hudCr").setAttribute("aria-label",tr("cr_name")+": "+crystals); }
+  const key=(heroClass||"")+"|"+myHueIdx+"|"+(img.druid_se_0?1:0);
+  if(key!==hudFaceKey&&typeof heroSprite==="function"){ const sp=heroSprite(heroClass==="druid"&&img.druid_se_0?"druid_se_0":"hero_se_0",myHueIdx);
+    if(sp){ hudFaceKey=key; const c=document.getElementById("hudFaceCv"), g=c.getContext("2d"); g.imageSmoothingEnabled=false; g.clearRect(0,0,48,48);
+      const b=spriteBox(sp); const side=Math.min(b.w,24); g.drawImage(sp,Math.round(b.cx-side/2),b.y,side,side,0,0,48,48); } }
+}
+const spriteBoxCache=new WeakMap();
+function spriteBox(sp){ if(spriteBoxCache.has(sp)) return spriteBoxCache.get(sp);
+  const g=document.createElement("canvas").getContext("2d"); g.canvas.width=sp.width; g.canvas.height=sp.height; g.drawImage(sp,0,0);
+  const d=g.getImageData(0,0,sp.width,sp.height).data; let x0=sp.width,x1=0,y0=sp.height;
+  for(let y=0;y<sp.height;y++)for(let x=0;x<sp.width;x++) if(d[(y*sp.width+x)*4+3]>128){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; }
+  // голова: верхняя часть фигуры; центр по верхним 12 строкам
+  let s=0,c=0; for(let y=y0;y<Math.min(sp.height,y0+12);y++)for(let x=0;x<sp.width;x++) if(d[(y*sp.width+x)*4+3]>128){ s+=x; c++; }
+  const r={x:x0,y:Math.max(0,y0-1),w:x1-x0+1,cx:c?s/c:(x0+x1)/2}; spriteBoxCache.set(sp,r); return r; }
+setInterval(()=>{ try{ updateHud(); }catch(e){} },400);
 function renderHP(){
+  try{ updateHud(); }catch(e){}
   const el=document.getElementById("hp"); let h="";
   for(let i=0;i<HP_MAX;i++) h+=HEART.replace("FILL",i<hero.hp?"#e8402c":"#3d3257").replace("HL",i<hero.hp?"#ff9a8a":"#3d3257");
   el.innerHTML=h; el.setAttribute("aria-label",tr("hp_label")+": "+hero.hp+"/"+HP_MAX);
@@ -4319,7 +4381,8 @@ async function loadSave(){
     if(["none","active","done"].includes(d.quest)) quest=d.quest;
     if(["none","active","done"].includes(d.q2)) quest2=d.q2;
     rodLevel=d.rod===2?2:1;
-    if(CLASSES.includes(d.cl)) heroClass=d.cl; renderSkills();
+    if(CLASSES.includes(d.cl)) heroClass=d.cl;
+    crystals=num(d.cr,0,1e7,0)|0; renderSkills();
     if(d.eq&&typeof d.eq==="object") for(const sl of SLOTS){ const id=d.eq[sl]; equip[sl]=typeof id==="string"&&GEAR[id]&&GEAR[id].slot===sl?id:null; }
     if(d.pg&&typeof d.pg==="object"){ prog.xp=num(d.pg.xp,0,1e7,0)|0;
       for(const k of Object.keys(prog.sk)) prog.sk[k]=num(d.pg.sk&&d.pg.sk[k],0,1e7,0)|0;
@@ -4337,7 +4400,7 @@ async function loadSave(){
 function tickSave(dt){
   if(!NET.db||!NET.myId||saving) return;
   saveT-=dt; if(saveT>0) return; saveT=4;
-  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,zn:ZONE,cl:heroClass,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
+  const s={inv:{...inv},hp:hero.hp,quest,q2:quest2,eq:{...equip},pg:{xp:prog.xp,ri:prog.ri||0,sk:{...prog.sk},st:{...prog.st,time:Math.round(prog.st.time)}},rd:{d:rodDur,w:{...rodWear}},rod:rodLevel,zn:ZONE,cl:heroClass,cr:crystals,x:Math.round(hero.x),y:Math.round(hero.y),nick:myNick};
   const j=JSON.stringify(s); if(j===lastSaveJSON) return;
   saving=true; lastSaveJSON=j;
   NET.db.doc(`data/users/${NET.myId}/save`).set(s).catch(()=>{lastSaveJSON="";}).finally(()=>{saving=false;});
@@ -4821,7 +4884,9 @@ loadAll.then(()=>{
     document.addEventListener("fullscreenchange",syncFs); document.addEventListener("webkitfullscreenchange",syncFs);
     if(TOUCH){ const once=e=>{ if(e.target.closest&&e.target.closest("#nickWrap,#fsBtn")) return; document.removeEventListener("pointerup",once,true); goFull(); };
       document.addEventListener("pointerup",once,true); } }
-  initUpdates(); renderSkills();
+  initUpdates();
+  document.getElementById("crPlus").onclick=()=>say("cr_soon","cr_soon_sub");
+  document.getElementById("hudFace").onclick=()=>{ if(winKind==="hero") closeWin(); else openWin("hero"); }; renderSkills();
   document.getElementById("partyYes").onclick=acceptInvite; document.getElementById("partyNo").onclick=declineInvite;
   const chatbar=document.getElementById("chatbar"), chatIn=document.getElementById("chatIn");
   const closeChat=()=>{ chatbar.hidden=true; chatIn.blur(); };
