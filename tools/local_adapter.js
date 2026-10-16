@@ -8,7 +8,7 @@
   const rnd=n=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";let s="";const b=new Uint8Array(n);crypto.getRandomValues(b);for(const x of b)s+=a[x%a.length];return s;};
   const okKey=k=>typeof k==="string"&&/^[A-Za-z0-9_-]{16,40}$/.test(k);
   // ключ мира: из ссылки → из прошлого раза → новый
-  let world="postapo_local_world";
+  let world="postapo_wasteland_v1";   // новое имя = чистый мир с новой картой (старые правки из браузера не мешают)
   ls.set("island_world",world);
   if(!location.hash.includes("world="+world)) try{history.replaceState(null,"",location.pathname+location.search+"#world="+world);}catch(e){}
   window.__islandWorld=world;

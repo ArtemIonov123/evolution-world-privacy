@@ -59,7 +59,7 @@ function drawSprites(anchor){
     for(let z=0;z<c.L;z++){
       if(wet(c)&&z===c.L-1) continue;
       const p=proj(X,Y,z+1), top=z===c.L-1;
-      const name=top?TOP_SPRITE[c.t]:CAVE?"block_cave_wall":(z<2?"block_rock":"block_grass");
+      const name=top?TOP_SPRITE[c.t]:CAVE?"block_cave_wall":"block_rock";   // постапо: под верхом — бетонная кладка
       ctx.drawImage(img[name],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y));
     }
     if(c.st){ const sn=stairSprite(c.st,q); if(sn==="block_stone_path") drawStairsBack(c); else { const p=proj(X,Y,c.L+1); ctx.drawImage(img[sn],Math.round(p[0]-HW),Math.round(p[1]-HH-TOP_Y)); } }

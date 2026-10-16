@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 python3 -I tools/assemble.py src tmp_game.html >/dev/null
-python3 -I tools/build2.py sprites tmp_game.html maps/island.json tmp_utf8.html >/dev/null
+python3 -I tools/build2.py sprites tmp_game.html maps/wasteland.json tmp_utf8.html >/dev/null
 python3 -I tools/asciify.py tmp_utf8.html tmp_ascii.html >/dev/null
 # локальная база в браузере + адаптер → работают админка и редактор (без интернета)
 python3 -I -c "

@@ -11,7 +11,7 @@ const ED_GROUPS=[
   ["ed_g_cave",[["k","block_cave_floor"],["K","block_cave_floor_2"],["j","block_cave_mud"],["q","block_cave_crystal"],["l","block_cave_lava"],["x","block_cave_wall"]],"land"],
   ["ed_g_height",[["up",null],["down",null],["stairs","stairs_left"],["stairs_del",null]],"land"],
   ["ed_g_water",[["w","water_deep_0"],["v","water_shallow_0"],["prop_lily_pad","prop_lily_pad"],["prop_reeds","prop_reeds"],["prop_rock_water","prop_rock_water"],["erase",null]],"water"],
-  ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["prop_crystal",null],["erase",null]],"decor"],
+  ["ed_g_objects",[["tree_big","tree_big"],["tree_small","tree_small"],["bush","bush"],["rock_big","rock_big"],["rock_small","rock_small"],["grass_tuft","grass_tuft"],["fence","fence_left"],["prop_crystal",null],["prop_car",null],["prop_tires",null],["prop_barrier",null],["prop_bones",null],["erase",null]],"decor"],
   ...(CAVE?[["ed_g_places",[["start",null],["exit",null],["boss",null]],"places"],
     ["ed_g_zones",[["zone_spider",null],["zone_bat","bat_se_0"],["zone_erase",null]],"places"]]
   :[["ed_g_places",[["start",null],["cave",null],["hut",null],["npc","npc_se_0"],["merchant","merchant_se_0"],["stall","stall_left"],["pier","pier_left"]],"places"],

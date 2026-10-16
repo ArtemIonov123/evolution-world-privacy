@@ -15,7 +15,7 @@ function waterTex(kind,f){
     const si=(py*im.width+px)*4, di=(j*N+i)*4; for(let t=0;t<3;t++) o.data[di+t]=sd.data[si+t]; o.data[di+3]=255; }
   g.putImageData(o,0,0); return WATER_TEX[k]=c;
 }
-const WATER_COL={deep:["#3c84c8","#4a95d4"],shallow:["#5cb8d8","#6cc6e0"]};
+const WATER_COL={deep:["#4a5a22","#56682a"],shallow:["#6a7a30","#7a8a3a"]};   // ядовитая вода
 function drawWater(c){
   const Z=walkZ(c), X=c.x-MX, Y=c.y-MY, e=0.52, kind=c.shallow?"shallow":"deep";
   const shore=DIRS4.some(([dx,dy])=>{const n=cellAt(c.x+dx,c.y+dy);return !wet(n)});
@@ -34,7 +34,7 @@ function drawWater(c){
     const hx=hash(c.x,c.y,k), hy=hash(c.x,c.y,k+9);
     const u=(((hx+T*0.05*(k%2?1:-1))%1)+1)%1;
     const p=proj(X-0.42+0.84*u, Y-0.42+0.84*hy, Z), a=Math.max(0,Math.sin(T*1.7+hx*20))*0.75;
-    ctx.fillStyle=`rgba(205,238,255,${a})`; ctx.fillRect(Math.round(p[0]-2),Math.round(p[1]),3+(k%2)*2,1);
+    ctx.fillStyle=`rgba(214,240,140,${a})`; ctx.fillRect(Math.round(p[0]-2),Math.round(p[1]),3+(k%2)*2,1);
   }
   }
   // пена у берега
@@ -42,7 +42,7 @@ function drawWater(c){
   DIRS4.forEach(([dx,dy],i)=>{
     const n=cellAt(c.x+dx,c.y+dy); if(wet(n)) return;
     const [a,b]=EDGE_CORNERS[i], al=0.35+0.3*Math.sin(T*2.2+c.x*1.3+c.y*0.7+i);
-    ctx.strokeStyle=`rgba(235,248,255,${al})`; ctx.lineWidth=1;
+    ctx.strokeStyle=`rgba(200,226,110,${al})`; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(cr[a][0],cr[a][1]+1); ctx.lineTo(cr[b][0],cr[b][1]+1); ctx.stroke();
   });
 }

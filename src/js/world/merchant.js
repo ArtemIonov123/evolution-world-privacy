@@ -250,7 +250,7 @@ function drawWaterFx(c){
     const k=r.t/1.4, rad=(r.small?0.05:0.08)+k*(r.big?0.5:r.small?0.18:0.32), a=(1-k)*(r.small?0.4:0.7);
     ctx.beginPath();
     for(let i=0;i<=20;i++){const an=i/20*Math.PI*2, p=proj(r.x-MX+Math.cos(an)*rad,r.y-MY+Math.sin(an)*rad,r.z); i?ctx.lineTo(...p):ctx.moveTo(...p);}
-    ctx.strokeStyle=`rgba(230,246,255,${a})`; ctx.lineWidth=1; ctx.stroke();
+    ctx.strokeStyle=`rgba(200,226,110,${a})`; ctx.lineWidth=1; ctx.stroke();
   }
   if(fishing&&cellAt(Math.round(fishing.bx),Math.round(fishing.by))===c){
     const b=bobberOnWater(); if(b) drawBobber(b.x,b.y,b.under);

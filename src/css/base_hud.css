@@ -1,7 +1,7 @@
 /* Layout: full-screen game canvas on lavender; compact pixel toolbar on top (toggles fold into a menu on phones);
    round zoom/rotate controls float on the right for the thumb; status bottom-left, catch panel bottom-right (top-left on phones). */
 :root{
-  --sky:#a99ad6; --panel:#2d2440; --panel-2:#3d3257; --edge:#1b1528;
+  --sky:#3d342e; --panel:#2d2440; --panel-2:#3d3257; --edge:#1b1528;
   --ink:#f4efff; --muted:#c9bde8; --accent:#ffd66b;
   --f-display:"Silkscreen","Courier New",monospace;
   --f-body:"PT Sans",system-ui,sans-serif;

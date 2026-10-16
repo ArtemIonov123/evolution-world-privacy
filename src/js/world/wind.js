@@ -40,6 +40,13 @@ function drawPropFallback(n,px,py){
   if(n==="prop_crystal"){ const gl=0.75+0.25*Math.sin(T*2+px*0.1);
     for(const [x,h,w] of [[-7,12,5],[-2,18,6],[4,11,5]]){ R(x-1,-h-1,w+2,h+1,"#1b1528"); R(x,-h,w,h,"#3aa8d8"); R(x,-h,2,h,`rgba(200,245,255,${gl})`); R(x+1,-h-1,w-2,1,"#e8fbff"); }
     R(-9,-1,19,2,"#1b1528"); return; }
+  // постапо: заглушки, пока GPT не нарисовал prop_car / prop_tires / prop_barrier / prop_bones
+  if(n==="prop_car"){ R(-25,-23,50,20,"#1b1528"); R(-24,-22,48,18,"#7a3a26"); R(-24,-22,48,3,"#9a5232"); R(-14,-32,30,11,"#1b1528"); R(-13,-31,28,10,"#6a3020");
+    R(-11,-29,10,6,"#2a2a2e"); R(2,-29,10,6,"#2a2a2e"); R(-20,-15,8,3,"#4a2418"); R(6,-12,10,4,"#a8683a"); R(-22,-6,9,8,"#1b1528"); R(14,-6,9,8,"#1b1528"); R(-20,-4,5,4,"#3a3a3e"); R(16,-4,5,4,"#3a3a3e"); return; }
+  if(n==="prop_tires"){ for(const [x,y] of [[-8,-6],[0,-4],[-4,-12]]){ R(x-6,y-4,13,8,"#1b1528"); R(x-5,y-3,11,6,"#2e2e34"); R(x-2,y-2,5,3,"#1b1528"); R(x-4,y-3,8,1,"#4a4a52"); } return; }
+  if(n==="prop_barrier"){ R(-15,-16,30,17,"#1b1528"); R(-14,-15,28,15,"#9a9488"); R(-14,-15,28,3,"#bab4a6");
+    for(let i=0;i<4;i++){ R(-12+i*7,-9,4,6,"#d8b830"); R(-8+i*7,-9,3,6,"#2a2a2e"); } return; }
+  if(n==="prop_bones"){ R(-10,-4,20,4,"#1b1528"); R(-9,-3,18,2,"#d8d0b8"); for(let i=0;i<4;i++){ R(-6+i*4,-9,2,6,"#1b1528"); R(-6+i*4,-8,1,5,"#e8e0c8"); } R(7,-7,6,5,"#1b1528"); R(8,-6,4,3,"#e8e0c8"); R(9,-5,1,1,"#1b1528"); return; }
   R(-3,-6,6,6,"#ff00ff");
 }
 const FENCE_BASE=27;   // y середины основания забора в его картинке
@@ -47,7 +54,7 @@ const TREES=[]; // клетки с деревьями
 for(const c of cells) for(const n of c.props) if(n.startsWith("tree")) TREES.push({c,big:n==="tree_big"});
 for(const c of cells) c.leaves=[];
 const leaves=[], streaks=[];
-const LEAF_COLORS=[["#b8e05a","#4f7f22"],["#e8c848","#8a6418"],["#f0a040","#8a4a14"],["#d86a30","#7a3010"],["#9fd050","#3f6f1a"]];
+const LEAF_COLORS=[["#c8a860","#6a5428"],["#b89048","#5a4018"],["#a87a40","#4a3014"],["#8a6a48","#3a2a18"],["#c0b080","#5a5030"]];   // сухие листья
 function updateWind(dt){
   if(!windOn) return;
   const w=windAt(T);

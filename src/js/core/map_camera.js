@@ -18,7 +18,7 @@ const TOP_SPRITE = {g:"block_grass",G:"block_grass_2",d:"block_grass_dark",s:"bl
 const LAND_TILES="gGdsenNrmfocpzukKxqlj", GRASSY="gGdfou";   // виды земли; «травяные» — где растут деревья и бегают зайцы
 const TOP_NAME = {g:"трава",G:"трава",d:"тёмная трава",s:"каменная тропа",e:"земля",w:"вода"};
 const BLOCKING = new Set(["tree_big","tree_small","bush","rock_big","fence_left","fence_right","prop_reeds","prop_rock_water",
-  "prop_barrel","prop_crate","prop_stump","prop_log","prop_signpost","prop_bush_berry","prop_crystal"]);
+  "prop_barrel","prop_crate","prop_stump","prop_log","prop_signpost","prop_bush_berry","prop_crystal","prop_car","prop_tires","prop_barrier"]);
 // водный декор ставится только на воду; любые другие prop_* — только на сушу
 const WATER_PROPS=new Set(["prop_lily_pad","prop_reeds","prop_rock_water"]);
 const isWaterProp=n=>WATER_PROPS.has(n);
@@ -26,7 +26,7 @@ const STAIR_DIR = {L:[-1,0], R:[0,-1], P:[1,0], Q:[0,1]};   // куда лест
 const STAIR_ORDER=["L","R","P","Q"];
 
 const img = {};
-const loadAll = Promise.all(Object.entries(SPRITES).map(([k,src])=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.src=src})));
+const loadAll = Promise.all(Object.entries(SPRITES).map(([k,src])=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=postapoLook(k,i);r()};i.src=src})));
 
 const cells=[], grid=[...Array(D)].map(()=>Array(W).fill(null));
 for(let y=0;y<D;y++)for(let x=0;x<W;x++){
