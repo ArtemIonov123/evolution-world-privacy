@@ -9,7 +9,10 @@ await p.evaluate(()=>{ setClass('warrior'); document.getElementById('classWrap')
 await p.waitForTimeout(300);
 const info=await p.evaluate(()=>({sel:bagSel,slots:document.querySelectorAll('.bslot').length,used:document.querySelector('.baguse').textContent,winW:Math.round(document.getElementById('win').getBoundingClientRect().width),over:document.querySelector('.wbody').scrollWidth>document.querySelector('.wbody').clientWidth+1}));
 console.log(w,info); await p.screenshot({path:`shot_bag_${w}.png`});
-if(w===390){ await p.evaluate(()=>{ bagSel="potion"; renderWin(); }); await p.screenshot({path:'shot_bag_potion.png'});
+if(w===390){ await p.evaluate(()=>{ const l={}; for(let i=0;i<14;i++) l["ctest"+String(i).padStart(2,"0")]={t:"mat",ru:"Камень "+i,b:"fang",hue:i*25}; applyItems({list:l}); for(const it of ITEMS) if(!inv[it.id]) inv[it.id]=1; renderInv(); renderWin(); }); await p.waitForTimeout(200);
+  console.log('many items',await p.evaluate(()=>{ const g=document.querySelector('.baggrid'); const n=document.querySelectorAll('.bslot').length; g.scrollTop=9999; return {slots:n,scrollable:g.scrollHeight>g.clientHeight,scrolled:g.scrollTop>0,used:document.querySelector('.baguse').textContent,detVisible:document.querySelector('.bagdet').getBoundingClientRect().top>0}; }));
+  await p.screenshot({path:'shot_bag_many.png'});
+  await p.evaluate(()=>{ for(const k of Object.keys(inv)) if(!['coin','karas','okun','meat_raw','pelt','fang','potion','potion_big','wood','sword_wood','cap_leather','rod_bamboo'].includes(k)) delete inv[k]; renderInv(); renderWin(); }); await p.evaluate(()=>{ bagSel="potion"; renderWin(); }); await p.screenshot({path:'shot_bag_potion.png'});
   await p.evaluate(()=>[...document.querySelectorAll('.bagtab')][1].click()); await p.waitForTimeout(100);
   console.log('gear tab',await p.evaluate(()=>[...document.querySelectorAll('.bslot img')].map(i=>i.alt).join(',')));
   await p.evaluate(()=>[...document.querySelectorAll('.bagtab')][2].click());

@@ -234,7 +234,8 @@ canvas.drag{cursor:grabbing}
 .bagtab{font-family:var(--f-body);letter-spacing:0;font-size:12px;min-height:34px;padding:2px 4px;line-height:1.1;border-bottom-width:0}
 .bagtab.on{background:var(--accent);color:var(--panel);box-shadow:inset 0 2px 0 rgba(255,255,255,.45)}
 .bagwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(108px,36%);gap:8px;align-items:start}
-.baggrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.baggrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;max-height:min(46vh,340px);overflow-y:auto;overscroll-behavior:contain;padding:2px 3px 2px 0;align-content:start}
+.wbag .wbody{overflow:hidden}
 .wbody .slot.bslot{width:auto;height:auto;aspect-ratio:1;background:#1b1528;border:2px solid #b8862e;box-shadow:inset 0 0 0 1px #000}
 .wbody .slot.bslot img{width:72%;height:72%}
 .wbody .slot.bslot span{right:3px;bottom:1px;font-size:10px}
@@ -265,7 +266,7 @@ body.bagart .bagbtn{background:var(--ui-btn-purple) center/100% 100% no-repeat;b
 body.bagart .bagbtn.big{background-image:var(--ui-btn-gold)}
 body.bagart .bagdiv{height:8px;background:var(--ui-divider) center/100% 100% no-repeat;image-rendering:pixelated}
 body.bagart .bagdiv::after{display:none}
-body.bagart .win{border:16px solid transparent;border-image:var(--ui-win-frame) 16 fill / 16px stretch;background:none;image-rendering:pixelated;box-shadow:none}
+body.bagart .win{box-sizing:border-box;border:12px solid transparent;border-image:var(--ui-win-frame) 16 fill / 12px stretch;background:none;image-rendering:pixelated;box-shadow:none}
 body.bagart .win .whead{border-bottom:0}
 body.bagart .win .wx{background:var(--ui-close) center/100% 100% no-repeat;border:0;box-shadow:none;width:32px;height:32px;min-height:0;padding:0;color:transparent;image-rendering:pixelated}
 .drow{display:flex;gap:10px;align-items:center}

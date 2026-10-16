@@ -72,7 +72,7 @@ function renderBag(body){
     const act=(k,fn,big)=>{ const b=mkEl("button","btn bagbtn"+(big?" big":""),tr(k)); b.type="button"; b.onclick=fn; acts.appendChild(b); };
     if(EDIBLE[id]) act(/^potion/.test(id)||(CUSTOM[id]&&CUSTOM[id].t==="potion")?"act_drink":"act_eat",()=>{ eatCooked(id); renderWin(); },true);
     if(GEAR[id]) act("act_equip",()=>{ equipItem(id); renderWin(); },true);
-    if(id!=="coin") act("act_drop",()=>{ inv[id]--; if(!inv[id]) delete inv[id]; renderInv(); renderWin(); },false);
+    if(id!=="coin") act("bag_drop",()=>{ inv[id]--; if(!inv[id]) delete inv[id]; renderInv(); renderWin(); },false);
     det.appendChild(acts); }
   wrap.appendChild(det); body.appendChild(wrap);
   const foot=mkEl("div","bagfoot"), co=mkEl("span","bagcoins"), cim=mkEl("img"); cim.src=iconURL("coin"); cim.alt=""; co.appendChild(cim); co.appendChild(mkEl("b",null,shortNum(inv.coin||0)));
