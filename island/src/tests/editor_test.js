@@ -29,5 +29,5 @@ console.log('B new map',await B.evaluate(()=>[cellAt(10,10).t,cellAt(12,16).prop
 const ctx2=await b.newContext({viewport:{width:900,height:650}}); await ctx2.addInitScript({content:fake});
 // share fake db across contexts not possible; use same ctx new page with other session
 const C=await pg('C',`http://localhost:8765/index.html#world=${W}&admin=zlykod`,'Ktos','uCCCCCCCCCCCCCC');
-console.log('C admin',await C.evaluate(()=>[isAdmin,document.getElementById('info').innerText]));
+console.log('C admin',await C.evaluate(()=>[isAdmin,document.getElementById('toast').innerText]));
 console.log('errors',errs); await b.close();})();

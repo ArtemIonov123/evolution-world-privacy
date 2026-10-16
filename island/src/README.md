@@ -1,4 +1,4 @@
-# Wyspa — исходники
+# Isle of Legends (Wyspa) — исходники
 
 Изометрическая пиксельная RPG-песочница. Код пишет Claude, графику рисует ChatGPT.
 
@@ -9,7 +9,8 @@
 
 | Путь | Что это |
 |---|---|
-| `build/game.html` | **Главный исходник**: разметка, стили и весь JS игры (карта, герой, рыбалка, рубка, хижина и NPC, ночь и костры, звери, бой, RPG-окна, мультиплеер). Места `/*SPRITES*/` и `/*MAP*/` заполняет сборка. |
+| `game/` | **Исходники игры, разбитые на модули** (css, html, js/core, world, mobs, combat, items, net, admin, ui, i18n). Порядок склейки — в `game/index.html`, описание каждого файла — в `game/README.md`. |
+| `build/assemble.py` | Склеивает `game/` в один `game.html` (места `/*SPRITES*/` и `/*MAP*/` потом заполняет `build2.py`). |
 | `build/m42h.json` | Карта острова 20×20 (уровни высот, лестницы, деревья, пруд, хижина, NPC). |
 | `build/fb_adapter.js` | Адаптер Firebase: даёт игре `claude.use("room"/"db"/"user")` как на claude.ai, но поверх Realtime Database. |
 | `sprites/<папка>/*.png` | Все картинки. Имя файла = имя спрайта в игре (`hero_se_0`, `wolf_dead`, `item_pelt`, `ui_bag` …). |
@@ -31,7 +32,7 @@ cp out/* ../../            # выкладка: index.html, version.json, manifes
 ## Как добавить картинку
 
 1. Положи PNG в нужную папку `sprites/…` с точным именем (например `sprites/items/item_bow.png`).
-2. В `game.html` обращайся к ней как `img.item_bow` (для иконок предметов — через `ICON_SPRITE`).
+2. В коде (`game/js/...`) обращайся к ней как `img.item_bow` (для иконок предметов — через `ICON_SPRITE`).
 3. Пересобери.
 
 ## Тесты

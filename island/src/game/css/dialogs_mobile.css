@@ -1,0 +1,92 @@
+/* окно ника */
+.nickwrap{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(20,14,34,.55);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nickdlg{width:min(360px,100%);padding:18px;display:flex;flex-direction:column;gap:10px}
+.nickdlg b{font-family:var(--f-display);font-weight:400;color:var(--accent);font-size:16px;letter-spacing:.04em}
+.nickdlg p{margin:0;color:var(--muted);font-size:14px;line-height:1.4}
+.nickdlg input{font:16px var(--f-body);padding:10px 12px;border:2px solid var(--edge);background:#fffdf4;color:#1b1528;border-radius:0}
+.nickdlg input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.nickdlg .big{font-size:15px;padding:10px 16px;min-height:44px;background:var(--accent);color:var(--panel)}
+.nickerr{color:#ffb4a0;font-size:13px}
+.tag .nm.mine{border-style:dashed}
+/* диалог с NPC */
+.dialog{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  width:min(620px,calc(100% - 32px));display:flex;gap:12px;padding:12px;z-index:4;align-items:flex-start}
+#portrait{width:72px;height:72px;image-rendering:pixelated;border:2px solid var(--edge);flex:none}
+.dlg-body{min-width:0;flex:1}
+.dlg-body p{margin:4px 0 10px;font-size:15px;line-height:1.45;color:var(--ink);max-width:62ch}
+.dlg-opts{display:flex;flex-direction:column;gap:6px}
+.dlg-opts .btn{text-align:left;font-family:var(--f-body);font-size:14px;font-weight:700;min-height:40px;padding:8px 12px;letter-spacing:0}
+/* телефоны */
+@media (max-width:720px){
+  .hud{gap:7px}
+  .hface{width:46px;height:46px} .hface canvas{width:40px;height:40px}
+  .hface.art{width:62px;height:62px} .hface.art canvas{left:8px;top:8px;width:46px;height:46px} .hface .hframe{width:66px;height:66px}
+  .hpill{min-width:70px}
+  .toast{bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:13px;padding:5px 10px;left:max(10px,env(safe-area-inset-left,0px));transform:none;max-width:calc(100% - 140px)}
+  .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:52px;padding:6px 8px}
+  .hp{left:max(10px,env(safe-area-inset-left,0px));top:10px}
+  .clock{font-size:11px;padding:2px 5px}
+  .actions{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .players{right:max(10px,env(safe-area-inset-right,0px));top:10px;max-width:130px;font-size:11px}
+  .chatbar{top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)}
+  .inv .slot{width:38px;height:38px}
+  .inv .slot img{width:28px;height:28px}
+  .ctrl{right:max(10px,env(safe-area-inset-right,0px));top:auto;transform:none;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .hotbar{left:max(10px,env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .edpanel{top:auto;left:10px;right:10px;width:auto;max-height:48%;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .edb{width:56px} .edb img{width:38px;height:28px}
+  body.editing .ctrl{bottom:calc(48% + 24px)}
+  .win{top:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:min(74%,calc(100% - 130px));width:calc(100% - 20px)}
+  .fishbar{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .fishbar .hook{font-size:24px;min-width:220px;padding:18px 30px 22px}
+  .dialog{width:auto;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));transform:none;
+    bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:10px;gap:10px}
+  #portrait{width:56px;height:56px}
+  .dlg-body p{font-size:14px}
+  .dlg-opts .btn{min-height:44px}
+}
+/* телефон боком: низкий экран */
+@media (max-height:500px) and (min-aspect-ratio:4/3){
+  .bar{padding-block:3px}
+  .btn{min-height:30px;padding:4px 8px}
+  .hface{width:40px;height:40px} .hface canvas{width:34px;height:34px}
+  .hface.art{width:48px;height:48px;margin-bottom:6px} .hface.art canvas{left:6px;top:6px;width:36px;height:36px} .hface .hframe{width:52px;height:52px} #menuBtn.art img{width:36px;height:36px}
+  .hface.art{margin-bottom:0} .hface b{bottom:-3px!important;height:15px!important;font-size:10px!important;line-height:11px!important;min-width:24px!important}
+  .hmid{flex-direction:row;align-items:center;gap:8px} .hrow{flex:none;max-width:130px} .hbar{flex:1}
+  .hcur{flex-direction:row}
+  .menu .btn{min-height:36px}
+  .hp{left:max(10px,env(safe-area-inset-left,0px));top:8px;padding:3px 5px}
+  .inv{right:auto;bottom:auto;left:max(10px,env(safe-area-inset-left,0px));top:44px;padding:5px 7px}
+  .inv .slot{width:34px;height:34px} .inv .slot img{width:26px;height:26px}
+  .players{right:max(10px,env(safe-area-inset-right,0px));top:8px;max-width:150px;font-size:11px;padding:4px 7px}
+  .toast{bottom:calc(56px + env(safe-area-inset-bottom,0px));font-size:12px;padding:4px 9px}
+  .ctrl{top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));right:max(10px,env(safe-area-inset-right,0px));transform:none;flex-direction:row;gap:6px}
+  .ctrl .gap,.zoom{display:none}
+  .round{width:42px;height:42px}
+  .actions,.fishbar{bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  .fishbar .hook{font-size:18px;padding:10px 24px 14px;min-width:170px}
+  .chatbar{top:8px;bottom:auto;width:min(440px,calc(100% - 340px));padding:6px;gap:5px}
+  .chatlog{max-height:72px;font-size:12px}
+  .quick .btn{font-size:12px;min-height:28px;padding:3px 7px}
+  .dialog{bottom:calc(8px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 20px));padding:8px;gap:8px;z-index:6}
+  #portrait{width:48px;height:48px}
+  .dlg-body p{font-size:13px;margin:2px 0 6px}
+  .dlg-opts{flex-direction:row;flex-wrap:wrap} .dlg-opts .btn{min-height:34px;font-size:13px}
+  .nickdlg{padding:12px;gap:7px}
+  .upd{top:6px}
+  .hotbar{top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));left:max(10px,env(safe-area-inset-left,0px))}
+  .hb{width:38px;height:38px} .hb img{width:28px;height:28px}
+  .win{top:6px;bottom:calc(54px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:none;width:min(520px,calc(100% - 20px))}
+  .doll{grid-template-columns:1fr 72px 1fr} .heroPrev{width:72px;height:108px}
+  .edpanel{top:6px;bottom:6px;left:max(10px,env(safe-area-inset-left,0px));right:auto;width:min(290px,45%);max-height:none}
+  body.editing .ctrl{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+}
+/* обновление */
+.upd{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:9;display:flex;align-items:center;gap:10px;padding:7px 8px 7px 12px;
+  max-width:calc(100% - 20px);box-shadow:0 4px 0 rgba(0,0,0,.25);animation:updIn .35s ease-out}
+.upd span{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap}
+.upd .big{background:var(--accent);color:var(--panel);min-height:38px;font-size:12px;white-space:nowrap}
+@keyframes updIn{from{transform:translate(-50%,-30px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.upd{animation:none}}
+

@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const ctx=await b.newContext({viewport:{width:390,height:740},deviceScaleFactor:2,hasTouch:true,isMobile:true});
 const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
 await p.addInitScript(()=>localStorage.setItem('island_nick','Artem'));
-await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200);
+await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200); await p.evaluate(()=>{ setClass('warrior'); const w=document.getElementById('classWrap'); if(w) w.remove(); });
 await p.evaluate(()=>{ inv.coin=70; inv.karas=3; inv.pelt=2; inv.wood=4; renderInv(); goTo("merchant"); });
 await p.waitForFunction(()=>winKind==="shop",null,{timeout:15000}).catch(()=>{});
 console.log('shop open',await p.evaluate(()=>[winKind,Math.hypot(hero.x-merch.x,hero.y-merch.y).toFixed(2)]));

@@ -1,0 +1,17 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch(); const errs=[];
+const ctx=await b.newContext({viewport:{width:900,height:600},deviceScaleFactor:2}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')});
+const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{ localStorage.setItem('island_nick','Artem'); localStorage.setItem('island_lang','ru'); });
+await p.goto('http://localhost:8765/index.html#world=CaveArtKey12345678'); await p.waitForTimeout(1500);
+await p.evaluate(()=>{ const c=PORTAL; const q=proj(c.x-MX,c.y-MY,c.L); follow=false; panX=450-q[0]*scale; panY=330-q[1]*scale; dirty=true; });
+await p.waitForTimeout(300); await p.screenshot({path:'A_entr.png',clip:{x:300,y:180,width:300,height:220}});
+await p.evaluate(()=>{ sessionStorage.setItem('island_zone','cave'); location.reload(); }); await p.waitForTimeout(2500);
+await p.evaluate(()=>{ follow=true; const ex=PORTAL; hero.x=ex.x+1; hero.y=ex.y; });
+await p.waitForTimeout(600); await p.screenshot({path:'A_exit.png'});
+await p.evaluate(()=>{ const g=MAP.boss; const c=cells.filter(c=>!c.blocked&&Math.hypot(c.x-g[0],c.y-g[1])<3.6&&Math.hypot(c.x-g[0],c.y-g[1])>2.6)[0]; hero.x=c.x; hero.y=c.y; hero.z=walkZ(c); HP_MAX=50; hero.hp=50;
+  const s=cells.filter(c=>!c.blocked&&Math.hypot(c.x-hero.x,c.y-hero.y)<2.5&&Math.hypot(c.x-hero.x,c.y-hero.y)>1)[0]; spawnAnimal("spider",s); animals[animals.length-1].alpha=1; });
+await p.waitForTimeout(3500); await p.screenshot({path:'A_boss.png'});
+await p.evaluate(()=>{ const g=animals.find(a=>a.kind==="golem"); g.slamT=0.5; g.slamCd=9; });
+await p.waitForTimeout(150); await p.screenshot({path:'A_slam.png'});
+console.log('errs',errs); await b.close();})();

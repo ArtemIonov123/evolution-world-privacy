@@ -1,0 +1,33 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:390,height:740},deviceScaleFactor:2,hasTouch:true,isMobile:true});
+await ctx.addInitScript({content:fs.readFileSync('mock_claude.js','utf8')});
+const errs=[];
+const A=await ctx.newPage(); A.on('pageerror',e=>errs.push('A:'+e.message));
+await A.goto('http://localhost:8765/index.html'); await A.evaluate(()=>localStorage.clear()); await A.reload(); await A.waitForTimeout(1500);
+console.log('modal visible on fresh',await A.isVisible('#nickWrap'));
+await A.screenshot({path:'nick_modal.png'});
+await A.fill('#nickIn','x'); await A.click('#nickForm button'); console.log('err shown',await A.isVisible('#nickErr'),await A.isVisible('#nickWrap'));
+await A.fill('#nickIn','  Artem_PL  '); await A.click('#nickForm button'); await A.waitForTimeout(300);
+console.log('modal after',await A.isVisible('#nickWrap'),'myNick',await A.evaluate(()=>myNick));
+const B=await ctx.newPage(); B.on('pageerror',e=>errs.push('B:'+e.message));
+await B.addInitScript(()=>{try{localStorage.removeItem('island_nick')}catch(e){}});
+await B.goto('http://localhost:8765/index.html'); await B.waitForTimeout(1500);
+console.log('B modal',await B.isVisible('#nickWrap'));
+await B.fill('#nickIn','Kolega'); await B.press('#nickIn','Enter'); await B.waitForTimeout(2000);
+console.log('A tags',await A.evaluate(()=>[...document.querySelectorAll('#tags .tag')].map(e=>e.id+':'+e.innerText)));
+console.log('B tags',await B.evaluate(()=>[...document.querySelectorAll('#tags .tag')].map(e=>e.id+':'+e.innerText)));
+console.log('A players',await A.evaluate(()=>document.getElementById('players').innerText.replace(/\n/g,' | ')));
+await B.evaluate(()=>sendChat('Hej!')); await B.waitForTimeout(800);
+await A.evaluate(()=>{document.getElementById('chatBtn').click()}); await A.waitForTimeout(400);
+console.log('A chatlog',await A.evaluate(()=>document.getElementById('chatLog').innerText.replace(/\n/g,' ')));
+await A.evaluate(()=>{document.getElementById('chatBtn').click()});
+await A.screenshot({path:'nick_a.png'});
+// change nick via menu
+await B.evaluate(()=>openNick()); console.log('B reopen value',await B.inputValue('#nickIn'));
+await B.fill('#nickIn','Kolega2'); await B.press('#nickIn','Enter'); await B.waitForTimeout(1200);
+console.log('A sees renamed',await A.evaluate(()=>[...remotes.values()].map(r=>r.nick)));
+// B leaves -> sleeper with nick
+await B.close({runBeforeUnload:true}); await A.waitForTimeout(1500);
+console.log('sleepers',await A.evaluate(()=>[...sleepers.values()].map(s=>s.nick)),'tags',await A.evaluate(()=>[...document.querySelectorAll('#tags .tag')].filter(e=>e.style.display!=='none').map(e=>e.innerText)));
+await A.screenshot({path:'nick_sleep.png'});
+console.log('errors',errs); await b.close();})();

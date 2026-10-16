@@ -7,7 +7,7 @@ console.log('starter rod',await p.evaluate(()=>[equip.rod,rodDur,rodMax(equip.ro
 const r=await p.evaluate(()=>{ inv.rod_bamboo=1; rodDur=2; wearRod(); const a=[equip.rod,rodDur]; wearRod(); return [a,equip.rod,rodDur,inv.rod_bamboo||0]; });
 console.log('wear/break -> next',JSON.stringify(r));
 await p.evaluate(()=>{ unequip("rod"); inv.rod_bamboo=0; delete inv.rod_bamboo; delete inv.rod_wood; });
-await p.evaluate(()=>{ goFish(cells.find(c=>c.water)); }); console.log('no rod msg',await p.evaluate(()=>document.getElementById('info').innerText));
+await p.evaluate(()=>{ goFish(cells.find(c=>c.water)); }); console.log('no rod msg',await p.evaluate(()=>document.getElementById('toast').innerText));
 await p.evaluate(()=>{ inv.wood=3; renderInv(); openDialog(); dlgNode="craft"; renderDialog(); });
 console.log('craft opts',await p.evaluate(()=>[...document.querySelectorAll('#dlgOpts button')].slice(0,2).map(b=>(b.disabled?'[x]':'')+b.textContent)));
 await p.evaluate(()=>{ [...document.querySelectorAll('#dlgOpts button')][0].click(); closeDialog(); });
@@ -20,5 +20,5 @@ await p.screenshot({path:'bat1.png'});
 await p.evaluate(()=>{ giveItem("club"); goTo(animals.find(a=>a.kind==="bat")); });
 await p.waitForFunction(()=>!animals.some(a=>a.kind==="bat"&&!(a.dying>0)),null,{timeout:20000}).catch(()=>{});
 await p.waitForTimeout(400); await p.screenshot({path:'bat2.png'});
-console.log('bat result',await p.evaluate(()=>({inv:{...inv},bats:prog.st.bats,msg:document.getElementById('info').innerText.replace(/\n/g,' ')})));
+console.log('bat result',await p.evaluate(()=>({inv:{...inv},bats:prog.st.bats,msg:document.getElementById('toast').innerText.replace(/\n/g,' ')})));
 console.log('errs',errs); await b.close();})();

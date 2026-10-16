@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const ctx=await b.newContext({viewport:{width:390,height:740},deviceScaleFactor:2,hasTouch:true,isMobile:true});
 const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
 await p.addInitScript(()=>localStorage.setItem('island_nick','Artem'));
-await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200);
+await p.goto('file://'+process.argv[2]); await p.waitForTimeout(1200); await p.evaluate(()=>{ setClass('warrior'); const w=document.getElementById('classWrap'); if(w) w.remove(); });
 await p.evaluate(()=>{ inv.coin=40; inv.wood=6; inv.pelt=4; inv.fang=3; inv.karas=2; inv.meat_cooked=1; inv.potion=1; quest2="active"; giveItem("club"); renderInv(); });
 console.log('weapon',await p.evaluate(()=>[equip.weapon,inv.club]));
 await p.tap('.hb[data-win="bag"]'); await p.waitForTimeout(200);
