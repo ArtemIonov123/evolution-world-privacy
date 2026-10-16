@@ -24,7 +24,7 @@ await ad.locator('.plinv select').selectOption('potion'); await ad.waitForTimeou
 await ad.click('.plbtns .big'); await ad.waitForTimeout(1500);
 console.log('admin msg:',await ad.evaluate(()=>document.querySelector('.adok')&&document.querySelector('.adok').textContent));
 console.log('player after:',await pl.evaluate(()=>({nick:myNick,coin:inv.coin,cr:crystals,potion:inv.potion,toast:document.getElementById('toast').textContent})));
-ad.on('dialog',d=>d.accept('мат в нике'));
+await ad.fill('#adBanR','мат в нике');
 await ad.evaluate(()=>[...document.querySelectorAll('.plbtns .btn')].find(x=>x.classList.contains('warn')).click()); await ad.waitForTimeout(1500);
 console.log('player banned:',await pl.evaluate(()=>({ban:!!document.getElementById('banWrap'),txt:document.getElementById('banWrap')&&document.getElementById('banWrap').textContent})));
 await pl.screenshot({path:'shot_ban.png'});

@@ -3678,6 +3678,7 @@ function adRenderCard(body){
   for(const it of ITEMS) if(it.id!=="coin"&&!(it.id in E.inv)){ const o=mkEl("option",null,tr("fish_"+it.id)); o.value=it.id; add.appendChild(o); }
   add.onchange=()=>{ if(add.value){ E.inv[add.value]=1; renderWin(); } }; il.appendChild(add);
   body.appendChild(il);
+  if(id!==NET.myId&&!ban){ const ri=mkEl("input","adsearch"); ri.id="adBanR"; ri.maxLength=120; ri.placeholder=tr("ad_ban_r"); ri.style.width="100%"; ri.style.marginTop="8px"; body.appendChild(ri); }
   const bt=mkEl("div","plbtns");
   bt.appendChild(adBtn(tr("ad_apply"),()=>adApply(id),"big"));
   bt.appendChild(adBtn(tr("ad_rename"),()=>{ E.nick="Hero"+id.slice(-4); adApply(id); }));
@@ -3706,7 +3707,7 @@ async function adApply(id){
 function adBan(id,on){
   if(!NET.db||id===NET.myId) return;
   const list={...BANS};
-  if(on){ const r=(window.prompt?prompt(tr("ad_ban_r"),""):"")||""; const pd=adPlayers.find(x=>x.id===id); list[id]={r:String(r).slice(0,120),t:Date.now(),n:pd?String(pd.d.n||"").slice(0,16):""}; }
+  if(on){ const ri=document.getElementById("adBanR"), r=ri?ri.value:""; const pd=adPlayers.find(x=>x.id===id); list[id]={r:String(r).slice(0,120),t:Date.now(),n:pd?String(pd.d.n||"").slice(0,16):""}; }
   else delete list[id];
   BANS=list; NET.db.doc("world/bans").set({list}).catch(()=>{}); renderWin();
 }
