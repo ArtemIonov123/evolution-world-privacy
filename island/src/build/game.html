@@ -3895,7 +3895,7 @@ async function adOpen(id){
   try{ const s=await NET.db.doc(`data/users/${id}/save`).get(); if(adSel!==id) return; adSave=s.exists?(s.data()||{}):false; }catch(e){ adSave=false; }
   const p=adPlayers.find(x=>x.id===id)||(id===NET.myId?adMine():{d:{}});
   const sv=adSave||{}, iv=sv.inv&&typeof sv.inv==="object"?{...sv.inv}:{};
-  adEdit={nick:cleanNick(sv.nf||sv.nick||p.d.n||""),coin:iv.coin|0,cr:sv.cr|0,xp:(sv.pg&&sv.pg.xp)|0,cl:CLASSES.includes(sv.cl)?sv.cl:"",inv:Object.fromEntries(Object.entries(iv).filter(([k,v])=>k!=="coin"&&typeof v==="number"&&v>0))};
+  adEdit={nick:cleanNick(sv.nf||sv.nick||p.d.n||""),coin:Math.floor(iv.coin||0),cr:Math.floor(sv.cr||0),xp:(sv.pg&&sv.pg.xp)|0,cl:CLASSES.includes(sv.cl)?sv.cl:"",inv:Object.fromEntries(Object.entries(iv).filter(([k,v])=>k!=="coin"&&typeof v==="number"&&v>0))};
   if(id===NET.myId) adEdit={nick:myNick,coin:inv.coin||0,cr:crystals,xp:prog.xp,cl:heroClass||"",inv:Object.fromEntries(Object.entries(inv).filter(([k])=>k!=="coin"))};
   if(winKind==="admin_pl"&&adSel===id) renderWin();
 }
@@ -3913,7 +3913,7 @@ function adRenderCard(body){
   const field=(lab,el)=>{ f.appendChild(mkEl("label",null,tr(lab))); f.appendChild(el); };
   const numIn=(k,max)=>{ const i=mkEl("input"); i.type="number"; i.min="0"; i.max=String(max); i.inputMode="numeric"; i.value=String(E[k]); i.oninput=()=>{ E[k]=Math.max(0,Math.min(max,Math.floor(+i.value||0))); }; return i; };
   const ni=mkEl("input"); ni.maxLength=16; ni.value=E.nick; ni.spellcheck=false; ni.oninput=()=>{ E.nick=ni.value; }; field("ad_nick",ni);
-  field("ad_coins",numIn("coin",9999999)); field("ad_cr",numIn("cr",9999999));
+  field("ad_coins",numIn("coin",INV_MAX_COIN)); field("ad_cr",numIn("cr",INV_MAX_COIN));
   const xi=numIn("xp",9999999); field("ad_xp",xi);
   const sel=mkEl("select"); for(const c of ["",...CLASSES]){ const o=mkEl("option",null,c?tr("cl_"+c):tr("ad_noclass")); o.value=c; if(E.cl===c) o.selected=true; sel.appendChild(o); }
   sel.onchange=()=>{ E.cl=sel.value; }; field("ad_class",sel);
@@ -3921,8 +3921,8 @@ function adRenderCard(body){
   body.appendChild(mkEl("b",null,tr("ad_inv")));
   const il=mkEl("div","plinv");
   for(const [k,v] of Object.entries(E.inv)){ if(!ITEMS.some(it=>it.id===k)) continue;
-    const r=mkEl("div","r"); r.appendChild(mkEl("span",null,tr("fish_"+k))); const i=mkEl("input"); i.type="number"; i.min="0"; i.max="9999"; i.value=String(v);
-    i.oninput=()=>{ E.inv[k]=Math.max(0,Math.min(9999,Math.floor(+i.value||0))); }; r.appendChild(i); il.appendChild(r); }
+    const r=mkEl("div","r"); r.appendChild(mkEl("span",null,tr("fish_"+k))); const i=mkEl("input"); i.type="number"; i.min="0"; i.max=String(INV_MAX); i.value=String(v);
+    i.oninput=()=>{ E.inv[k]=Math.max(0,Math.min(INV_MAX,Math.floor(+i.value||0))); }; r.appendChild(i); il.appendChild(r); }
   const add=mkEl("select"); const o0=mkEl("option",null,tr("ad_add")); o0.value=""; add.appendChild(o0);
   for(const it of ITEMS) if(it.id!=="coin"&&!(it.id in E.inv)){ const o=mkEl("option",null,tr("fish_"+it.id)); o.value=it.id; add.appendChild(o); }
   add.onchange=()=>{ if(add.value){ E.inv[add.value]=1; renderWin(); } }; il.appendChild(add);
@@ -3938,9 +3938,9 @@ function adRenderCard(body){
 async function adApply(id){
   const E=adEdit; if(!E||!NET.db) return;
   const nick=cleanNick(E.nick); const inv2={};
-  for(const [k,v] of Object.entries(E.inv)) if(v>0&&ITEMS.some(it=>it.id===k)) inv2[k]=Math.min(9999,v|0);
-  if(E.coin>0) inv2.coin=E.coin|0;
-  const set={inv:inv2,cr:E.cr|0,xp:E.xp|0,cl:E.cl||""}; if(nick.length>=2) set.nick=nick;
+  for(const [k,v] of Object.entries(E.inv)) if(v>0&&ITEMS.some(it=>it.id===k)) inv2[k]=Math.min(INV_MAX,Math.floor(v));
+  if(E.coin>0) inv2.coin=Math.min(INV_MAX_COIN,Math.floor(E.coin));
+  const set={inv:inv2,cr:Math.floor(E.cr||0),xp:Math.floor(E.xp||0),cl:E.cl||""}; if(nick.length>=2) set.nick=nick;
   if(id===NET.myId){ applyAdminOp({id:Date.now(),set},true); adMsg=tr("ad_saved"); renderWin(); return; }
   try{
     const ref=NET.db.doc(`data/users/${id}/save`); const s=await ref.get(); const sv=s.exists?(s.data()||{}):{};
@@ -3965,8 +3965,8 @@ function applyAdminOp(op,self){
   if(!op||typeof op!=="object"||!op.set||typeof op.set!=="object") return;
   const s=op.set;
   if(s.inv&&typeof s.inv==="object"){ for(const k of Object.keys(inv)) delete inv[k];
-    for(const [k,v] of Object.entries(s.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0) inv[k]=Math.min(9999999,v|0); }
-  if(typeof s.cr==="number") crystals=Math.max(0,s.cr|0);
+    for(const [k,v] of Object.entries(s.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0) inv[k]=Math.min(k==="coin"?INV_MAX_COIN:INV_MAX,Math.floor(v)); }
+  if(typeof s.cr==="number") crystals=Math.max(0,Math.min(INV_MAX_COIN,Math.floor(s.cr)));
   if(typeof s.xp==="number") prog.xp=Math.max(0,s.xp|0);
   if(typeof s.cl==="string"){ if(CLASSES.includes(s.cl)){ if(s.cl!==heroClass) setClass(s.cl); } else if(heroClass){ if(form) endForm(); heroClass=null; renderSkills(); } }
   if(typeof s.nick==="string"&&cleanNick(s.nick).length>=2){ forcedNick=cleanNick(s.nick); setNick(forcedNick,true); }
@@ -5151,6 +5151,7 @@ function applyFires(docs){
 }
 // ---- личное сохранение ----
 let saveT=3, saving=false, lastSaveJSON="", forcedNick=null;
+const INV_MAX_COIN=2e9, INV_MAX=1e6;   // сколько можно хранить: монет/кристаллов и любой другой вещи
 async function loadSave(){
   try{
     let s=await NET.db.doc(`data/users/${NET.myId}/save`).get();
@@ -5158,12 +5159,12 @@ async function loadSave(){
     if(!s.exists&&window.__islandOldUid){ const o=await NET.db.doc(`data/users/${window.__islandOldUid}/save`).get(); if(o.exists){ s=o; lastSaveJSON=""; saveT=0; } }
     if(!s.exists) return;
     const d=s.data()||{};
-    if(d.inv&&typeof d.inv==="object") for(const [k,v] of Object.entries(d.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0) inv[k]=Math.min(9999,v|0);
+    if(d.inv&&typeof d.inv==="object") for(const [k,v] of Object.entries(d.inv)) if(ITEMS.some(it=>it.id===k)&&typeof v==="number"&&v>0&&isFinite(v)) inv[k]=Math.min(k==="coin"?INV_MAX_COIN:INV_MAX,Math.floor(v));
     if(["none","active","done"].includes(d.quest)) quest=d.quest;
     if(["none","active","done"].includes(d.q2)) quest2=d.q2;
     rodLevel=d.rod===2?2:1;
     if(CLASSES.includes(d.cl)) heroClass=d.cl;
-    crystals=num(d.cr,0,1e7,0)|0; renderSkills();
+    crystals=Math.floor(num(d.cr,0,INV_MAX_COIN,0)); renderSkills();
     if(d.eq&&typeof d.eq==="object") for(const sl of SLOTS){ const id=d.eq[sl]; equip[sl]=typeof id==="string"&&GEAR[id]&&GEAR[id].slot===sl?id:null; }
     if(d.pg&&typeof d.pg==="object"){ prog.xp=num(d.pg.xp,0,1e7,0)|0;
       for(const k of Object.keys(prog.sk)) prog.sk[k]=num(d.pg.sk&&d.pg.sk[k],0,1e7,0)|0;
