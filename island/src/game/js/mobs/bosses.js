@@ -11,7 +11,7 @@ function bsSanitize(id,o){
   const pos=Array.isArray(o.pos)&&o.pos.length===2&&o.pos.every(v=>Number.isInteger(v)&&v>=0&&v<60)?[o.pos[0],o.pos[1]]:null;
   return {id,boss:true,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"golem",hue:itNum(o.hue,359),sz:Math.max(80,Math.min(260,itNum(o.sz,260)||160)),zn:o.zn==="island"?"island":"cave",
     hp:Math.max(5,itNum(o.hp,99999)),dmg:Math.max(1,itNum(o.dmg,20)),spd:Math.max(1,Math.min(4,itNum(o.spd,4)||1)),range:Math.max(2,Math.min(12,itNum(o.range,12)||6)),
-    xp:itNum(o.xp,99999),rsp:Math.max(1,Math.min(1440,itNum(o.rsp,1440)||10)),pos,
+    up:upSanitize(o.up),xp:itNum(o.xp,99999),rsp:Math.max(1,Math.min(1440,itNum(o.rsp,1440)||10)),pos,
     slam:o.slam?1:0,slamDmg:Math.max(1,itNum(o.slamDmg,30)||2),slamR:Math.max(15,Math.min(45,itNum(o.slamR,45)||23)),slamCd:Math.max(3,Math.min(30,itNum(o.slamCd,30)||7)),
     sum:o.sum?1:0,sumK:typeof o.sumK==="string"&&/^[a-z0-9]{2,14}$/.test(o.sumK)?o.sumK:"bat",sumN:Math.max(1,Math.min(5,itNum(o.sumN,5)||2)),
     rage:o.rage?1:0,rageAt:Math.max(5,Math.min(90,itNum(o.rageAt,90)||30)),
@@ -24,7 +24,7 @@ function applyBosses(d){
     delete I18N.ru["ed_src_"+k]; delete I18N.pl["ed_src_"+k]; delete CMOBS[k]; }
   mobTintCache.clear();
   for(const [id,o] of Object.entries(list).slice(0,30)){ const m=bsSanitize(id,o); if(!m) continue;
-    CMOBS[id]=m; bossesRaw[id]=m; BOSSES.push(id);
+    CMOBS[id]=m; bossesRaw[id]=m; BOSSES.push(id); regMobImgs(id,m.up);
     I18N.ru["ed_src_"+id]=m.ru+" (босс)"; I18N.pl["ed_src_"+id]=m.pl+" (boss)";
     if(!DROP_DEF[id]) DROP_DEF[id]=[{id:"coin",ch:100,a:20,b:50},{id:"potion_big",ch:60,a:1,b:1}]; }
   for(let i=animals.length-1;i>=0;i--){ const a=animals[i]; if(/^bs[a-z0-9]{4,12}$/.test(a.kind)&&!CMOBS[a.kind]) animals.splice(i,1); }

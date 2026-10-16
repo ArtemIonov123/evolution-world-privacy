@@ -18,6 +18,13 @@
 .edopt{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .edmrow{display:flex;gap:8px;align-items:flex-start}
 .edtabs{display:flex;gap:4px;flex-wrap:wrap}
+.upgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:4px 0}
+.upcell{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.upcell small{font-size:10px;line-height:1.15;opacity:.85}
+.upimg{width:100%;aspect-ratio:1;display:grid;place-items:center;background:#3d6b3a;border:2px dashed #8a7fb0;cursor:pointer;overflow:hidden}
+.upcell.req .upimg{border-color:var(--accent)}
+.upimg img{max-width:90%;max-height:90%;image-rendering:pixelated}.upimg span{font-size:22px;color:#e8e0ff;opacity:.8}
+.upcell .upx{position:absolute;top:-4px;right:-4px;min-height:0;width:20px;height:20px;padding:0;font-size:11px;line-height:1;background:#a33;color:#fff}
 .edsec{font-weight:700;color:var(--accent);font-size:14px;margin:2px 0 0}
 .adhub{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .adcard{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px;min-height:76px;font-family:var(--f-body);letter-spacing:0}

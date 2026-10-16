@@ -59,7 +59,7 @@ function renderMobCard(body){
   const E=mbDraft; if(!E){ mbSel=null; return renderAdminMobs(body); }
   adHead(body,()=>{ mbSel=null; mbDraft=null; adMsg=""; renderWin(); });
   const pv=mkEl("div","mbprev"), pc=mkEl("canvas"); pc.width=pc.height=96; pv.appendChild(pc); const pt=mkEl("b",null,""); pv.appendChild(pt); body.appendChild(pv);
-  const prev=()=>{ const g=pc.getContext("2d"); g.clearRect(0,0,96,96); g.imageSmoothingEnabled=false; const sp=img[E.b+"_se_0"];
+  const prev=()=>{ const g=pc.getContext("2d"); g.clearRect(0,0,96,96); g.imageSmoothingEnabled=false; const sp=draftSprite(E,()=>prev());
     if(sp){ const t=document.createElement("canvas"); t.width=sp.width; t.height=sp.height; t.getContext("2d").drawImage(sp,0,0); hueShift(t,E.hue);
       const k=Math.min(2,80/Math.max(sp.width,sp.height)*1.25)*E.sz/100*0.8; g.drawImage(t,48-sp.width*k/2,90-sp.height*k,sp.width*k,sp.height*k); }
     pt.textContent=(LANG==="ru"?E.ru||E.pl:E.pl||E.ru)||"\u2026"; };
@@ -75,6 +75,7 @@ function renderMobCard(body){
   for(const bk of MB_BASES){ const b=mkEl("button","btn"+(E.b===bk?" on":"")); b.type="button"; const im=mkEl("img"); im.src=SPRITES[bk+"_se_0"]||""; im.alt=""; b.appendChild(im); b.appendChild(mkEl("span",null,tr("mb_b_"+bk)));
     b.onclick=()=>{ E.b=bk; renderWin(); }; bases.appendChild(b); }
   body.appendChild(bases);
+  renderUpSlots(body,E,64);
   const f2=mkEl("div","plform");
   const rng=(k,lo,hi,lab)=>{ const r=mkEl("input"); r.type="range"; r.min=String(lo); r.max=String(hi); r.value=String(E[k]); r.oninput=()=>{ E[k]=+r.value; prev(); }; f2.appendChild(mkEl("label",null,tr(lab))); f2.appendChild(r); };
   rng("hue",0,359,"it_hue"); rng("sz",60,200,"mb_size");
@@ -102,6 +103,23 @@ function renderMobCard(body){
     bt.appendChild(adBtn(tr(mbDelAsk?"it_del_ok":"it_del"),()=>{ if(!mbDelAsk){ mbDelAsk=true; renderWin(); return; } mbWrite(E.id,null); mbSel=null; mbDraft=null; renderWin(); },"warn")); }
   body.appendChild(bt);
   if(adMsg) body.appendChild(mkEl("div","adok",adMsg));
+}
+// «Своя картинка»: 5 ячеек, обязательна только первая
+function renderUpSlots(body,E,max){
+  body.appendChild(mkEl("b",null,tr("up_title")));
+  const w=mkEl("div","upgrid");
+  for(const k of UP_KEYS){ const cell=mkEl("div","upcell"+(k==="se0"?" req":"")), has=E.up&&E.up[k];
+    const prevI=mkEl("div","upimg"); if(has){ const i=mkEl("img"); i.src=has; i.alt=""; prevI.appendChild(i); } else prevI.appendChild(mkEl("span",null,"+"));
+    cell.appendChild(prevI); cell.appendChild(mkEl("small",null,tr("up_"+k)));
+    const inp=mkEl("input"); inp.type="file"; inp.accept="image/png,image/*"; inp.style.display="none";
+    inp.onchange=()=>{ const fl=inp.files&&inp.files[0]; if(!fl) return; upLoadFile(fl,max,url=>{ if(!url){ adMsg=tr("up_empty"); renderWin(); return; }
+      if(k!=="se0"&&!(E.up&&E.up.se0)){ adMsg=tr("up_need_first"); renderWin(); return; }
+      E.up={...(E.up||{}),[k]:url}; if(k==="se0") E.hue=0; adMsg=""; renderWin(); }); };
+    prevI.onclick=()=>inp.click(); cell.appendChild(inp);
+    if(has){ const x=adBtn("\u2715",()=>{ if(k==="se0") E.up=null; else { const u={...E.up}; delete u[k]; E.up=u; } renderWin(); },"upx"); cell.appendChild(x); }
+    w.appendChild(cell); }
+  body.appendChild(w);
+  body.appendChild(mkEl("p","adnote",tr(E.up&&E.up.se0?"up_note_on":"up_note")));
 }
 function mbWrite(id,val){
   const list={}; for(const [k,v] of Object.entries(mobsRaw)) list[k]=v;

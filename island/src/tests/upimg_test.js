@@ -1,0 +1,50 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+const U='/tmp/claude-0/-home-claude/627c00d6-9af8-5cbe-9624-042427a98684/scratchpad/upimgs/';
+(async()=>{const b=await chromium.launch(); const errs=[];
+const ctx=await b.newContext({viewport:{width:390,height:800}}); await ctx.addInitScript({content:fs.readFileSync('fake_rtdb.js','utf8')});
+const W='#world=UpImgKey'+Date.now();
+const mk=async(id,first)=>{ const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(id+': '+e.message));
+  await p.addInitScript(`window.Telegram={WebApp:{initData:"x",initDataUnsafe:{start_param:"",user:{id:${id},first_name:${JSON.stringify(first)},language_code:"ru"}},ready(){},expand(){}}};try{localStorage.setItem("island_lang","ru")}catch(e){}`);
+  await p.goto('http://localhost:8765/index.html'+W); await p.waitForTimeout(2500);
+  await p.evaluate(()=>{ if(!heroClass) setClass('warrior'); const c=document.getElementById('classWrap'); if(c) c.remove(); }); return p; };
+const ad=await mk(1661222371,"Artem"); const pl=await mk(777020,"Petya");
+// новый моб со своей картинкой
+await ad.evaluate(()=>{ openWin("admin"); winKind="admin_mobs"; mbSel=null; renderWin(); document.querySelector('.wbody > .btn.big').click(); });
+await ad.locator('.plform input').nth(0).fill('Красный слизень');
+const files=ad.locator('.upcell input[type=file]');
+await files.nth(1).setInputFiles(U+'m_se1.png'); await ad.waitForTimeout(400);
+console.log('need first msg',await ad.evaluate(()=>document.querySelector('.adok')&&document.querySelector('.adok').textContent));
+await ad.locator('.upcell input[type=file]').nth(0).setInputFiles(U+'m_se0.png'); await ad.waitForTimeout(400);
+await ad.locator('.upcell input[type=file]').nth(1).setInputFiles(U+'m_se1.png'); await ad.waitForTimeout(400);
+await ad.locator('.upcell input[type=file]').nth(2).setInputFiles(U+'m_ne0.png'); await ad.waitForTimeout(400);
+await ad.locator('.upcell input[type=file]').nth(4).setInputFiles(U+'m_dead.png'); await ad.waitForTimeout(400);
+console.log('draft up',await ad.evaluate(()=>Object.fromEntries(Object.entries(mbDraft.up||{}).map(([k,v])=>[k,v.length]))));
+await ad.evaluate(()=>{ Object.assign(mbDraft,{ai:"aggr",hp:6,d:1,dn:1,n:1,nn:1}); });
+await ad.evaluate(()=>document.querySelector('.mbprev').scrollIntoView()); await ad.waitForTimeout(200);
+await ad.screenshot({path:'shot_up_card.png'});
+await ad.evaluate(()=>document.querySelector('.upgrid').scrollIntoView()); await ad.screenshot({path:'shot_up_slots.png'});
+await ad.evaluate(()=>mbSave()); await ad.waitForTimeout(1200);
+const kind=await ad.evaluate(()=>Object.keys(CMOBS).find(k=>!CMOBS[k].boss));
+const sizes=await pl.evaluate(k=>{ const m=CMOBS[k]; return {has:!!m, up:Object.keys(m.up||{}), pre:mobPre(m,k), imgs:["se_0","se_1","ne_0","ne_1","dead"].map(f=>{ const i=img["cm_"+k+"_"+f]; return i?i.width+"x"+i.height:"-"; })}; },kind);
+console.log('player registered',sizes);
+// появляется на карте с картинкой
+const host=(await ad.evaluate(()=>NET.host))?ad:pl;
+await host.evaluate(k=>{ const c=fleeCell(hero,hero.x,hero.y,1.5,2.5); spawnAnimal(k,c); const a=animals[animals.length-1]; a.alpha=1; a.home={x:c.x,y:c.y}; window.A=a; },kind);
+await host.waitForTimeout(1200);
+console.log('drawn',await host.evaluate(()=>A.drawn&&A.drawn.sp&&[A.drawn.sp.width,A.drawn.sp.height]));
+await host.screenshot({path:'shot_up_game.png'});
+await host.evaluate(()=>{ for(let i=0;i<5&&!(A.dying>0);i++) applyHit(A,NET.myPeer,hero.x,hero.y,3); }); await host.waitForTimeout(400);
+console.log('dead sprite',await host.evaluate(()=>A.drawn&&A.drawn.sp&&A.drawn.sp.width));
+await host.screenshot({path:'shot_up_dead.png'});
+// босс со своей картинкой
+await ad.evaluate(()=>{ openWin("admin"); winKind="admin_bosses"; bsSel=null; renderWin(); document.querySelector('.wbody > .btn.big').click(); });
+await ad.locator('.plform input').nth(0).fill('Огромный слизень');
+await ad.locator('.upcell input[type=file]').nth(0).setInputFiles(U+'m_se0.png'); await ad.waitForTimeout(400);
+await ad.evaluate(()=>bsSave()); await ad.waitForTimeout(800);
+console.log('boss up',await pl.evaluate(()=>{ const k=Object.keys(CMOBS).find(k=>CMOBS[k].boss); const i=img["cm_"+k+"_se_0"]; return [!!CMOBS[k].up, i&&i.width]; }));
+const docLen=await ad.evaluate(async()=>{ const s=await NET.db.doc("world/mobs").get(); return JSON.stringify(s.data()).length; });
+console.log('mobs doc size',docLen);
+// убрать картинку -> снова обычный вид
+await ad.evaluate(k=>{ openWin("admin"); winKind="admin_mobs"; mbSel=k; mbDraft={...CMOBS[k]}; renderWin(); document.querySelector('.upcell .upx').click(); mbSave(); },kind); await ad.waitForTimeout(800);
+console.log('removed',await pl.evaluate(k=>[!!CMOBS[k].up,mobPre(CMOBS[k],k),!!img["cm_"+k+"_se_0"]],kind));
+console.log('errs',errs); await b.close();})();

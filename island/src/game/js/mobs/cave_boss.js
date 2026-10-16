@@ -81,7 +81,7 @@ function drawGolemP(g,frame,moving,raise,glow){
 function drawBeast(a){
   if(a.alpha<=0.01) return;
   worldTransform(); ctx.imageSmoothingEnabled=false;
-  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const cm=CMOBS[a.kind], pre=cm?cm.b:a.kind, big=a.kind==="golem", boss=big||!!(cm&&cm.boss), sc=cm?cm.sz/100:1;
+  let [fx,fy]=proj(a.x-MX,a.y-MY,a.z); const cm=CMOBS[a.kind], pre=cm?mobPre(cm,a.kind):a.kind, big=a.kind==="golem", boss=big||!!(cm&&cm.boss), sc=cm?cm.sz/100:1;
   if(boss&&(a.slamT>0||a.slamFx>0)){   // красный круг — куда ударит голем; белая волна — удар
     const k=a.slamT>0?1-a.slamT/GOLEM_SLAM_T:1, SR=a.slamR||(cm&&cm.boss?cm.slamR/10:GOLEM_SLAM_R), rr=a.slamT>0?SR:SR*(1.2-a.slamFx*0.4);
     ctx.beginPath(); for(let i=0;i<=32;i++){ const an=i/32*Math.PI*2, q=proj(a.x-MX+Math.cos(an)*rr,a.y-MY+Math.sin(an)*rr,a.z); i?ctx.lineTo(...q):ctx.moveTo(...q); }
@@ -94,6 +94,7 @@ function drawBeast(a){
   let sp=img[`${pre}_${a.facing}_${frame}`], mirror=false;
   if(!sp&&a.facing[1]==="w"){ sp=img[`${pre}_${a.facing[0]}e_${frame}`]; mirror=true; }
   if(a.dying>0&&img[pre+"_dead"]){ sp=img[pre+"_dead"]; mirror=a.facing[1]==="w"; }
+  if(cm&&sp&&!sp.width) sp=null;
   if(cm&&sp) sp=mobTint(a.kind,sp);
   if(boss&&a.slamT>0) fx+=Math.round(Math.sin(T*60)*(1-a.slamT/GOLEM_SLAM_T)*2);   // дрожит перед ударом
   a.drawn={x:Math.round(fx),y:Math.round(fy),sp,name:null,mirror};

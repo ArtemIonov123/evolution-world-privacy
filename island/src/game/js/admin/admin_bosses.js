@@ -35,7 +35,7 @@ function renderBossCard(body){
   const E=bsDraft; if(!E){ bsSel=null; return renderAdminBosses(body); }
   adHead(body,()=>{ bsSel=null; bsDraft=null; adMsg=""; renderWin(); });
   const pv=mkEl("div","mbprev"), pc=mkEl("canvas"); pc.width=pc.height=96; pv.appendChild(pc); const pt=mkEl("b",null,""); pv.appendChild(pt); body.appendChild(pv);
-  const prev=()=>{ const g=pc.getContext("2d"); g.clearRect(0,0,96,96); g.imageSmoothingEnabled=false; const sp=img[E.b+"_se_0"];
+  const prev=()=>{ const g=pc.getContext("2d"); g.clearRect(0,0,96,96); g.imageSmoothingEnabled=false; const sp=draftSprite(E,()=>prev());
     if(sp){ const t=document.createElement("canvas"); t.width=sp.width; t.height=sp.height; t.getContext("2d").drawImage(sp,0,0); hueShift(t,E.hue);
       const k=Math.min(2.4,88/Math.max(sp.width,sp.height))*Math.min(1,E.sz/180); g.drawImage(t,48-sp.width*k/2,92-sp.height*k,sp.width*k,sp.height*k); }
     pt.textContent=(LANG==="ru"?E.ru||E.pl:E.pl||E.ru)||"…"; };
@@ -47,6 +47,7 @@ function renderBossCard(body){
   for(const bk of MB_BASES){ const b=mkEl("button","btn"+(E.b===bk?" on":"")); b.type="button"; const im=mkEl("img"); im.src=SPRITES[bk+"_se_0"]||""; im.alt=""; b.appendChild(im); b.appendChild(mkEl("span",null,tr("mb_b_"+bk)));
     b.onclick=()=>{ E.b=bk; renderWin(); }; bases.appendChild(b); }
   body.appendChild(bases);
+  renderUpSlots(body,E,112);
   const f2=mkEl("div","plform");
   const rng=(k,lo,hi,lab)=>{ const r=mkEl("input"); r.type="range"; r.min=String(lo); r.max=String(hi); r.value=String(E[k]); r.oninput=()=>{ E[k]=+r.value; prev(); }; bsField(f2,lab,r); };
   rng("hue",0,359,"it_hue"); rng("sz",80,260,"mb_size");
