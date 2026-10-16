@@ -4,6 +4,8 @@
 // КОГДА ПРИХОДИТ НОВАЯ КАРТИНКА ОТ GPT — впиши её имя в POSTAPO_ART, тогда её не перекрашиваем.
 const POSTAPO_ART=new Set([
   // сюда — имена новых картинок, например "block_grass", "hero_se_0"
+  "block_grass","block_grass_2","block_grass_dark","block_dirt","block_sand","block_stone_path",
+  "block_cobble_dark","block_gravel","block_planks","block_mud",            // набор 1: земля (16.10)
 ]);
 const DUST_RE=/^(block_|stairs_|tree_|bush$|grass_tuft|prop_bush_berry|prop_flowers|prop_stump|prop_log|prop_mushrooms|stone_slab|rock_|fence_|hut_|cave_entrance|prop_signpost|prop_crate|prop_barrel|stall_|pier_)/;
 const TOXIC_RE=/^water_/;
