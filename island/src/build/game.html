@@ -190,7 +190,7 @@ canvas.drag{cursor:grabbing}
 .clcard ul li::before{content:"\25C6  ";color:var(--accent)}
 .clpic{width:72px;height:90px;image-rendering:pixelated}
 @media (max-width:720px){ .skills{right:calc(max(10px,env(safe-area-inset-right,0px)) + 60px);bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-direction:column-reverse;gap:6px} .skb{width:48px;height:48px} }
-@media (max-height:500px){ .skills{right:calc(max(10px,env(safe-area-inset-right,0px)) + 166px);bottom:calc(8px + env(safe-area-inset-bottom,0px));flex-direction:row} .skb{width:42px;height:42px} }
+@media (max-height:500px) and (min-aspect-ratio:4/3){ .skills{right:calc(max(10px,env(safe-area-inset-right,0px)) + 166px);bottom:calc(8px + env(safe-area-inset-bottom,0px));flex-direction:row} .skb{width:42px;height:42px} }
 .party{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:12px;z-index:3;padding:5px 8px;font-size:12px;min-width:150px;max-width:220px}
 .party b{display:block;font-family:var(--f-display);font-weight:400;font-size:11px;color:var(--accent);letter-spacing:.05em;margin-bottom:2px}
 .party .pm{display:flex;align-items:center;gap:6px;line-height:1.6;min-width:0}
@@ -206,7 +206,7 @@ canvas.drag{cursor:grabbing}
 .upd.pask{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));flex-wrap:wrap;justify-content:center;max-width:min(520px,calc(100% - 20px))}
 .upd.pask span{white-space:normal;text-align:center}
 @media (max-width:720px){ .party{left:max(10px,env(safe-area-inset-left,0px));top:10px;font-size:11px;min-width:130px;max-width:170px} .upd.pask{bottom:calc(66px + env(safe-area-inset-bottom,0px));width:calc(100% - 20px)} }
-@media (max-height:500px){ .party{top:8px;padding:3px 6px} .upd.pask{bottom:calc(56px + env(safe-area-inset-bottom,0px))} }
+@media (max-height:500px) and (min-aspect-ratio:4/3){ .party{top:8px;padding:3px 6px} .upd.pask{bottom:calc(56px + env(safe-area-inset-bottom,0px))} }
 .bossbar{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;width:min(320px,calc(100% - 360px));min-width:200px;padding:5px 10px;text-align:center}
 .bossbar b{display:block;font-family:var(--f-display);font-weight:400;font-size:12px;color:#ff9a7a;letter-spacing:.05em}
 .bossbar i{display:block;height:10px;margin-top:4px;border:2px solid var(--edge);background:#3d3257}
@@ -423,7 +423,7 @@ body.editing .hotbar,body.editing .actions,body.editing .players,body.editing .h
   .dlg-opts .btn{min-height:44px}
 }
 /* телефон боком: низкий экран */
-@media (max-height:500px){
+@media (max-height:500px) and (min-aspect-ratio:4/3){
   .bar{padding-block:3px}
   .btn{min-height:30px;padding:4px 8px}
   .hface{width:40px;height:40px} .hface canvas{width:34px;height:34px}
