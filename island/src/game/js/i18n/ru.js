@@ -96,6 +96,8 @@ I18N.ru={
     pt_look:"Вид", pt_lv:"С уровня (0 — любой)", pt_lv_short:"с {n} ур.", pt_on:"Портал работает", pt_show:"Показать на карте", pt_saved:"Сохранено",
     pt_nowhere:"Этот портал пока никуда не ведёт", pt_nowhere_short:"? никуда", pt_closed:"Портал закрыт", pt_closed_tag:"закрыт",
     pt_save_first:"Сначала выбери, куда ведёт портал, и сохрани", ed_t_link_new:"Портал", pt_placed:"Портал поставлен — настрой, куда он ведёт",
+    bag_t_all:"Всё", bag_t_gear:"Снаряжение", bag_t_food:"Еда и зелья", bag_t_mat:"Материалы", bag_tab_empty:"В этой вкладке пусто",
+    bag_sell:"Купец даст", bag_coins:"{n} монет", bag_used:"Занято {n} / {m}",
     ad_mobs:"Мобы", ad_mobs_d:"Свои монстры, сила и зоны", win_admin_mobs:"Мобы",
     mb_new:"+ Новый моб", mb_none:"Своих мобов пока нет. Создай первого!", mb_look:"Вид", mb_size:"Размер %", mb_where:"Где живёт", mb_island:"Остров", mb_cave:"Пещера",
     mb_ai:"Поведение", mb_ai_aggr:"Агрессивный", mb_ai_night:"Злой ночью", mb_ai_passive:"Мирный", mb_ai_aggr_d:"нападает на всех, кто подойдёт", mb_ai_night_d:"днём мирный, ночью нападает", mb_ai_passive_d:"бьёт только в ответ",

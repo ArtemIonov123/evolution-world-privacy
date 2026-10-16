@@ -8,7 +8,7 @@ await p.evaluate(()=>{ inv.coin=40; inv.wood=6; inv.pelt=4; inv.fang=3; inv.kara
 console.log('weapon',await p.evaluate(()=>[equip.weapon,inv.club]));
 await p.tap('.hb[data-win="bag"]'); await p.waitForTimeout(200);
 await p.tap('.wbody .slot[title="Mikstura lecznicza"]'); await p.waitForTimeout(150); await p.screenshot({path:'w_bag.png'});
-console.log('bag detail',await p.evaluate(()=>document.querySelector('.detail').innerText.replace(/\n/g,' | ')));
+console.log('bag detail',await p.evaluate(()=>document.querySelector('.bagdet').innerText.replace(/\n/g,' | ')));
 // craft at npc
 await p.evaluate(()=>{ openDialog(); dlgNode="craft"; renderDialog(); });
 console.log('craft opts',await p.evaluate(()=>[...document.querySelectorAll('#dlgOpts button')].map(b=>(b.disabled?'[x] ':'')+b.textContent)));

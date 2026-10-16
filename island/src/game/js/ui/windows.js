@@ -37,11 +37,48 @@ function mkBar(into,need,col){ const w=mkEl("div","bar"); const f=mkEl("i"); f.s
 function renderWin(){
   if(!winKind) return;
   document.getElementById("winTitle").textContent=tr("win_"+winKind);
+  document.getElementById("win").classList.toggle("wbag",winKind==="bag");
   const body=document.getElementById("winBody"); body.textContent="";
   if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else if(winKind==="admin_bosses") renderAdminBosses(body); else if(winKind==="admin_zones") renderAdminZones(body); else if(winKind==="admin_portals") renderAdminPortals(body); else
   if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
 }
+const BAG_SIZE=30, BAG_TABS=["all","gear","food","mat"];
+let bagTab="all";
+const bagCat=id=>GEAR[id]?"gear":(EDIBLE[id]||id==="meat_raw")?"food":"mat";
 function renderBag(body){
+  const all=ITEMS.filter(f=>inv[f.id]);
+  const tabs=mkEl("div","bagtabs");
+  for(const t of BAG_TABS){ const b=mkEl("button","btn bagtab"+(bagTab===t?" on":""),tr("bag_t_"+t)); b.type="button"; b.setAttribute("aria-pressed",bagTab===t);
+    b.onclick=()=>{ bagTab=t; bagSel=null; renderWin(); }; tabs.appendChild(b); }
+  body.appendChild(tabs);
+  const got=all.filter(f=>bagTab==="all"||(f.id!=="coin"&&bagCat(f.id)===bagTab));
+  if(bagSel&&(!inv[bagSel]||!got.some(f=>f.id===bagSel))) bagSel=null;
+  if(!bagSel&&got.length) bagSel=(got.find(f=>f.id!=="coin")||got[0]).id;
+  const wrap=mkEl("div","bagwrap");
+  const grid=mkEl("div","baggrid"), n=Math.max(BAG_SIZE,Math.ceil(got.length/5)*5);
+  for(let i=0;i<n;i++){ const f=got[i];
+    if(f){ const s=slotBtn(f.id,inv[f.id],()=>{ bagSel=f.id; renderWin(); },bagSel===f.id); s.classList.add("bslot"); const sc=s.querySelector("span"); if(sc) sc.textContent=shortNum(inv[f.id]); grid.appendChild(s); }
+    else grid.appendChild(mkEl("div","slot bslot empty")); }
+  wrap.appendChild(grid);
+  const det=mkEl("div","bagdet");
+  if(!bagSel){ det.appendChild(mkEl("p","muted",tr(all.length?"bag_tab_empty":"bag_empty"))); }
+  else { const id=bagSel, ic=mkEl("div","bagbig"), im=mkEl("img"); im.src=iconURL(id); im.alt=""; ic.appendChild(im); det.appendChild(ic);
+    det.appendChild(mkEl("b","bagname cat-"+bagCat(id),tr("fish_"+id)+(inv[id]>1?" \u00D7"+inv[id]:"")));
+    det.appendChild(mkEl("i","bagdiv")); const ds=itemDesc(id); if(ds) det.appendChild(mkEl("p","bagdesc",ds));
+    const sp=id!=="coin"?sellPrice(id):0;
+    if(sp>0){ det.appendChild(mkEl("i","bagdiv")); const pr=mkEl("p","bagprice"); pr.appendChild(document.createTextNode(tr("bag_sell")+" "));
+      const ci=mkEl("img"); ci.src=iconURL("coin"); ci.alt=""; pr.appendChild(ci); pr.appendChild(mkEl("b",null,tr("bag_coins",{n:sp}))); det.appendChild(pr); }
+    const acts=mkEl("div","bagacts");
+    const act=(k,fn,big)=>{ const b=mkEl("button","btn bagbtn"+(big?" big":""),tr(k)); b.type="button"; b.onclick=fn; acts.appendChild(b); };
+    if(EDIBLE[id]) act(/^potion/.test(id)||(CUSTOM[id]&&CUSTOM[id].t==="potion")?"act_drink":"act_eat",()=>{ eatCooked(id); renderWin(); },true);
+    if(GEAR[id]) act("act_equip",()=>{ equipItem(id); renderWin(); },true);
+    if(id!=="coin") act("act_drop",()=>{ inv[id]--; if(!inv[id]) delete inv[id]; renderInv(); renderWin(); },false);
+    det.appendChild(acts); }
+  wrap.appendChild(det); body.appendChild(wrap);
+  const foot=mkEl("div","bagfoot"), co=mkEl("span","bagcoins"), cim=mkEl("img"); cim.src=iconURL("coin"); cim.alt=""; co.appendChild(cim); co.appendChild(mkEl("b",null,shortNum(inv.coin||0)));
+  foot.appendChild(co); foot.appendChild(mkEl("span","baguse",tr("bag_used",{n:all.filter(f=>f.id!=="coin").length,m:BAG_SIZE}))); body.appendChild(foot);
+}
+function renderBagOld(body){
   const got=ITEMS.filter(f=>inv[f.id]);
   if(!got.length){ body.appendChild(mkEl("p","muted",tr("bag_empty"))); return; }
   if(bagSel&&!inv[bagSel]) bagSel=null;

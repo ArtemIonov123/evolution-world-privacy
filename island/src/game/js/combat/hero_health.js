@@ -47,6 +47,10 @@ function applyHudArt(){
     for(const [k,v] of [["--hud-slot","hud_slot_frame"],["--hud-ring","hud_skill_ring"],["--hud-atk","hud_attack_btn"],["--hud-atk-p","hud_attack_btn_press"],["--hud-arc","hud_skill_arc"],["--hud-round","hud_round_btn"],["--hud-badge","hud_badge"]])
       if(S[v]) r.setProperty(k,`url(${S[v]})`);
     document.body.classList.add("bhud"); setTimeout(()=>{ try{ placeSkillArc(); }catch(e){} },0); }
+  if(S.ui_slot&&S.ui_win_frame){ const r=document.documentElement.style;
+    for(const [k,v] of [["--ui-slot","ui_slot"],["--ui-slot-sel","ui_slot_sel"],["--ui-tab","ui_tab"],["--ui-tab-on","ui_tab_on"],["--ui-btn-gold","ui_btn_gold"],["--ui-btn-purple","ui_btn_purple"],["--ui-divider","ui_divider"],["--ui-win-frame","ui_win_frame"],["--ui-close","ui_close"]])
+      if(S[v]) r.setProperty(k,`url(${S[v]})`);
+    document.body.classList.add("bagart"); }
   if(S.hud_btn_menu){ const m=document.getElementById("menuBtn"), sv=m.querySelector("svg"); if(sv){ const i=document.createElement("img"); i.src=S.hud_btn_menu; i.alt=""; i.width=i.height=40; sv.replaceWith(i); m.classList.add("art"); } }
 }
 function renderHP(){

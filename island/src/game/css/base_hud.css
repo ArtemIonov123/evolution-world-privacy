@@ -227,6 +227,47 @@ canvas.drag{cursor:grabbing}
 .wbody .slot.empty{opacity:.4;cursor:default}
 .wbody .slot:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .detail{border-top:1px solid var(--panel-2);padding-top:8px}
+/* ---- сумка ---- */
+.win.wbag{width:min(560px,calc(100% - 16px))}
+.win.wbag .whead{justify-content:center;position:relative}.win.wbag .whead b{font-size:17px}.win.wbag .wx{position:absolute;right:6px;top:4px}
+.bagtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.bagtab{font-family:var(--f-body);letter-spacing:0;font-size:12px;min-height:34px;padding:2px 4px;line-height:1.1;border-bottom-width:0}
+.bagtab.on{background:var(--accent);color:var(--panel);box-shadow:inset 0 2px 0 rgba(255,255,255,.45)}
+.bagwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(108px,36%);gap:8px;align-items:start}
+.baggrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.wbody .slot.bslot{width:auto;height:auto;aspect-ratio:1;background:#1b1528;border:2px solid #b8862e;box-shadow:inset 0 0 0 1px #000}
+.wbody .slot.bslot img{width:72%;height:72%}
+.wbody .slot.bslot span{right:3px;bottom:1px;font-size:10px}
+.wbody .slot.bslot span::before{content:"\00D7"}
+.wbody .slot.bslot.sel{border-color:#ffe08a;background:#3a2c58;box-shadow:0 0 6px rgba(255,214,107,.7),inset 0 0 0 1px #000}
+.wbody .slot.bslot.empty{opacity:1;cursor:default;border-color:#7a5a24}
+.bagdet{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px;background:#1b1528;border:2px solid #b8862e;min-height:100%;box-sizing:border-box;text-align:center}
+.bagbig{width:64px;height:64px;display:grid;place-items:center;border:2px solid #b8862e;background:#2b2340}
+.bagbig img{width:48px;height:48px;image-rendering:pixelated}
+.bagname{font-size:14px;line-height:1.2;color:#ffd66b}.bagname.cat-food{color:#ff6a5a}.bagname.cat-gear{color:#9fd0ff}
+.bagdiv{display:block;width:100%;height:6px;background:linear-gradient(#b8862e,#b8862e) center/100% 1px no-repeat}
+.bagdiv::after{content:"";display:block;width:6px;height:6px;margin:0 auto;background:#ffd66b;transform:rotate(45deg) scale(.75)}
+.bagdesc{margin:0;font-size:12px;line-height:1.3;color:#e8e0f4}
+.bagprice{margin:0;font-size:12px;color:#e8e0f4;display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:center}
+.bagprice img{width:16px;height:16px;image-rendering:pixelated}.bagprice b{color:#ffd66b}
+.bagacts{display:flex;flex-direction:column;gap:5px;width:100%;margin-top:auto}
+.bagbtn{font-family:var(--f-body);font-weight:700;letter-spacing:0;font-size:13px;min-height:36px;width:100%;background:#5a4a9a;color:#fff}
+.bagbtn.big{background:var(--accent);color:var(--panel)}
+.bagfoot{display:flex;align-items:center;justify-content:space-between;border-top:2px solid #b8862e;padding-top:6px;font-size:13px}
+.bagcoins{display:flex;align-items:center;gap:5px}.bagcoins img{width:18px;height:18px;image-rendering:pixelated}.bagcoins b{font-family:var(--f-display);font-weight:400;color:#ffd66b}
+.baguse{color:#e8e0f4}
+/* картинки от GPT (если есть) */
+body.bagart .wbody .slot.bslot{background:var(--ui-slot) center/100% 100% no-repeat;border:0;box-shadow:none;image-rendering:pixelated}
+body.bagart .wbody .slot.bslot.sel{background-image:var(--ui-slot-sel)}
+body.bagart .bagtab{background:var(--ui-tab) center/100% 100% no-repeat;border:0;box-shadow:none;color:#f4efe0;image-rendering:pixelated}
+body.bagart .bagtab.on{background-image:var(--ui-tab-on);color:#2b2340}
+body.bagart .bagbtn{background:var(--ui-btn-purple) center/100% 100% no-repeat;border:0;box-shadow:none;image-rendering:pixelated}
+body.bagart .bagbtn.big{background-image:var(--ui-btn-gold)}
+body.bagart .bagdiv{height:8px;background:var(--ui-divider) center/100% 100% no-repeat;image-rendering:pixelated}
+body.bagart .bagdiv::after{display:none}
+body.bagart .win{border:16px solid transparent;border-image:var(--ui-win-frame) 16 fill / 16px stretch;background:none;image-rendering:pixelated;box-shadow:none}
+body.bagart .win .whead{border-bottom:0}
+body.bagart .win .wx{background:var(--ui-close) center/100% 100% no-repeat;border:0;box-shadow:none;width:32px;height:32px;min-height:0;padding:0;color:transparent;image-rendering:pixelated}
 .drow{display:flex;gap:10px;align-items:center}
 .drow img{width:48px;height:48px;image-rendering:pixelated;flex:none}
 .drow b{font-size:15px}
