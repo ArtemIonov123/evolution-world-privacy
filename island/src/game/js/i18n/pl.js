@@ -99,7 +99,7 @@ I18N.pl={
     pt_nowhere:"Ten portal jeszcze nigdzie nie prowadzi", pt_nowhere_short:"? donikąd", pt_closed:"Portal zamknięty", pt_closed_tag:"zamknięty",
     pt_save_first:"Najpierw wybierz, dokąd prowadzi, i zapisz", ed_t_link_new:"Portal", pt_placed:"Portal postawiony — ustaw, dokąd prowadzi",
     bag_t_all:"Wszystko", bag_t_gear:"Ekwipunek", bag_t_food:"Jedzenie", bag_t_mat:"Materiały", bag_tab_empty:"W tej zakładce nic nie ma",
-    bag_drop:"Wyrzuć", bag_sell:"Kupiec da", bag_coins:"{n} monet", bag_used:"Zajęte {n} / {m}",
+    bag_full:"Torba pełna", bag_full_sub:"wyrzuć albo sprzedaj coś", bag_drop:"Wyrzuć", bag_sell:"Kupiec da", bag_coins:"{n} monet", bag_used:"Zajęte {n} / {m}",
     ad_mobs:"Potwory", ad_mobs_d:"Własne potwory, ich siła i strefy", win_admin_mobs:"Potwory",
     mb_new:"+ Nowy potwór", mb_none:"Brak własnych potworów. Stwórz pierwszego!", mb_look:"Wygląd", mb_size:"Rozmiar %", mb_where:"Gdzie żyje", mb_island:"Wyspa", mb_cave:"Jaskinia",
     mb_ai:"Zachowanie", mb_ai_aggr:"Agresywny", mb_ai_night:"Agresywny nocą", mb_ai_passive:"Spokojny", mb_ai_aggr_d:"atakuje każdego, kto podejdzie", mb_ai_night_d:"w dzień spokojny, nocą atakuje", mb_ai_passive_d:"oddaje tylko, gdy go uderzysz",

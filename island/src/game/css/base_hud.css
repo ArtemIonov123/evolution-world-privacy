@@ -256,7 +256,7 @@ canvas.drag{cursor:grabbing}
 .bagbtn.big{background:var(--accent);color:var(--panel)}
 .bagfoot{display:flex;align-items:center;justify-content:space-between;border-top:2px solid #b8862e;padding-top:6px;font-size:13px}
 .bagcoins{display:flex;align-items:center;gap:5px}.bagcoins img{width:18px;height:18px;image-rendering:pixelated}.bagcoins b{font-family:var(--f-display);font-weight:400;color:#ffd66b}
-.baguse{color:#e8e0f4}
+.baguse{color:#e8e0f4}.baguse.full{color:#ff6a5a;font-weight:700}
 /* картинки от GPT (если есть) */
 body.bagart .wbody .slot.bslot{background:var(--ui-slot) center/100% 100% no-repeat;border:0;box-shadow:none;image-rendering:pixelated}
 body.bagart .wbody .slot.bslot.sel{background-image:var(--ui-slot-sel)}

@@ -82,6 +82,7 @@ function shopPortrait(){
 }
 function buy(s){
   if((inv.coin||0)<s.p){ shopMsg=["shop_no_money"]; renderWin(); return; }
+  if(!bagRoom(s.id)){ shopMsg=["bag_full"]; renderWin(); return; }
   inv.coin-=s.p; if(!inv.coin) delete inv.coin;
   const n=s.n||1; inv[s.id]=(inv[s.id]||0)+n; const g=GEAR[s.id]; if(g&&!equip[g.slot]) equipItem(s.id);
   floats.push({key:"plus",p:{n,fish:"#fish_"+s.id},col:"#ffe0a0",t:0});
@@ -208,7 +209,7 @@ function updateFishing(dt){
     floats.push({key:"lost",col:"#ffb4a0",t:0});
     f.state="wait"; f.t=0; f.timer=waitTime(); say("lost_st");
   } else if(f.state==="reel"&&f.t>=0.75){
-    inv[f.fish.id]=(inv[f.fish.id]||0)+1; if(inv.bait){ inv.bait--; if(!inv.bait) delete inv.bait; } renderInv();
+    if(bagRoom(f.fish.id)) inv[f.fish.id]=(inv[f.fish.id]||0)+1; else bagFull(); if(inv.bait){ inv.bait--; if(!inv.bait) delete inv.bait; } renderInv();
     if(f.fish.id!=="boot") prog.st.fish++; addXP(xpFish(f.fish.id),"fish");
     floats.push({key:"plus",p:{n:1,fish:"#fish_"+f.fish.id},col:f.fish.id==="gold"?"#ffd66b":f.fish.id==="boot"?"#d8c0a8":"#ffffff",t:0});
     say("caught","caught_sub",{fish:"#fish_"+f.fish.id});

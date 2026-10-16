@@ -30,6 +30,12 @@ function addXP(n,skill){
     for(let i=0;i<24;i++) chips.push({x:hero.x,y:hero.y,z:hero.z*LH+20,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.5)*1.4,vz:30+Math.random()*40,t:0,life:0.9,col:i%2?"#ffd66b":"#fff4b0",spark:true}); }
   refreshUI();
 }
+// ---- место в сумке: 30 видов вещей (монеты место не занимают, к уже лежащей вещи добавить можно всегда) ----
+const BAG_SIZE=30;
+const bagUsed=()=>ITEMS.filter(f=>f.id!=="coin"&&inv[f.id]>0).length;
+const bagRoom=id=>id==="coin"||inv[id]>0||bagUsed()<BAG_SIZE;
+let bagFullT=0;
+function bagFull(){ const now=Date.now(); if(now-bagFullT>2500){ bagFullT=now; say("bag_full","bag_full_sub"); floats.push({key:"bag_full",col:"#ff8a7a",t:0}); } }
 // предмет в сумку; снаряжение само надевается, если слот пуст
 function canWear(g){ return !(g.lv&&heroLevel()<g.lv)&&!(g.cl&&g.cl!==heroClass); }
 function giveItem(id,n=1){ inv[id]=(inv[id]||0)+n; const g=GEAR[id]; if(g&&!equip[g.slot]&&canWear(g)) equipItem(id); else renderInv(); }
@@ -42,12 +48,13 @@ function equipItem(id){
   if(g.slot==="rod"){ if(old) rodWear[old]=rodDur; rodDur=rodWear[id]??rodMax(id); delete rodWear[id]; }
   equip[g.slot]=id; recalcHP(); renderInv(); lastSaveJSON="";
 }
-function unequip(slot){ const id=equip[slot]; if(!id) return; equip[slot]=null; if(slot==="rod"){ rodWear[id]=rodDur; rodDur=0; } inv[id]=(inv[id]||0)+1; recalcHP(); renderInv(); lastSaveJSON=""; }
+function unequip(slot){ const id=equip[slot]; if(!id) return; if(!bagRoom(id)){ bagFull(); return; } equip[slot]=null; if(slot==="rod"){ rodWear[id]=rodDur; rodDur=0; } inv[id]=(inv[id]||0)+1; recalcHP(); renderInv(); lastSaveJSON=""; }
 // ---- ремесло у рыбака ----
 const canCraft=r=>(inv.coin||0)>=r.coin&&Object.entries(r.need).every(([k,n])=>(inv[k]||0)>=n);
 const costText=r=>Object.entries(r.need).map(([k,n])=>`${n}× ${tr("fish_"+k).toLowerCase()}`).concat(r.coin?[`${r.coin} ${tr("coins")}`]:[]).join(", ");
 function craft(r){
   if(!canCraft(r)) return;
+  if(!bagRoom(r.id)){ bagFull(); return; }
   for(const [k,n] of Object.entries(r.need)){ inv[k]-=n; if(!inv[k]) delete inv[k]; }
   inv.coin-=r.coin; if(!inv.coin) delete inv.coin;
   giveItem(r.id); floats.push({key:"plus",p:{n:1,fish:"#fish_"+r.id},col:"#ffe0a0",t:0});

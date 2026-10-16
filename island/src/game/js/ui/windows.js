@@ -42,7 +42,7 @@ function renderWin(){
   if(winKind==="admin") renderAdminHub(body); else if(winKind==="admin_pl") renderAdminPlayers(body); else if(winKind==="admin_nf") renderNickFilter(body); else if(winKind==="admin_items") renderAdminItems(body); else if(winKind==="admin_mobs") renderAdminMobs(body); else if(winKind==="admin_bosses") renderAdminBosses(body); else if(winKind==="admin_zones") renderAdminZones(body); else if(winKind==="admin_portals") renderAdminPortals(body); else
   if(winKind==="shop") renderShop(body); else if(winKind==="bag") renderBag(body); else if(winKind==="equip") renderEquip(body); else if(winKind==="hero") renderHero(body); else renderQuests(body);
 }
-const BAG_SIZE=30, BAG_TABS=["all","gear","food","mat"];
+const BAG_TABS=["all","gear","food","mat"];
 let bagTab="all";
 const bagCat=id=>GEAR[id]?"gear":(EDIBLE[id]||id==="meat_raw")?"food":"mat";
 function renderBag(body){
@@ -76,7 +76,7 @@ function renderBag(body){
     det.appendChild(acts); }
   wrap.appendChild(det); body.appendChild(wrap);
   const foot=mkEl("div","bagfoot"), co=mkEl("span","bagcoins"), cim=mkEl("img"); cim.src=iconURL("coin"); cim.alt=""; co.appendChild(cim); co.appendChild(mkEl("b",null,shortNum(inv.coin||0)));
-  foot.appendChild(co); foot.appendChild(mkEl("span","baguse",tr("bag_used",{n:all.filter(f=>f.id!=="coin").length,m:BAG_SIZE}))); body.appendChild(foot);
+  foot.appendChild(co); { const u=bagUsed(); foot.appendChild(mkEl("span","baguse"+(u>=BAG_SIZE?" full":""),tr("bag_used",{n:u,m:BAG_SIZE}))); } body.appendChild(foot);
 }
 function renderBagOld(body){
   const got=ITEMS.filter(f=>inv[f.id]);

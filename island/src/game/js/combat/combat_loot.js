@@ -104,8 +104,9 @@ function applyHit(a,peer,fromX,fromY,dmg=1,crit=false,o={}){
 }
 function giveLoot(a){
   const got=rollDrops(a&&a.kind?a.kind:"wolf");
-  for(const [id,n] of got){ inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:id==="coin"?"#ffd66b":"#f0e0c0",t:-0.25*floats.length}); }
-  const kind=a&&a.kind||"wolf"; renderInv();
+  let lostLoot=false;
+  for(const [id,n] of got){ if(!bagRoom(id)){ lostLoot=true; continue; } inv[id]=(inv[id]||0)+n; floats.push({key:"plus",p:{n,fish:"#fish_"+id},col:id==="coin"?"#ffd66b":"#f0e0c0",t:-0.25*floats.length}); }
+  const kind=a&&a.kind||"wolf"; renderInv(); if(lostLoot) setTimeout(bagFull,900);
   if(kind==="bat"){ say("bat_killed","bat_killed_sub"); prog.st.bats=(prog.st.bats||0)+1; }
   else if(kind==="spider"){ say("spider_killed","bat_killed_sub"); prog.st.spiders=(prog.st.spiders||0)+1; }
   else if(kind==="golem"){ say("boss_killed","boss_killed_sub"); prog.st.bosses=(prog.st.bosses||0)+1; }

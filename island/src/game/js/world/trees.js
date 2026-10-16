@@ -45,9 +45,9 @@ function hitTree(t){
   if(ch.hits>=HITS[name]){
     t.falling={t:0,dx:t.x-hero.x,dy:t.y-hero.y,name}; netTreeGone(t);
     chopping=null;
-    const n=logsOf(name)+(Math.random()<extraLogChance()?1:0); if(n>0) inv.wood=(inv.wood||0)+n; renderInv();
+    const n=logsOf(name)+(Math.random()<extraLogChance()?1:0); const room=bagRoom("wood"); if(n>0){ if(room) inv.wood=(inv.wood||0)+n; else bagFull(); } renderInv();
     prog.st.trees++; addXP(xpOf("tree"),"chop");
-    floats.push({key:"plus",p:{n,fish:"#fish_wood"},col:"#f0c890",t:0});
+    if(room) floats.push({key:"plus",p:{n,fish:"#fish_wood"},col:"#f0c890",t:0});
     say("felled");
   }
 }
