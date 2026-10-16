@@ -1776,9 +1776,13 @@ function renderShop(body){
   det.appendChild(acts); body.appendChild(det);
 }
 
+// 12345 → 12.3K, 1000000 → 1M (как в играх); до 10 000 — полностью
+function shortNum(n){ n=Math.floor(+n||0); if(n<10000) return String(n);
+  for(const [v,u] of [[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]]) if(n>=v){ const x=n/v; return (x>=100?Math.floor(x):Math.floor(x*10)/10).toString().replace(/\.0$/,"")+u; }
+  return String(n); }
 function renderHdCoins(){
   const n=inv.coin||0, el=document.getElementById("hdCoinN"); if(!el) return;
-  if(el.textContent!==String(n)){ el.textContent=String(n); document.getElementById("hdCoins").setAttribute("aria-label",tr("shop_coins",{c:n})); }
+  if(el.textContent!==shortNum(n)){ el.textContent=shortNum(n); document.getElementById("hdCoins").setAttribute("aria-label",tr("shop_coins",{c:n})); }
   const im=document.getElementById("hdCoinIcon"); if(im&&!im.getAttribute("src")&&typeof ICONS!=="undefined"&&ICONS.coin) im.src=iconURL("coin");
 }
 setInterval(renderHdCoins,500);
@@ -2643,7 +2647,7 @@ function updateHud(){
   document.getElementById("hudHpTxt").textContent=hero.hp+" / "+HP_MAX; document.getElementById("hudHp").setAttribute("aria-label",tr("hp_label")+": "+hero.hp+"/"+HP_MAX);
   setW(document.getElementById("hudXpFill"),L.into/Math.max(1,L.need));
   document.getElementById("hudXpTxt").textContent=L.into+" / "+L.need+" XP";
-  const cn=document.getElementById("hudCrN"); if(cn.textContent!==String(crystals)){ cn.textContent=String(crystals); document.getElementById("hudCr").setAttribute("aria-label",tr("cr_name")+": "+crystals); }
+  const cn=document.getElementById("hudCrN"); if(cn.textContent!==shortNum(crystals)){ cn.textContent=shortNum(crystals); document.getElementById("hudCr").setAttribute("aria-label",tr("cr_name")+": "+crystals); }
   const key=(heroClass||"")+"|"+myHueIdx+"|"+(img.druid_se_0?1:0);
   if(key!==hudFaceKey&&typeof heroSprite==="function"){ const sp=heroSprite(heroClass==="druid"&&img.druid_se_0?"druid_se_0":"hero_se_0",myHueIdx);
     if(sp){ hudFaceKey=key; const c=document.getElementById("hudFaceCv"), g=c.getContext("2d"); g.imageSmoothingEnabled=false; g.clearRect(0,0,48,48);
