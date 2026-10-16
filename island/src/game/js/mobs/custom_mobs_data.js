@@ -45,7 +45,7 @@ function mobPreview(kind,size,def){
 function mbSanitize(id,o){
   if(!/^m[a-z0-9]{4,12}$/.test(id)||!o||typeof o!=="object") return null;
   const ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
-  return {id,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"wolf",hue:itNum(o.hue,359),sz:Math.max(60,Math.min(200,itNum(o.sz,200)||100)),zn:o.zn==="cave"?"cave":"island",
+  return {id,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"wolf",hue:itNum(o.hue,359),sz:Math.max(60,Math.min(200,itNum(o.sz,200)||100)),zn:zoneOk(o.zn)?o.zn:"island",
     ai:MB_AI.includes(o.ai)?o.ai:"aggr",hp:Math.max(1,itNum(o.hp,999)),dmg:Math.max(1,itNum(o.dmg,10)),spd:Math.max(1,Math.min(4,itNum(o.spd,4)||2)),range:Math.max(2,Math.min(10,itNum(o.range,10)||5)),
     up:upSanitize(o.up),xp:itNum(o.xp,5000),d:o.d?1:0,dn:itNum(o.dn,20),n:o.n?1:0,nn:itNum(o.nn,20),cn:itNum(o.cn,20)};
 }

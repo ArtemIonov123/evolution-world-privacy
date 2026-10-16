@@ -5,7 +5,7 @@ for(const c of cells) c.grow=1;
 let chopping=null;                       // {tree, t, hits, cyc, struck}
 const chips=[], regrow=[];
 const treeName=c=>c&&c.props.find(n=>n.startsWith("tree"));
-function refreshBlocked(c){ c.shallow=c.t==="v"; c.blocked=!!c.water||!!c.hutPart||!!c.npcHere||!!c.merchHere||!!c.stall||c.props.some(n=>BLOCKING.has(n)); }
+function refreshBlocked(c){ c.shallow=c.t==="v"; c.blocked=!!c.water||!!c.link||!!c.hutPart||!!c.npcHere||!!c.merchHere||!!c.stall||c.props.some(n=>BLOCKING.has(n)); }
 function stopChopping(){ chopping=null; hero.pendingChop=null; }
 
 // клик по дереву: подходим к соседней клетке (лучше — перед деревом, чтобы его было видно)

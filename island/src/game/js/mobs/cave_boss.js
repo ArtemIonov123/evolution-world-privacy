@@ -10,7 +10,7 @@ function caveSpawn(farFromAll){
     const z=zonePick(k,c=>freeCell(c)&&farFromAll(c,5)), c=z!==undefined?z:randomCell(c=>freeCell(c)&&farFromAll(c,6));
     if(!c) continue; spawnAnimal(k,c); const a=animals[animals.length-1]; a.home={x:c.x,y:c.y};
     if(k==="bat"){ a.fly=2.2; a.phase=Math.random(); a.attackT=1.5; } }
-  for(const [k,m] of Object.entries(CMOBS)){ if(m.zn!=="cave"||live(k)>=m.cn||Math.random()>0.3) continue; spawnMob(k,"n",farFromAll,0); }
+  for(const [k,m] of Object.entries(CMOBS)){ if(m.boss||m.zn!==ZONE||live(k)>=m.cn||Math.random()>0.3) continue; spawnMob(k,"n",farFromAll,0); }
   const b=MAP.boss&&cellAt(MAP.boss[0],MAP.boss[1]);
   if(b&&!animals.some(a=>a.kind==="golem")&&Date.now()-bossDeadAt>bossRespawnMs()&&farFromAll(b,2.5)){
     spawnAnimal("golem",b); const g=animals[animals.length-1]; g.home={x:b.x,y:b.y}; g.slamCd=4; g.attackT=1.2; }

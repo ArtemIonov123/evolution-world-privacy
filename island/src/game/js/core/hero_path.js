@@ -62,6 +62,7 @@ function goTo(c){
   if(typeof c==="object"&&isMob(c)){ if(placing) return; attackWolf(c); return; }
   if(placing){ if(c&&typeof c==="object") placeFireAt(c); return; }
   if(typeof c==="object"&&c.fire){ goAdjacent(c,()=>openFireMenu(c.fire),"go_fire"); return; }
+  if(typeof c==="object"&&c.link){ const id=c.link; goAdjacent(c,()=>useLink(id),"go_link"); return; }
   if(c==="portal"||c.portal){ goAdjacent(PORTAL,usePortal,CAVE?"go_exit":"go_cave"); return; }
   if(c==="merchant"||c.merchHere||c.stall){ goTrade(); return; }
   if(c==="npc"||c==="hut"||c.hutPart||c.npcHere){ goTalk(); return; }

@@ -58,6 +58,7 @@ function pickEntity(mx,my){
   const wx=(mx-panX)/scale, wy=(my-panY)/scale;
   if(npc){ const [fx,fy]=proj(npc.x-MX,npc.y-MY,npc.z); if(Math.abs(wx-fx)<=11&&wy>=fy-44&&wy<=fy+4) return "npc"; }
   if(pickPortal(wx,wy)) return "portal";
+  { const lk=pickLink(wx,wy); if(lk) return lk; }
   if(pickMerchant(wx,wy)) return "merchant";
   if(HUT){
     const g=hutGeom(), pts=[];

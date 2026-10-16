@@ -10,6 +10,7 @@ function renderAdminHub(body){
   card("\u{1F465}","ad_pl","ad_pl_d",()=>{ adSel=null; adMsg=""; winKind="admin_pl"; renderWin(); });
   card("\u{1F5E1}\uFE0F","ad_items","ad_items_d",()=>{ itSel=null; adMsg=""; winKind="admin_items"; renderWin(); });
   card("\u{1F43A}","ad_mobs","ad_mobs_d",()=>{ mbSel=null; adMsg=""; winKind="admin_mobs"; renderWin(); });
+  card("\u{1F3DD}\uFE0F","ad_zones","ad_zones_d",()=>{ znSel=null; adMsg=""; winKind="admin_zones"; renderWin(); });
   card("\u{1F479}","ad_bosses","ad_bosses_d",()=>{ bsSel=null; adMsg=""; winKind="admin_bosses"; renderWin(); });
   card("\u{1F4AC}","ad_texts","ad_texts_d",()=>{ closeWin(); edEnter("texts"); });
   card("\u{1F6D2}","ad_shop","ad_shop_d",()=>{ closeWin(); edEnter("shop"); });

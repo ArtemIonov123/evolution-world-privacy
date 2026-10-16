@@ -68,6 +68,7 @@ function drawSprites(anchor){
     if(c.fire) drawFire(c);
     if(c.stump) drawStump(c);
     if(c.portal) drawPortal(c);
+    if(c.link) drawLink(c);
     if(c.props.length){
       const p=proj(X,Y,wet(c)?walkZ(c):c.L);
       for(const name of c.props){

@@ -9,7 +9,7 @@ function bsSanitize(id,o){
   if(!/^bs[a-z0-9]{4,12}$/.test(id)||!o||typeof o!=="object") return null;
   const ru=itClean(o.ru).slice(0,24), pl=itClean(o.pl).slice(0,24)||ru; if(!ru&&!pl) return null;
   const pos=Array.isArray(o.pos)&&o.pos.length===2&&o.pos.every(v=>Number.isInteger(v)&&v>=0&&v<60)?[o.pos[0],o.pos[1]]:null;
-  return {id,boss:true,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"golem",hue:itNum(o.hue,359),sz:Math.max(80,Math.min(260,itNum(o.sz,260)||160)),zn:o.zn==="island"?"island":"cave",
+  return {id,boss:true,ru:ru||pl,pl,b:MB_BASES.includes(o.b)?o.b:"golem",hue:itNum(o.hue,359),sz:Math.max(80,Math.min(260,itNum(o.sz,260)||160)),zn:zoneOk(o.zn)?o.zn:"cave",
     hp:Math.max(5,itNum(o.hp,99999)),dmg:Math.max(1,itNum(o.dmg,20)),spd:Math.max(1,Math.min(4,itNum(o.spd,4)||1)),range:Math.max(2,Math.min(12,itNum(o.range,12)||6)),
     up:upSanitize(o.up),xp:itNum(o.xp,99999),rsp:Math.max(1,Math.min(1440,itNum(o.rsp,1440)||10)),pos,
     slam:o.slam?1:0,slamDmg:Math.max(1,itNum(o.slamDmg,30)||2),slamR:Math.max(15,Math.min(45,itNum(o.slamR,45)||23)),slamCd:Math.max(3,Math.min(30,itNum(o.slamCd,30)||7)),

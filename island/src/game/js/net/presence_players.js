@@ -31,7 +31,7 @@ function onPeersChange(change){
   for(const p of change.peers){
     if(p.sameTab||p.kind!=="viewer") continue;
     const pr=p.presence||{}; if(pr.v!==1||pr.afk===1) continue;   // АФК (свернул игру или долго бездействует) — как будто нет
-    const zn=pr.zn==="cave"?"cave":"island", uid=(typeof pr.id==="string"&&pr.id.length<80&&pr.id)||p.by||null;
+    const zn=zoneOk(pr.zn)?pr.zn:"island", uid=(typeof pr.id==="string"&&pr.id.length<80&&pr.id)||p.by||null;
     if(uid&&uid!==NET.myId){ const str=v=>typeof v==="string"&&v.length<80?v:null;
       online.set(uid,{uid,peer:p.peer,nick:nickOf(pr.n),c:num(pr.c|0,0,PLAYER_HUES.length-1,0)|0,hp:num(pr.hp,0,99,5)|0,hm:num(pr.hm,1,99,5)|0,zn,lv:num(pr.lv|0,1,99,1),
         pj:str(pr.pj),pk:str(pr.pk),pd:num(pr.pd,0,1e15,0),kk:Array.isArray(pr.kk)?pr.kk.slice(0,6).map(String):[],

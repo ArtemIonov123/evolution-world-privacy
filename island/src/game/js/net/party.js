@@ -36,6 +36,7 @@ function acceptInvite(){
 }
 function declineInvite(){ if(partyAsk&&partyAsk.key) answered.add(partyAsk.key); partyAsk=null; renderPartyAsk(); }
 function travelZone(zn){
+  if(CUSTOMZ||ZID.test(zn)){ travelTo(zn,"start"); return; }
   if(zn===ZONE||fainting) return; fainting=true; hero.path=[]; document.getElementById("fade").style.opacity="1"; say(zn==="cave"?"cave_enter":"cave_leave");
   saveNow(); try{ sessionStorage.setItem("island_zone",zn); sessionStorage.setItem("island_spawn","portal"); }catch(e){}
   setTimeout(()=>location.reload(),1100);
@@ -84,14 +85,14 @@ function renderParty(){
     const sw=mkEl("i"); sw.style.background=hueCss(c); row.appendChild(sw);
     row.appendChild(mkEl("span",null,(i===0?"★ ":"")+(m.me?(myNick||tr("you")):(o?o.nick||tr("someone"):"…"))));
     const bar=mkEl("em","hpb"), fill=mkEl("s"); fill.style.width=Math.round(100*Math.max(0,hp)/Math.max(1,hm))+"%"; bar.appendChild(fill); row.appendChild(bar);
-    if(!m.me&&o&&o.zn!==ZONE){ const t=mkEl("button","btn mini zn",tr(o.zn==="cave"?"where_cave":"where_island")); t.type="button"; t.title=tr("party_travel"); t.onclick=()=>travelZone(o.zn); row.appendChild(t); }
+    if(!m.me&&o&&o.zn!==ZONE){ const t=mkEl("button","btn mini zn",zoneWhere(o.zn)); t.type="button"; t.title=tr("party_travel"); t.onclick=()=>travelZone(o.zn); row.appendChild(t); }
     el.appendChild(row); });
 }
 function renderPartyAsk(){
   const el=document.getElementById("partyAsk"); if(!el) return;
   if(!partyAsk){ el.hidden=true; return; }
   el.hidden=false;
-  document.getElementById("partyAskText").textContent=partyAsk.kind==="follow"?tr("party_follow",{n:partyAsk.nick||tr("someone"),w:"#"+(partyAsk.zn==="cave"?"where_to_cave":"where_to_island")}):tr("party_ask",{n:partyAsk.nick});
+  document.getElementById("partyAskText").textContent=partyAsk.kind==="follow"?tr("party_follow",{n:partyAsk.nick||tr("someone"),w:(ZID.test(partyAsk.zn)||CUSTOMZ)?"\u2192 "+zoneName(partyAsk.zn):"#"+(partyAsk.zn==="cave"?"where_to_cave":"where_to_island")}):tr("party_ask",{n:partyAsk.nick});
   document.getElementById("partyYes").textContent=tr(partyAsk.kind==="follow"?"party_go":"party_yes");
   document.getElementById("partyNo").textContent=tr("party_no");
 }
@@ -113,13 +114,13 @@ function renderPlayers(){
   el.hidden=false;
   const sl=[];   // в списке — только те, кто сейчас в игре
   el.textContent="";
-  const head=document.createElement("b"); head.textContent=tr(CAVE?"players_title_cave":"players_title")+" · "+(remotes.size+1+away.size); el.appendChild(head);
+  const head=document.createElement("b"); head.textContent=(CUSTOMZ?zoneName(ZONE):tr(CAVE?"players_title_cave":"players_title"))+" · "+(remotes.size+1+away.size); el.appendChild(head);
   const row=(color,text,off,uid)=>{ const d=document.createElement(uid?"button":"div"); d.className="prow"+(off?" off":"")+(uid?" pick":""); if(uid){ d.type="button"; d.onclick=()=>{ selPlayer=selPlayer===uid?null:uid; renderPlayers(); }; }
     const i=document.createElement("i"); i.style.background=color; const sp=document.createElement("span"); sp.textContent=(inMyParty(uid==="me"?NET.myId:uid)&&myPartyKey()?"◆ ":"")+text; d.append(i,sp); el.appendChild(d);
     if(uid&&selPlayer===uid) el.appendChild(playerMenu(uid)); };
   row(hueCss(myHueIdx),myNick?myNick+" ("+tr("you")+")":tr("you"),false,myPartyKey()?"me":null);
   for(const r of remotes.values()) row(hueCss(r.c),playerName(r),false,r.uid||null);
-  for(const a of away.values()){ const uid=[...online.values()].find(o=>o.peer===a.peer)?.uid; row(hueCss(a.c),(a.nick||(a.by&&names[a.by])||tr("someone"))+" · "+tr(a.zn==="cave"?"where_cave":"where_island"),true,uid||null); }
+  for(const a of away.values()){ const uid=[...online.values()].find(o=>o.peer===a.peer)?.uid; row(hueCss(a.c),(a.nick||(a.by&&names[a.by])||tr("someone"))+" · "+zoneWhere(a.zn),true,uid||null); }
   for(const p of sl.slice(0,5)) row(hueCss(p.c),(p.nick||(names[p.by])||tr("someone"))+" · "+tr("sleeping")+" "+agoText(p.last),true);
   if([...remotes.values(),...sl].some(r=>r.by&&!(r.by in names))) resolveNames();
 }

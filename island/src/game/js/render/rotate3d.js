@@ -35,6 +35,7 @@ function draw3D(anchor){
     if(wet(c)){ worldTransform(); drawWater(c); drawWaterFx(c); if(c.pier) drawMarketProp(c.pier,c); } else face(TEX[top+"_top"],p0,sub(proj(X0+1,Y0,Z),p0),sub(proj(X0,Y0+1,Z),p0));
     if(c.stump){ worldTransform(); drawStump(c); }
     if(c.portal) drawPortal(c);
+    if(c.link) drawLink(c);
     if(c.props.length){
       const ctr=proj(c.x-MX,c.y-MY,wet(c)?walkZ(c):c.L);
       for(const name of c.props){

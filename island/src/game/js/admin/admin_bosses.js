@@ -18,7 +18,7 @@ function renderAdminBosses(body){
     const im=mkEl("img"); im.src=mobPreview(id,32); im.alt=""; b.appendChild(im);
     const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,mbName(m)));
     const sk=[m.slam?"\u{1F4A5}":"",m.sum?"\u{1F987}":"",m.rage?"\u{1F525}":""].join("");
-    nm.appendChild(mkEl("small",null,(m.zn==="cave"?tr("mb_cave"):tr("mb_island"))+" · HP "+m.hp+" · "+tr("bs_rsp_short",{n:m.rsp})+(sk?" · "+sk:"")+(m.pos?"":" · ⚠ "+tr("bs_nopos_short")))); b.appendChild(nm);
+    nm.appendChild(mkEl("small",null,zoneName(m.zn)+" · HP "+m.hp+" · "+tr("bs_rsp_short",{n:m.rsp})+(sk?" · "+sk:"")+(m.pos?"":" · ⚠ "+tr("bs_nopos_short")))); b.appendChild(nm);
     b.onclick=()=>{ bsSel=id; bsDelAsk=false; adMsg=""; bsDraft={...m}; renderWin(); }; l.appendChild(b); }
   body.appendChild(l);
   body.appendChild(mkEl("b","sub",tr("mb_builtin")));
@@ -51,7 +51,7 @@ function renderBossCard(body){
   const f2=mkEl("div","plform");
   const rng=(k,lo,hi,lab)=>{ const r=mkEl("input"); r.type="range"; r.min=String(lo); r.max=String(hi); r.value=String(E[k]); r.oninput=()=>{ E[k]=+r.value; prev(); }; bsField(f2,lab,r); };
   rng("hue",0,359,"it_hue"); rng("sz",80,260,"mb_size");
-  const zs=mkEl("div","mbseg"); for(const [v,t] of [["island","mb_island"],["cave","mb_cave"]]) zs.appendChild(adBtn(tr(t),()=>{ if(E.zn!==v){ E.zn=v; E.pos=null; } renderWin(); },E.zn===v?"on":""));
+  const zs=mkEl("div","mbseg"); for(const [v,t] of allZones().map(z=>[z,zoneName(z)])) zs.appendChild(adBtn(t,()=>{ if(E.zn!==v){ E.zn=v; E.pos=null; } renderWin(); },E.zn===v?"on":""));
   bsField(f2,"mb_where",zs); body.appendChild(f2);
   const f3=mkEl("div","plform");
   bsField(f3,"mb_hp",bsNum(E,"hp",5,99999)); bsField(f3,"bs_dmg",bsNum(E,"dmg",1,20));
@@ -76,7 +76,7 @@ function renderBossCard(body){
   const bt=mkEl("div","plbtns");
   bt.appendChild(adBtn(tr("it_save"),bsSave,"big"));
   if(!E.isNew&&CMOBS[E.id]){
-    bt.appendChild(adBtn(tr("bs_place"),()=>{ if(E.zn!==ZONE){ adMsg=tr("mb_zone_other",{z:"#"+(E.zn==="cave"?"ad_mapc":"ad_mapi")}); renderWin(); return; }
+    bt.appendChild(adBtn(tr("bs_place"),()=>{ if(E.zn!==ZONE){ adMsg=tr("mb_zone_other",{z:zoneName(E.zn)}); renderWin(); return; }
       closeWin(); edEnter("map"); edCat="places"; edTool="bpos_"+E.id; edRender(); say("bs_place_hint"); }));
     bt.appendChild(adBtn(tr("mb_loot"),()=>{ closeWin(); edEnter("drop"); edDropSel="mob:"+E.id; edRender(); }));
     bt.appendChild(adBtn(tr(bsDelAsk?"it_del_ok":"it_del"),()=>{ if(!bsDelAsk){ bsDelAsk=true; renderWin(); return; } bsWrite(E.id,null); bsSel=null; bsDraft=null; renderWin(); },"warn")); }

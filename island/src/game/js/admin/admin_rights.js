@@ -20,5 +20,5 @@ async function initAdmin(){
   } else if(!window.__islandWorld&&NET.user&&NET.user.isOwner){ try{ ok=!!(await NET.user.isOwner()); }catch(e){} }
   isAdmin=ok; const b=document.getElementById("editBtn"); if(b) b.hidden=!ok;
   if(ok){ let re=null, hub=null; try{ re=sessionStorage.getItem("island_reedit"); sessionStorage.removeItem("island_reedit"); hub=sessionStorage.getItem("island_adhub"); sessionStorage.removeItem("island_adhub"); }catch(e){}
-    if(re) setTimeout(()=>edEnter(re==="1"?"map":re),300); else if(hub) setTimeout(()=>openWin("admin"),300); }
+    if(re) setTimeout(()=>{ if(!EDIT) edEnter(re==="1"?"map":re); },300); else if(hub) setTimeout(()=>openWin("admin"),300); }
 }

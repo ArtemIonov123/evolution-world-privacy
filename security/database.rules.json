@@ -49,7 +49,7 @@
           },
           "$shared": {
             "$id": {
-              ".write": "auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && ($shared === 'trees' || $shared === 'fires' || $shared === 'cave_trees' || $shared === 'cave_fires')",
+              ".write": "auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && $shared.matches(/^(cave_|z[a-z0-9]{4,10}_)?(trees|fires)$/)",
               ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 600)"
             }
           }

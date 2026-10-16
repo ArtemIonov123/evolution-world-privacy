@@ -12,6 +12,7 @@ const npc = NPCC ? {x:NPCC.x, y:NPCC.y, z:walkZ(NPCC), facing:"se", t:0, turnT:3
 if(NPCC){ NPCC.npcHere=true; NPCC.blocked=true; NPCC.props=[]; }
 // ================= Пещера: вход на острове, выход в пещере =================
 const PORTAL=(()=>{
+  if(CUSTOMZ) return null;
   const p=CAVE?MAP.exit:MAP.cave, ok=c=>c&&!wet(c)&&!c.hutPart&&!c.npcHere&&!c.merchHere&&!c.stall&&!c.st;
   let c=p&&cellAt(p[0],p[1]);
   if(!ok(c)){   // вход не задан — сами выбираем сухую клетку подальше от старта, с проходом рядом
@@ -24,7 +25,7 @@ const PORTAL=(()=>{
 })();
 // где появиться после перехода: у входа/выхода или (после обморока в пещере) у хижины
 let SPAWN_FIXED=false;
-{ let sp=null; try{ sp=sessionStorage.getItem("island_spawn"); sessionStorage.removeItem("island_spawn"); }catch(e){}
+{ let sp=null; try{ sp=sessionStorage.getItem("island_spawn"); sessionStorage.removeItem("island_spawn"); }catch(e){} window.__spawnReq=sp||"";
   const near=t=>t&&[...Array(9)].map((_,i)=>cellAt(t.x+(i%3)-1,t.y+((i/3)|0)-1)).filter(n=>n&&!n.blocked&&!wet(n)&&Math.abs(walkZ(n)-walkZ(t))<=1)
     .sort((a,b)=>depthOf(b.x-MX,b.y-MY)-depthOf(a.x-MX,a.y-MY))[0];
   const spot=sp==="portal"?near(PORTAL):sp==="faint"?near(NPCC):null;

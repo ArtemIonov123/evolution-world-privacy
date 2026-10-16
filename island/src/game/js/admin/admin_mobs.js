@@ -16,7 +16,7 @@ function renderAdminMobs(body){
   for(const id of ids){ const m=CMOBS[id], b=mkEl("button","btn itrow"); b.type="button";
     const im=mkEl("img"); im.src=mobPreview(id,32); im.alt=""; b.appendChild(im);
     const nm=mkEl("span","nm"); nm.appendChild(mkEl("b",null,mbName(m)));
-    const when=m.zn==="cave"?tr("mb_cave")+" \u00D7"+m.cn:tr("mb_island")+(m.d&&m.dn?" \u2600"+m.dn:"")+(m.n&&m.nn?" \u263E"+m.nn:"");
+    const when=zoneKind(m.zn)==="cave"?zoneName(m.zn)+" \u00D7"+m.cn:zoneName(m.zn)+(m.d&&m.dn?" \u2600"+m.dn:"")+(m.n&&m.nn?" \u263E"+m.nn:"");
     nm.appendChild(mkEl("small",null,tr("mb_ai_"+m.ai)+" \u00B7 HP "+m.hp+" \u00B7 "+tr("mb_dmg").split(" ")[0]+" "+m.dmg+" \u00B7 "+when)); b.appendChild(nm);
     b.onclick=()=>{ mbSel=id; mbDelAsk=false; adMsg=""; mbDraft={...m}; renderWin(); }; l.appendChild(b); }
   body.appendChild(l);
@@ -79,7 +79,7 @@ function renderMobCard(body){
   const f2=mkEl("div","plform");
   const rng=(k,lo,hi,lab)=>{ const r=mkEl("input"); r.type="range"; r.min=String(lo); r.max=String(hi); r.value=String(E[k]); r.oninput=()=>{ E[k]=+r.value; prev(); }; f2.appendChild(mkEl("label",null,tr(lab))); f2.appendChild(r); };
   rng("hue",0,359,"it_hue"); rng("sz",60,200,"mb_size");
-  f2.appendChild(mkEl("label",null,tr("mb_where"))); f2.appendChild(seg("zn",[["island",tr("mb_island")],["cave",tr("mb_cave")]]));
+  f2.appendChild(mkEl("label",null,tr("mb_where"))); f2.appendChild(seg("zn",allZones().map(z=>[z,zoneName(z)])));
   body.appendChild(f2);
   body.appendChild(mkEl("b",null,tr("mb_ai")));
   body.appendChild(seg("ai",MB_AI.map(a=>[a,tr("mb_ai_"+a)])));
@@ -88,7 +88,7 @@ function renderMobCard(body){
   fd("mb_hp",num("hp",1,999)); fd("mb_dmg",num("dmg",1,10));
   f3.appendChild(mkEl("label",null,tr("mb_spd"))); f3.appendChild(seg("spd",[1,2,3,4].map(v=>[v,tr("mb_spd_"+v)])));
   fd("mb_range",num("range",2,10)); fd("mb_xp",num("xp",0,5000));
-  if(E.zn==="cave") fd("mb_count",num("cn",0,20));
+  if(zoneKind(E.zn)==="cave") fd("mb_count",num("cn",0,20));
   else { const dl=mkEl("label","chk"), dc=mkEl("input"); dc.type="checkbox"; dc.checked=!!E.d; dc.onchange=()=>{ E.d=dc.checked?1:0; }; dl.append(dc,document.createTextNode(tr("mb_day"))); f3.appendChild(dl); f3.appendChild(num("dn",0,20));
     const nl=mkEl("label","chk"), nc=mkEl("input"); nc.type="checkbox"; nc.checked=!!E.n; nc.onchange=()=>{ E.n=nc.checked?1:0; }; nl.append(nc,document.createTextNode(tr("mb_night"))); f3.appendChild(nl); f3.appendChild(num("nn",0,20)); }
   body.appendChild(f3);
@@ -99,7 +99,7 @@ function renderMobCard(body){
   if(!E.isNew&&CMOBS[E.id]){
     bt.appendChild(adBtn(tr("mb_loot"),()=>{ closeWin(); edEnter("drop"); edDropSel="mob:"+E.id; edRender(); }));
     if(E.zn===ZONE) bt.appendChild(adBtn(tr("mb_zone"),()=>{ closeWin(); edEnter("map"); edCat="places"; edTool="zone_"+E.id; edRender(); }));
-    else bt.appendChild(adBtn(tr("mb_zone"),()=>{ adMsg=tr("mb_zone_other",{z:"#"+(E.zn==="cave"?"ad_mapc":"ad_mapi")}); renderWin(); }));
+    else bt.appendChild(adBtn(tr("mb_zone"),()=>{ adMsg=tr("mb_zone_other",{z:zoneName(E.zn)}); renderWin(); }));
     bt.appendChild(adBtn(tr(mbDelAsk?"it_del_ok":"it_del"),()=>{ if(!mbDelAsk){ mbDelAsk=true; renderWin(); return; } mbWrite(E.id,null); mbSel=null; mbDraft=null; renderWin(); },"warn")); }
   body.appendChild(bt);
   if(adMsg) body.appendChild(mkEl("div","adok",adMsg));

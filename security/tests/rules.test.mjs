@@ -32,6 +32,10 @@ await t("игрок НЕ пишет в чат от чужого имени", ass
 await t("игрок НЕ правит чужое сообщение", assertFails(B.ref(W + "chat/1760000000000-abcde").set(J({ t: "xx", by: "utgB", n: "B", ts: 1 }))));
 await t("старые сообщения можно чистить", assertSucceeds(B.ref(W + "chat/1760000000000-abcde").remove()));
 await t("игрок рубит деревья (общие)", assertSucceeds(A.ref(W + "trees/t_1_2").set(J({ s: "gone", at: 1 }))));
+await t("деревья на своём острове — можно", assertSucceeds(A.ref(W + "zabc123_trees/t_1_2").set(J({ s: "gone", at: 1 }))));
+await t("игрок НЕ создаёт острова и переходы", assertFails(A.ref(W + "world/zones").set(J({ list: {} }))));
+await t("игрок НЕ меняет карту своего острова", assertFails(A.ref(W + "world/map_zabc123").set(J({ m: 1 }))));
+await t("админ создаёт остров", assertSucceeds(ADM.ref(W + "world/links").set(J({ list: {} }))));
 await t("игрок НЕ создаёт левые разделы базы", assertFails(A.ref(W + "hack/x").set(J({ a: 1 }))));
 await t("слишком большое сохранение отклоняется", assertFails(A.ref(W + "data/users/utgA/save").set({ j: "x".repeat(40000) })));
 await t("присутствие от своего имени", assertSucceeds(A.ref("w/TESTWORLD/room/pA").set({ by: "utgA", j: "{}", t: 1 })));

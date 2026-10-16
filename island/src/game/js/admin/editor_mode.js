@@ -48,7 +48,7 @@ function edRender(){
   const tools=mkEl("div","edtools");
   for(const [gk,items0,cat] of ED_GROUPS){ if(cat!==edCat) continue; const grp=mkEl("div","edgrp"); grp.appendChild(mkEl("b",null,tr(gk)));
     const row=mkEl("div","edrow");
-    const items=gk==="ed_g_places"?[...items0,...Object.keys(CMOBS).filter(k=>CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["bpos_"+k,"mob:"+k])]:gk==="ed_g_zones"?[...items0.slice(0,-1),...Object.keys(CMOBS).filter(k=>!CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["zone_"+k,"mob:"+k]),items0[items0.length-1]]:items0;
+    const items=gk==="ed_g_places"?[...items0.filter(([id])=>!CUSTOMZ||id==="start"||id==="boss"),...allZones().filter(z=>z!==ZONE).map(z=>["link_"+z,null]),["link_del",null],...Object.keys(CMOBS).filter(k=>CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["bpos_"+k,"mob:"+k])]:gk==="ed_g_zones"?[...items0.slice(0,-1),...Object.keys(CMOBS).filter(k=>!CMOBS[k].boss&&CMOBS[k].zn===ZONE).map(k=>["zone_"+k,"mob:"+k]),items0[items0.length-1]]:items0;
     for(const [id,spr] of items){
       if(spr&&spr.startsWith("mob:")){ const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; const k=spr.slice(4), im=mkEl("img"); im.src=mobPreview(k,40); im.alt=""; b.appendChild(im);
         b.appendChild(mkEl("small",null,LANG==="ru"?CMOBS[k].ru:CMOBS[k].pl)); b.onclick=()=>{ edTool=id; edRender(); }; row.appendChild(b); continue; } const b=mkEl("button","edb"+(edTool===id?" on":"")); b.type="button"; b.title=edLabel(id);
@@ -58,7 +58,7 @@ function edRender(){
         g2.fillStyle=WATER_COL[id==="v"?"shallow":"deep"][0]; g2.beginPath(); g2.moveTo(19,4); g2.lineTo(37,14); g2.lineTo(19,24); g2.lineTo(1,14); g2.closePath(); g2.fill();
         if(isWaterProp(id)){ const sv=ctx; ctx=g2; drawPropFallback(id,19,18); ctx=sv; } else { g2.fillStyle="rgba(230,246,255,.8)"; g2.fillRect(12,12,6,1); g2.fillRect(21,16,5,1); }
         b.appendChild(cv2); }
-      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫",stairs_del:"⌫",cave:"⛰",exit:"⇡",boss:"☠",zone_spider:"✳",prop_crystal:"◆"}[id]||"?"));
+      else b.appendChild(mkEl("span","edic",{w:"≈",up:"▲",down:"▼",erase:"✕",start:"★",hut:"⌂",zone_erase:"⌫",stairs_del:"⌫",cave:"⛰",exit:"⇡",boss:"☠",zone_spider:"✳",prop_crystal:"◆",link_del:"⌫"}[id]||(id.startsWith("link_")?(zoneKind(id.slice(5))==="cave"?"⛰":"🏝"):"?")));
       b.appendChild(mkEl("small",null,edLabel(id)));
       b.onclick=()=>{ edTool=id; edRender(); say("ed_t_"+id,id==="fence"?"ed_fence_sub":id==="stairs"?"ed_stairs_sub":PLACE_TOOLS.includes(id)?"ed_tap_sub":edPaint?"ed_drag_sub":"ed_tap_sub"); }; row.appendChild(b); }
     grp.appendChild(row); if(gk==="ed_g_zones") grp.appendChild(mkEl("p","muted",tr("ed_zone_note"))); tools.appendChild(grp); }

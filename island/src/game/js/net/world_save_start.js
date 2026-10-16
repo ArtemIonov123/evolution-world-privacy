@@ -110,6 +110,8 @@ async function initNet(){
     db.doc("world/mobs").onSnapshot(s=>applyMobs(s.exists?s.data():null),()=>{});
     try{ const s=await db.doc("world/bosses").get(); applyBosses(s.exists?s.data():null); }catch(e){}
     db.doc("world/bosses").onSnapshot(s=>applyBosses(s.exists?s.data():null),()=>{});
+    db.doc("world/zones").onSnapshot(s=>{ if(s.metadata&&s.metadata.fromCache&&!s.exists) return; applyZones(s.exists?s.data():null); },()=>{});
+    db.doc("world/links").onSnapshot(s=>{ if(s.metadata&&s.metadata.fromCache&&!s.exists) return; applyLinks(s.exists?s.data():null); },()=>{});
     db.doc("world/boss_dead").onSnapshot(s=>applyBossDead(s.exists?s.data():null),()=>{});
     if(NET.myId) await loadSave();
     classLoaded=true;
