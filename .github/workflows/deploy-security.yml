@@ -1,0 +1,52 @@
+name: Deploy server and security
+# Выкладывает сервер (Cloudflare Worker: вход через Telegram + бот), настраивает бота
+# и по галочке lock_rules закрывает базу правилами из security/database.rules.json.
+# Нужные секреты репозитория: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, TELEGRAM_TOKEN, FIREBASE_SA
+on:
+  workflow_dispatch:
+    inputs:
+      lock_rules:
+        description: "Закрыть базу правилами (включать только когда вход через сервер уже работает)"
+        type: boolean
+        default: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: security } }
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Check secrets
+        run: |
+          miss=""; for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID TELEGRAM_TOKEN FIREBASE_SA; do [ -n "${!v}" ] || miss="$miss $v"; done
+          if [ -n "$miss" ]; then echo "::error::Не хватает секретов:$miss"; exit 1; fi
+          printf '%s' "$FIREBASE_SA" | node -e 'const s=JSON.parse(require("fs").readFileSync(0,"utf8")); if(!s.private_key||!s.client_email) process.exit(1); console.log("service account:", s.client_email)'
+      - run: npm i --no-audit --no-fund
+      - run: npm run test:worker
+      - name: Deploy worker
+        working-directory: security/worker
+        run: |
+          npx wrangler deploy 2>&1 | tee deploy.log
+          printf '%s' "$TELEGRAM_TOKEN" | npx wrangler secret put TELEGRAM_TOKEN
+          printf '%s' "$FIREBASE_SA" | npx wrangler secret put FIREBASE_SA
+          URL=$(grep -o 'https://[a-zA-Z0-9.-]*workers\.dev' deploy.log | head -1)
+          echo "WORKER_URL=$URL" >> $GITHUB_ENV
+          echo "### Сервер: $URL" >> $GITHUB_STEP_SUMMARY
+          echo "WORKER_URL=$URL"
+      - name: Set up bot (webhook, menu button, commands)
+        run: |
+          KEY=$(printf 'hook|%s' "$TELEGRAM_TOKEN" | sha256sum | cut -c1-48)
+          sleep 5; curl -sf "$WORKER_URL/setup?key=$KEY" | tee -a $GITHUB_STEP_SUMMARY
+      - name: Lock database rules
+        if: ${{ inputs.lock_rules }}
+        run: |
+          printf '%s' "$FIREBASE_SA" > sa.json
+          GOOGLE_APPLICATION_CREDENTIALS=$PWD/sa.json npx firebase deploy --only database --project island-6cbab --non-interactive
+          rm -f sa.json
+          echo "### База закрыта правилами" >> $GITHUB_STEP_SUMMARY

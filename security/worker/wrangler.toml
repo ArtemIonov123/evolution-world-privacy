@@ -1,0 +1,8 @@
+name = "isle-of-legends"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+ADMIN_IDS = "1661222371"
+GAME_URL = "https://artemionov123.github.io/evolution-world-privacy/island/#world=Zndpq1U6xpOHMsiA1AP0"
+ALLOWED_ORIGINS = "https://artemionov123.github.io"

@@ -1,0 +1,19 @@
+name: Security tests
+# Проверка сервера (подпись Telegram, пропуск Firebase) и правил базы на эмуляторе Firebase
+on:
+  push:
+    paths: ["security/**", ".github/workflows/security.yml"]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: security } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - run: npm i --no-audit --no-fund
+      - run: npm run test:worker
+      - run: npm run test:rules

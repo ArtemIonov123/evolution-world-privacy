@@ -1,0 +1,60 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "w": {
+      "$w": {
+        ".read": "auth != null",
+        "room": {
+          "$peer": {
+            ".write": "auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)",
+            ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 20000)"
+          }
+        },
+        "db": {
+          "world": {
+            "$doc": {
+              ".write": "auth.token.admin === true || (auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && ($doc === 'clock' || $doc === 'cave_boss' || $doc === 'boss_dead'))",
+              ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 400000)"
+            }
+          },
+          "data": {
+            "users": {
+              "$uid": {
+                ".write": "auth.token.admin === true || (auth.uid === $uid && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists())",
+                "save": { ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 30000)" }
+              }
+            }
+          },
+          "players": {
+            "$uid": {
+              ".write": "auth.token.admin === true || (auth.uid === $uid && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists())",
+              ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 2000)"
+            }
+          },
+          "wallet": {
+            "$uid": { ".write": "auth.token.admin === true" }
+          },
+          "banned": {
+            "$uid": { ".write": "auth.token.admin === true" }
+          },
+          "admin_ops": {
+            "$uid": { ".write": "auth.token.admin === true || (auth.uid === $uid && !newData.exists())" }
+          },
+          "chat": {
+            "$id": {
+              ".write": "auth.token.admin === true || (auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && $id.matches(/^[0-9]{10,15}-[a-z0-9]{1,8}$/) && (!newData.exists() || (!data.exists() && newData.child('j').val().contains('\"by\":\"'+auth.uid+'\"'))))",
+              ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 1200)"
+            }
+          },
+          "$shared": {
+            "$id": {
+              ".write": "auth != null && !root.child('w/'+$w+'/db/banned/'+auth.uid).exists() && ($shared === 'trees' || $shared === 'fires' || $shared === 'cave_trees' || $shared === 'cave_fires')",
+              ".validate": "!newData.exists() || (newData.child('j').isString() && newData.child('j').val().length < 600)"
+            }
+          }
+        }
+      }
+    }
+  }
+}
