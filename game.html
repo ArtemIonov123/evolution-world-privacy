@@ -6816,9 +6816,15 @@ loadAll.then(()=>{
   invEl.addEventListener("click",e=>{ const s=e.target.closest(".slot.edible"); if(s) eatCooked(s.dataset.id); });
   invEl.addEventListener("keydown",e=>{ const s=e.target.closest(".slot.edible"); if((e.key==="Enter"||e.key===" ")&&s){ e.preventDefault(); eatCooked(s.dataset.id); } });
   document.getElementById("buildFire").onclick=startPlacing;
-  document.getElementById("nickForm").onsubmit=e=>{ e.preventDefault();
+  // \u0444\u043e\u0440\u043c\u044b \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0442 \u0438 \u0442\u0430\u043c, \u0433\u0434\u0435 \u00ab\u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u0444\u043e\u0440\u043c\u044b\u00bb \u0437\u0430\u043f\u0440\u0435\u0449\u0435\u043d\u0430 (\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u0444\u0430\u0439\u043b\u0430 \u0432\u043d\u0443\u0442\u0440\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f, \u043f\u0435\u0441\u043e\u0447\u043d\u0438\u0446\u044b):
+  // \u043a\u043d\u043e\u043f\u043a\u0430 \u0438 Enter \u0432\u044b\u0437\u044b\u0432\u0430\u044e\u0442 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u0441\u0430\u043c\u0438, \u0431\u0435\u0437 submit
+  window.formAct=(id,fn)=>{ const f=document.getElementById(id); if(!f) return;
+    f.onsubmit=e=>{ e.preventDefault(); fn(); };
+    const b=f.querySelector("button"); if(b){ b.type="button"; b.onclick=e=>{ e.preventDefault(); fn(); }; }
+    for(const i of f.querySelectorAll("input")) i.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.isComposing){ e.preventDefault(); fn(); } }); };
+  formAct("nickForm",()=>{
     if(setNick(document.getElementById("nickIn").value)){ document.getElementById("nickWrap").hidden=true; say("nick_hi","hint_sub",{n:myNick}); if(TOUCH) goFull(); }
-    else { const er=document.getElementById("nickErr"); er.textContent=tr(badNick(document.getElementById("nickIn").value)?"nick_bad":"nick_err"); er.hidden=false; } };
+    else { const er=document.getElementById("nickErr"); er.textContent=tr(badNick(document.getElementById("nickIn").value)?"nick_bad":"nick_err"); er.hidden=false; } });
   document.getElementById("nickBtn").onclick=()=>{ menuEl.classList.remove("open"); openNick(); };
   { const ab=document.getElementById("atkBtn"); ab.onclick=()=>{ attackNearest(); ab.classList.add("press"); setTimeout(()=>ab.classList.remove("press"),140); }; }
   document.getElementById("editBtn").onclick=()=>{ menuEl.classList.remove("open"); if(winKind!=="admin") openWin("admin"); };
@@ -6841,7 +6847,7 @@ loadAll.then(()=>{
   const chatbar=document.getElementById("chatbar"), chatIn=document.getElementById("chatIn");
   const closeChat=()=>{ chatbar.hidden=true; chatIn.blur(); };
   document.getElementById("chatBtn").onclick=()=>{ chatbar.hidden=!chatbar.hidden; if(!chatbar.hidden){ renderChatLog(); markChatRead(); chatIn.focus(); } };
-  document.getElementById("chatForm").onsubmit=e=>{ e.preventDefault(); sendChat(chatIn.value); chatIn.value=""; closeChat(); };
+  formAct("chatForm",()=>{ sendChat(chatIn.value); chatIn.value=""; closeChat(); });
   chatIn.addEventListener("keydown",e=>{ if(e.key==="Escape"){ e.preventDefault(); closeChat(); } });
   document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ sendChat(tr(b.dataset.q)); closeChat(); });
   document.getElementById("cancelPlace").onclick=cancelPlacing;

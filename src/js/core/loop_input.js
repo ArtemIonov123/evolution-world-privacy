@@ -151,9 +151,15 @@ loadAll.then(()=>{
   invEl.addEventListener("click",e=>{ const s=e.target.closest(".slot.edible"); if(s) eatCooked(s.dataset.id); });
   invEl.addEventListener("keydown",e=>{ const s=e.target.closest(".slot.edible"); if((e.key==="Enter"||e.key===" ")&&s){ e.preventDefault(); eatCooked(s.dataset.id); } });
   document.getElementById("buildFire").onclick=startPlacing;
-  document.getElementById("nickForm").onsubmit=e=>{ e.preventDefault();
+  // формы работают и там, где «отправка формы» запрещена (просмотр файла внутри приложения, песочницы):
+  // кнопка и Enter вызывают действие сами, без submit
+  window.formAct=(id,fn)=>{ const f=document.getElementById(id); if(!f) return;
+    f.onsubmit=e=>{ e.preventDefault(); fn(); };
+    const b=f.querySelector("button"); if(b){ b.type="button"; b.onclick=e=>{ e.preventDefault(); fn(); }; }
+    for(const i of f.querySelectorAll("input")) i.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.isComposing){ e.preventDefault(); fn(); } }); };
+  formAct("nickForm",()=>{
     if(setNick(document.getElementById("nickIn").value)){ document.getElementById("nickWrap").hidden=true; say("nick_hi","hint_sub",{n:myNick}); if(TOUCH) goFull(); }
-    else { const er=document.getElementById("nickErr"); er.textContent=tr(badNick(document.getElementById("nickIn").value)?"nick_bad":"nick_err"); er.hidden=false; } };
+    else { const er=document.getElementById("nickErr"); er.textContent=tr(badNick(document.getElementById("nickIn").value)?"nick_bad":"nick_err"); er.hidden=false; } });
   document.getElementById("nickBtn").onclick=()=>{ menuEl.classList.remove("open"); openNick(); };
   { const ab=document.getElementById("atkBtn"); ab.onclick=()=>{ attackNearest(); ab.classList.add("press"); setTimeout(()=>ab.classList.remove("press"),140); }; }
   document.getElementById("editBtn").onclick=()=>{ menuEl.classList.remove("open"); if(winKind!=="admin") openWin("admin"); };
@@ -176,7 +182,7 @@ loadAll.then(()=>{
   const chatbar=document.getElementById("chatbar"), chatIn=document.getElementById("chatIn");
   const closeChat=()=>{ chatbar.hidden=true; chatIn.blur(); };
   document.getElementById("chatBtn").onclick=()=>{ chatbar.hidden=!chatbar.hidden; if(!chatbar.hidden){ renderChatLog(); markChatRead(); chatIn.focus(); } };
-  document.getElementById("chatForm").onsubmit=e=>{ e.preventDefault(); sendChat(chatIn.value); chatIn.value=""; closeChat(); };
+  formAct("chatForm",()=>{ sendChat(chatIn.value); chatIn.value=""; closeChat(); });
   chatIn.addEventListener("keydown",e=>{ if(e.key==="Escape"){ e.preventDefault(); closeChat(); } });
   document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ sendChat(tr(b.dataset.q)); closeChat(); });
   document.getElementById("cancelPlace").onclick=cancelPlacing;
