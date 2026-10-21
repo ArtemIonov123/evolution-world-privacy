@@ -24,7 +24,7 @@ F = 2  # во сколько раз детальнее (меняется по г
 # персонажи и звери — в 4 раза детальнее (@4x): у GPT «пиксель» ~11 px, герой ~110 пикселей ростом —
 # @4x как раз сохраняет его родную детальность; блоки и предметы — @2x
 CHAR_GROUPS = {'hero', 'npc', 'animals'}
-def factor_for(group): return 4 if group in CHAR_GROUPS else 2
+def factor_for(group): return 2 if group == 'terrain' else 4   # земля @2x (у GPT блок ~130 «пикселей» в ширину), остальное @4x
 
 import numpy as np
 def smart_resize(a, nw, nh):

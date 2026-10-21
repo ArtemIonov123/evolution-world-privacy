@@ -8,6 +8,8 @@ const POSTAPO_ART=new Set([
   "block_cobble_dark","block_gravel","block_planks","block_mud",            // набор 1: земля (16.10)
   "hero_ne_0","hero_ne_1","hero_ne_2","hero_ne_3",                          // набор 2: герой — ходьба (16.10)
   "hero_se_0","hero_se_1","hero_se_2","hero_se_3",
+  "tree_big","tree_small","bush","grass_tuft","grass_tuft_2","rock_big","rock_small",   // набор 3: объекты (21.10)
+  "prop_barrel","prop_crate","prop_signpost","prop_car","prop_tires","prop_barrier","prop_bones",
 ]);
 const DUST_RE=/^(block_|stairs_|tree_|bush$|grass_tuft|prop_bush_berry|prop_flowers|prop_stump|prop_log|prop_mushrooms|stone_slab|rock_|fence_|hut_|cave_entrance|prop_signpost|prop_crate|prop_barrel|stall_|pier_)/;
 const TOXIC_RE=/^water_/;

@@ -62,7 +62,7 @@ function updateWind(dt){
   for(const tr of TREES){
     if(leaves.length>260) break;
     if(tr.c.grow<0.6||tr.c.falling) continue;
-    if(Math.random()<dt*(0.2+1.2*w*w)){
+    if(Math.random()<dt*(0.2+1.2*w*w)*(POSTAPO_ART.has("tree_big")?0.08:1)){   // у сухих деревьев листьев почти нет
       leaves.push({x:tr.c.x+(Math.random()-.5)*0.7, y:tr.c.y+(Math.random()-.5)*0.7,
         z:walkZ(tr.c)*LH+(tr.big?50+Math.random()*50:38+Math.random()*38),
         ph:Math.random()*6.28, spin:3+Math.random()*4, fall:9+Math.random()*7,
