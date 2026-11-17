@@ -1,7 +1,9 @@
 name: NEON BREACH APK
-# Builds the Android APK (Trusted Web Activity: the game opens in Chrome, AR works)
-# and publishes it as a GitHub Release. The game itself is served by GitHub Pages
-# from neon-breach/index.html.
+# Builds two APKs and publishes them as a GitHub Release:
+#  - NEON_BREACH.apk        native ARCore app (landscape locked before ARCore, setDisplayGeometry),
+#                           game bundled inside (works offline except AR needs Google Play Services for AR)
+#  - NEON_BREACH_Chrome.apk Trusted Web Activity: opens the GitHub Pages version in Chrome (WebXR)
+# The web version is served by GitHub Pages from neon-breach/index.html.
 on:
   push:
     paths: ["neon-breach/**", ".github/workflows/neon-breach-apk.yml"]
@@ -11,24 +13,47 @@ permissions:
 jobs:
   apk:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: neon-breach/android } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: "8.7" }
-      - name: Build APK
-        run: gradle --no-daemon assembleRelease
-      - name: Rename
-        run: cp app/build/outputs/apk/release/app-release.apk NEON_BREACH.apk
+
+      - name: Build native ARCore APK
+        working-directory: neon-breach/android-native
+        run: |
+          mkdir -p app/src/main/assets
+          cp ../index.html app/src/main/assets/index.html
+          gradle --no-daemon assembleRelease 2>&1 | tee ../../build-native.log
+          test ${PIPESTATUS[0]} -eq 0
+          cp app/build/outputs/apk/release/app-release.apk ../../NEON_BREACH.apk
+
+      - name: Build Chrome (TWA) APK
+        working-directory: neon-breach/android
+        run: |
+          gradle --no-daemon assembleRelease 2>&1 | tee ../../build-twa.log
+          test ${PIPESTATUS[0]} -eq 0
+          cp app/build/outputs/apk/release/app-release.apk ../../NEON_BREACH_Chrome.apk
+
       - uses: actions/upload-artifact@v4
-        with: { name: NEON_BREACH-apk, path: neon-breach/android/NEON_BREACH.apk }
+        with: { name: NEON_BREACH-apk, path: "NEON_BREACH*.apk" }
+
       - name: Publish release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          gh release create "neon-breach-${{ github.run_number }}" NEON_BREACH.apk \
+          gh release create "neon-breach-${{ github.run_number }}" NEON_BREACH.apk NEON_BREACH_Chrome.apk \
             --title "NEON BREACH APK #${{ github.run_number }}" \
-            --notes "Скачай NEON_BREACH.apk на телефон и установи. Игра открывается через Chrome, AR работает. Нужен интернет." \
+            --notes "NEON_BREACH.apk — основная версия: ARCore встроен, экран сразу горизонтальный, игра внутри приложения. NEON_BREACH_Chrome.apk — запасная: открывает игру с сайта через Chrome (WebXR)." \
             --latest
-          echo "### APK: https://github.com/${{ github.repository }}/releases/latest/download/NEON_BREACH.apk" >> $GITHUB_STEP_SUMMARY
+
+      # Public build log for debugging (commit comment), only when something failed.
+      - name: Report failure
+        if: failure()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          LOG=$( (tail -n 60 build-native.log 2>/dev/null; echo ----; tail -n 40 build-twa.log 2>/dev/null) | grep -v '^$' | tail -n 90 )
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" -f body="Build failed:
+          \`\`\`
+          $LOG
+          \`\`\`" || true

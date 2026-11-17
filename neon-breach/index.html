@@ -120,11 +120,12 @@ function spawn(){enemies=specs.map(([x,z,type],i)=>({x,z,type,hp:type==='brute'?
 spawn();
 function toast(t,ms=1900){const e=$('notice');e.textContent=t;e.classList.add('visible');clearTimeout(toast.timer);toast.timer=setTimeout(()=>e.classList.remove('visible'),ms)}
 function hud(){$('health').textContent=Math.max(0,Math.ceil(player.hp));$('ammo').textContent=player.ammo;$('kill').textContent=`${kills}/${enemies.length}`}
+const nativeAR={on:false}; // Android APK: ARCore runs natively, pose comes via window.NativeAR
 const xr={session:null,ref:null,worldFromXR:null,lastPose:null,frames:0,status:'AR не включён',orientationStatus:'не запрошена',orientationLocked:false};let showCamera=false,gyroEnabled=false,gyroState={last:null,alpha:0,beta:0,zeroBeta:0},quality='high';
 function cameraDir(){return [Math.cos(player.pitch)*Math.cos(player.a),Math.sin(player.pitch),Math.cos(player.pitch)*Math.sin(player.a)]}
 function getCamera(){const eye=[player.x,player.eye,player.z],v=cameraDir();return {eye,view:lookAt(eye,[eye[0]+v[0],eye[1]+v[1],eye[2]+v[2]])}}
 function lineOfSight(x1,z1,x2,z2){const d=Math.hypot(x2-x1,z2-z1);for(let s=.12;s<d;s+=.14){const t=s/d;if(!open(x1+(x2-x1)*t,z1+(z2-z1)*t))return false}return true}
-function fire(){if(paused||fireCooldown>0)return;if(player.ammo<=0){toast('НЕТ ПАТРОНОВ');fireCooldown=.3;return}player.ammo--;fireCooldown=.23;shotFlash=.16;$('weapon').classList.add('firing');$('flash').classList.add('show');setTimeout(()=>{$('weapon').classList.remove('firing');$('flash').classList.remove('show')},120);const dir=xr.session&&xr.lastPose?xr.lastPose.dir:cameraDir(),eye=xr.session&&xr.lastPose?xr.lastPose.eye:[player.x,player.eye,player.z];let best=null,near=99;
+function fire(){if(paused||fireCooldown>0)return;if(player.ammo<=0){toast('НЕТ ПАТРОНОВ');fireCooldown=.3;return}player.ammo--;fireCooldown=.23;shotFlash=.16;$('weapon').classList.add('firing');$('flash').classList.add('show');setTimeout(()=>{$('weapon').classList.remove('firing');$('flash').classList.remove('show')},120);const dir=(xr.session||nativeAR.on)&&xr.lastPose?xr.lastPose.dir:cameraDir(),eye=(xr.session||nativeAR.on)&&xr.lastPose?xr.lastPose.eye:[player.x,player.eye,player.z];let best=null,near=99;
  for(const e of enemies){if(!e.alive)continue;const h=e.type==='brute'?1.65:1.35;let hit=false,hitT=999;for(const y of [h*.32,h*.6,h*.87]){const d=[e.x-eye[0],y-eye[1],e.z-eye[2]],t=d[0]*dir[0]+d[1]*dir[1]+d[2]*dir[2];if(t<0||t>24)continue;const off=Math.hypot(d[0]-dir[0]*t,d[1]-dir[1]*t,d[2]-dir[2]*t);if(off< (e.type==='brute'?.48:.36)){hit=true;hitT=Math.min(t,hitT)}}if(hit&&hitT<near&&lineOfSight(eye[0],eye[2],e.x,e.z)){best=e;near=hitT}}
  if(best){best.hp-=45;best.hit=.16;if(best.hp<=0){best.alive=false;kills++;toast('ЦЕЛЬ УНИЧТОЖЕНА');if(kills===enemies.length)toast('СЕКТОР ОЧИЩЕН — ВЫХОД В ДАЛЬНЕМ ОТСЕКЕ',4000)}}hud()}
 function dynamic(){const mesh=newGeometry();for(const e of enemies){if(!e.alive)continue;const s=e.type==='brute'?1.12:.85,walk=Math.sin(time*5+e.phase)*.10,bright=e.hit>0?[1.9,.65,.6]:[1,1,1];box(mesh,e.x,.84*s+walk*.2,e.z,.67*s,1.1*s,.50*s,7,e.type==='brute'?[.75*bright[0],.29*bright[1],.26*bright[2]]:[.48*bright[0],.44*bright[1],.48*bright[2]]);box(mesh,e.x,1.56*s+walk*.2,e.z,.47*s,.44*s,.42*s,10,[.40*bright[0],.48*bright[1],.53*bright[2]]);for(const dx of [-.16,.16]){box(mesh,e.x+dx*s,1.61*s+walk*.2,e.z-.214*s,.11*s,.07*s,.055*s,5,[1,1,1]);box(mesh,e.x+dx*2.5*s,.77*s+Math.sin(time*5+e.phase+dx*5)*.09,e.z,.20*s,.82*s,.21*s,10,[.35,.45,.51]);box(mesh,e.x+dx*1.25*s,.22*s+Math.sin(time*5+e.phase+dx*7)*.05,e.z,.22*s,.5*s,.23*s,9,[.24,.30,.34])}box(mesh,e.x,1.2*s,e.z-.285*s,.34*s,.19*s,.09*s,6,[.75,.72,.67]);}
@@ -143,14 +144,14 @@ function stickCalc(e){let r=$('stick').getBoundingClientRect(),cx=r.left+r.width
 const look=$('lookzone');look.addEventListener('pointerdown',e=>{lookTouch={id:e.pointerId,x:e.clientX,y:e.clientY};look.setPointerCapture(e.pointerId)});look.addEventListener('pointermove',e=>{if(!lookTouch||lookTouch.id!==e.pointerId||xr.session)return;player.a+=(e.clientX-lookTouch.x)*.004;player.pitch=clamp(player.pitch-(e.clientY-lookTouch.y)*.004,-1.5,1.5);lookTouch.x=e.clientX;lookTouch.y=e.clientY});for(const ev of ['pointerup','pointercancel'])look.addEventListener(ev,()=>lookTouch=null);
 $('fire').addEventListener('pointerdown',e=>{e.preventDefault();fire()});
 function gamepads(dt){const pads=navigator.getGamepads?.()||[];let gp=null;for(const p of pads)if(p&&p.connected){gp=p;break}if(!gp)return[0,0];padStatus=gp.id.slice(0,15);const axis=i=>Math.abs(gp.axes[i]||0)<.17?0:gp.axes[i];if(!xr.session){player.a+=axis(2)*dt*2.0;player.pitch=clamp(player.pitch-axis(3)*dt*1.45,-1.5,1.5)}if(gp.buttons[7]?.pressed||gp.buttons[5]?.pressed)fire();return [axis(0),axis(1)]}
-function movement(dt){const [px,py]=gamepads(dt);if(paused)return;let forward=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)-stickY-py;let side=(keys.KeyD?1:0)-(keys.KeyA?1:0)+stickX+px;if(xr.session){forward=0;side=0}const speed=(keys.ShiftLeft?3.8:2.5)*dt,m=Math.hypot(forward,side);if(m>.08){forward/=Math.max(1,m);side/=Math.max(1,m);const a=player.a;advance(player,(Math.cos(a)*forward-Math.sin(a)*side)*speed,(Math.sin(a)*forward+Math.cos(a)*side)*speed);walkPhase+=dt*9} }
+function movement(dt){const [px,py]=gamepads(dt);if(paused)return;let forward=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)-stickY-py;let side=(keys.KeyD?1:0)-(keys.KeyA?1:0)+stickX+px;if(xr.session||nativeAR.on){forward=0;side=0}const speed=(keys.ShiftLeft?3.8:2.5)*dt,m=Math.hypot(forward,side);if(m>.08){forward/=Math.max(1,m);side/=Math.max(1,m);const a=player.a;advance(player,(Math.cos(a)*forward-Math.sin(a)*side)*speed,(Math.sin(a)*forward+Math.cos(a)*side)*speed);walkPhase+=dt*9} }
 function update(dt){time+=dt;shotFlash=Math.max(0,shotFlash-dt);hurt=Math.max(0,hurt-dt);fireCooldown=Math.max(0,fireCooldown-dt);movement(dt);if(paused)return;
  for(const e of enemies){if(!e.alive)continue;e.hit=Math.max(0,e.hit-dt);e.phase+=dt*2;e.atk-=dt;const d=Math.hypot(e.x-player.x,e.z-player.z);if(d<6.4&&d>.85&&lineOfSight(e.x,e.z,player.x,player.z)){const dx=(player.x-e.x)/d,dz=(player.z-e.z)/d;advance(e,dx*e.speed*dt,dz*e.speed*dt,.22)}if(d<.85&&e.atk<=0){player.hp-=e.type==='brute'?12:7;e.atk=1.3;hurt=.24;hud();if(player.hp<=0){paused=true;$('intro').classList.remove('hidden');$('intro').querySelector('p').textContent='МИССИЯ ПРОВАЛЕНА. Перезапусти сектор, чтобы вернуться на базу.';$('startBtn').textContent='ПОВТОРИТЬ МИССИЮ'}}}
  for(const it of items)if(!it.taken&&Math.hypot(player.x-it.x,player.z-it.z)<.56){it.taken=true;if(it.type==='ammo'){player.ammo+=24;toast('+24 ПАТРОНА')}else{player.hp=Math.min(100,player.hp+30);toast('+30 ЗДОРОВЬЯ')}hud()}
  if(kills===enemies.length&&Math.hypot(player.x-20.5,player.z-21.4)<1){wave++;player.x=4.5;player.z=6.5;player.a=0;player.hp=100;player.ammo+=30;spawn();hud();toast('СЕКТОР '+wave+' — НОВАЯ ВОЛНА',3500)}
 }
-function updateStatus(){let s=`WEBGL2 • ${fps} FPS • ${xr.session?'AR: '+xr.status:'3D: '+(gyroEnabled?'ГИРО':'СВОБОДНЫЙ ВЗГЛЯД')}`;if(xr.session&&innerHeight>innerWidth)s+=' • AR вертикально: ↻ ГОРИЗ.';if(xr.session&&xr.lastPose)s+=` • ВЫСОТА ${xr.lastPose.eye[1].toFixed(2)}м`;else if(padStatus!=='нет')s+=' • ГЕЙМПАД';$('status').textContent=s;$('hurt').style.opacity=hurt>0?String(hurt*.9):'0'}
-function tick(t){if(xr.session)return;const dt=Math.min(.045,Math.max(0,(t-last)/1000||.016));last=t;update(dt);resize();const c=getCamera();draw(c.view,projection,c.eye,canvas.width,canvas.height);frameCount++;if(t-lastFps>550){fps=Math.round(frameCount*1000/(t-lastFps||1000));frameCount=0;lastFps=t;updateStatus()}requestAnimationFrame(tick)}
+function updateStatus(){let s=`WEBGL2 • ${fps} FPS • ${(xr.session||nativeAR.on)?'AR: '+xr.status:'3D: '+(gyroEnabled?'ГИРО':'СВОБОДНЫЙ ВЗГЛЯД')}`;if(xr.session&&innerHeight>innerWidth)s+=' • AR вертикально: ↻ ГОРИЗ.';if((xr.session||nativeAR.on)&&xr.lastPose)s+=` • ВЫСОТА ${xr.lastPose.eye[1].toFixed(2)}м`;else if(padStatus!=='нет')s+=' • ГЕЙМПАД';$('status').textContent=s;$('hurt').style.opacity=hurt>0?String(hurt*.9):'0'}
+function tick(t){if(xr.session)return;const dt=Math.min(.045,Math.max(0,(t-last)/1000||.016));last=t;update(dt);resize();const c=(nativeAR.on&&nativeCamera())||getCamera();draw(c.view,projection,c.eye,canvas.width,canvas.height);frameCount++;if(t-lastFps>550){fps=Math.round(frameCount*1000/(t-lastFps||1000));frameCount=0;lastFps=t;updateStatus()}requestAnimationFrame(tick)}
 // WebXR's local reference space uses Y as the real-world vertical axis.
 // Align the game with the device heading only, never with its pitch/roll.
 // Cancelling the entire pose rotation would tilt or even invert the station when AR starts in portrait.
@@ -202,12 +203,12 @@ function xrTick(t,frame){if(!xr.session)return;const session=xr.session;session.
  for(const view of pose.views){const camM=mul(xr.worldFromXR,view.transform.matrix),eye=[camM[12],camM[13],camM[14]],v=invert(camM),fwd=[-camM[8],-camM[9],-camM[10]],viewport=layer.getViewport(view);if(!viewport)continue;xr.lastPose={eye,dir:fwd};if(view===base){player.x=clamp(eye[0],.4,24.6);player.z=clamp(eye[2],.4,24.6);player.eye=clamp(eye[1],.42,2.5)}draw(v,view.projectionMatrix,eye,viewport.width,viewport.height,viewport.x,viewport.y,layer.framebuffer,0)}
  if(xr.frames%35===0){fps=Math.round(1/dt);updateStatus()}
  }
-async function startAR(){if(xr.session)return;if(!navigator.xr||!window.isSecureContext){toast('AR нужен HTTPS и Chrome с WebXR',3500);return}if(document.fullscreenElement){await document.exitFullscreen().catch(()=>{});toast('Fullscreen закрыт. Нажми AR ещё раз',3000);return}try{const session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['local','dom-overlay'],domOverlay:{root:$('xrOverlay')}});await gl.makeXRCompatible();const ref=await session.requestReferenceSpace('local');session.updateRenderState({baseLayer:new XRWebGLLayer(session,gl,{alpha:true})});xr.session=session;xr.ref=ref;xr.worldFromXR=null;xr.lastPose=null;xr.frames=0;xr.status='ОЖИДАНИЕ ТРЕКИНГА';document.body.classList.add('xr-active');canvas.style.visibility='visible';$('arBtn').classList.add('on');$('arBtn').textContent='◉ AR ON';$('intro').classList.add('hidden');$('settings').classList.add('hidden');paused=false;active=true;session.addEventListener('end',()=>{xr.session=null;xr.ref=null;xr.lastPose=null;xr.worldFromXR=null;document.body.classList.remove('xr-active');try{screen.orientation?.unlock?.()}catch(e){}canvas.style.visibility='visible';$('arBtn').classList.remove('on');$('arBtn').textContent='◉ AR';xr.status='AR выключен';last=performance.now();requestAnimationFrame(tick);toast('AR завершён')},{once:true});last=performance.now();session.requestAnimationFrame(xrTick);void requestARLandscape(false).then(ok=>{if(!ok && xr.session===session)toast('AR включён. Chrome сохраняет портретный экран: включи автоповорот и попробуй ↻ ГОРИЗ.',4300);else if(xr.session===session)toast('AR горизонтально • нажми ⊙ ЦЕНТР для калибровки',2600)});}catch(e){toast('AR не запустился: '+(e.name||'ошибка')+' '+(e.message||''),5000);console.error(e)}}
-async function stopAR(){if(xr.session)try{await xr.session.end()}catch(e){console.warn(e)}}
-function recenter(){if(xr.session){xr.worldFromXR=null;toast('Калибровка AR: держи голову прямо')}else{gyroState.zeroBeta=gyroState.beta;player.pitch=0;toast('Камера откалибрована')}}
+async function startAR(){if(window.NativeAR)return startNativeAR();if(xr.session)return;if(!navigator.xr||!window.isSecureContext){toast('AR нужен HTTPS и Chrome с WebXR',3500);return}if(document.fullscreenElement){await document.exitFullscreen().catch(()=>{});toast('Fullscreen закрыт. Нажми AR ещё раз',3000);return}try{const session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['local','dom-overlay'],domOverlay:{root:$('xrOverlay')}});await gl.makeXRCompatible();const ref=await session.requestReferenceSpace('local');session.updateRenderState({baseLayer:new XRWebGLLayer(session,gl,{alpha:true})});xr.session=session;xr.ref=ref;xr.worldFromXR=null;xr.lastPose=null;xr.frames=0;xr.status='ОЖИДАНИЕ ТРЕКИНГА';document.body.classList.add('xr-active');canvas.style.visibility='visible';$('arBtn').classList.add('on');$('arBtn').textContent='◉ AR ON';$('intro').classList.add('hidden');$('settings').classList.add('hidden');paused=false;active=true;session.addEventListener('end',()=>{xr.session=null;xr.ref=null;xr.lastPose=null;xr.worldFromXR=null;document.body.classList.remove('xr-active');try{screen.orientation?.unlock?.()}catch(e){}canvas.style.visibility='visible';$('arBtn').classList.remove('on');$('arBtn').textContent='◉ AR';xr.status='AR выключен';last=performance.now();requestAnimationFrame(tick);toast('AR завершён')},{once:true});last=performance.now();session.requestAnimationFrame(xrTick);void requestARLandscape(false).then(ok=>{if(!ok && xr.session===session)toast('AR включён. Chrome сохраняет портретный экран: включи автоповорот и попробуй ↻ ГОРИЗ.',4300);else if(xr.session===session)toast('AR горизонтально • нажми ⊙ ЦЕНТР для калибровки',2600)});}catch(e){toast('AR не запустился: '+(e.name||'ошибка')+' '+(e.message||''),5000);console.error(e)}}
+async function stopAR(){if(nativeAR.on)return stopNativeAR();if(xr.session)try{await xr.session.end()}catch(e){console.warn(e)}}
+function recenter(){if(xr.session||nativeAR.on){xr.worldFromXR=null;toast('Калибровка AR: держи голову прямо')}else{gyroState.zeroBeta=gyroState.beta;player.pitch=0;toast('Камера откалибрована')}}
 function toggleSettings(){const e=$('settings');if(e.classList.contains('hidden')){paused=true;e.classList.remove('hidden')}else{paused=false;e.classList.add('hidden')}}
 $('settingsBtn').addEventListener('click',toggleSettings);$('introSettings').addEventListener('click',()=>{$('intro').classList.add('hidden');$('settings').classList.remove('hidden')});$('resumeBtn').addEventListener('click',()=>{paused=false;$('settings').classList.add('hidden')});$('startBtn').addEventListener('click',()=>{if(!active||player.hp<=0){player={x:4.5,z:6.5,a:0,pitch:0,eye:1.58,hp:100,ammo:60};spawn();hud();active=true}paused=false;$('intro').classList.add('hidden');toast('СИСТЕМА ВОССТАНОВЛЕНА • СЕКТОР 07');canvas.focus()});$('resetBtn').addEventListener('click',()=>{player={x:4.5,z:6.5,a:0,pitch:0,eye:1.58,hp:100,ammo:60};wave=1;spawn();hud();paused=false;$('settings').classList.add('hidden')});
-$('introAR').addEventListener('click',startAR);$('arBtn').addEventListener('click',()=>xr.session?stopAR():startAR());$('rotateBtn').addEventListener('click',rotateAR);$('centerBtn').addEventListener('click',recenter);$('calibrateBtn').addEventListener('click',recenter);
+$('introAR').addEventListener('click',startAR);$('arBtn').addEventListener('click',()=>(xr.session||nativeAR.on)?stopAR():startAR());$('rotateBtn').addEventListener('click',rotateAR);$('centerBtn').addEventListener('click',recenter);$('calibrateBtn').addEventListener('click',recenter);
 $('quality').addEventListener('click',()=>{quality=quality==='high'?'low':'high';$('quality').textContent=quality==='high'?'ВЫСОКОЕ':'ЭКОНОМ';resize()});$('cameraBtn').addEventListener('click',()=>toast('Реальная камера и безопасная зона отключены; ARCore использует камеру только для отслеживания.',3300));
 $('fullBtn').addEventListener('click',async()=>{if(xr.session){toast('WebXR уже использует собственный полноэкранный режим');return}try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch(e){toast('Fullscreen недоступен')}});
 $('gyroBtn').addEventListener('click',async()=>{if(gyroEnabled){gyroEnabled=false;$('gyroBtn').textContent='ВЫКЛ';return}try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const s=await DeviceOrientationEvent.requestPermission();if(s!=='granted'){toast('Доступ к гироскопу запрещён');return}}gyroEnabled=true;gyroState.last=null;gyroState.zeroBeta=gyroState.beta;$('gyroBtn').textContent='ВКЛ';toast('Гироскоп: поворот и взгляд. Ходьба — геймпад / WASD.')}catch(e){toast('Гироскоп недоступен: '+e.message)}});
@@ -225,6 +226,43 @@ window.addEventListener('orientationchange',()=>{
   if(xr.session){xr.orientationStatus=innerWidth>innerHeight?'горизонтально':'вертикально';updateStatus();}
 });
 
+
+// ===== Android APK: native ARCore =====
+// The app locks landscape BEFORE ARCore starts and passes the real screen size and rotation
+// to ARCore (setDisplayGeometry). Here we only read the display-oriented camera pose:
+// no extra 90° rotation of the picture or the interface.
+function nativeCamera(){
+ let s='';try{s=NativeAR.pose()}catch(e){}
+ if(!s||s[0]!=='T'){
+  const why=s?(s.split(',')[1]||''):'';
+  xr.status=s[0]==='P'?'ПОИСК ПОЗЫ '+why:s[0]==='E'?'ОШИБКА '+why:'ЗАПУСК ARCORE';
+  return xr.lastCam||null;
+ }
+ const a=s.split(','),m=new Float32Array(16);for(let i=0;i<16;i++)m[i]=+a[i+1];
+ if(!xr.worldFromXR){xr.worldFromXR=anchorAR({transform:{matrix:m}});xr.status='ОТКАЛИБРОВАНО'}else xr.status='ТРЕКИНГ ARCORE';
+ const camM=mul(xr.worldFromXR,m),eye=[camM[12],camM[13],camM[14]];
+ xr.lastPose={eye,dir:[-camM[8],-camM[9],-camM[10]]};
+ player.x=clamp(eye[0],.4,24.6);player.z=clamp(eye[2],.4,24.6);player.eye=clamp(eye[1],.42,2.5);
+ return xr.lastCam={view:invert(camM),eye};
+}
+function startNativeAR(){
+ if(nativeAR.on)return;
+ try{NativeAR.start()}catch(e){toast('ARCore недоступен в этой сборке',3500);return}
+ nativeAR.on=true;xr.worldFromXR=null;xr.lastPose=null;xr.lastCam=null;xr.status='ЗАПУСК ARCORE';
+ document.body.classList.add('xr-active');$('arBtn').classList.add('on');$('arBtn').textContent='◉ AR ON';
+ $('intro').classList.add('hidden');$('settings').classList.add('hidden');paused=false;active=true;
+ toast('ARCore: держи телефон ровно, затем ⊙ ЦЕНТР',2600);
+}
+function stopNativeAR(){
+ try{NativeAR.stop()}catch(e){}
+ nativeAR.on=false;xr.lastPose=null;xr.lastCam=null;xr.worldFromXR=null;
+ document.body.classList.remove('xr-active');$('arBtn').classList.remove('on');$('arBtn').textContent='◉ AR';
+ xr.status='AR выключен';toast('AR завершён');
+}
+window.onNativeAR=(state,msg)=>{
+ if(state==='error'){toast(msg,4500);if(nativeAR.on)stopNativeAR()}
+ else if(msg)toast(msg,state==='started'?1600:4200);
+};
 hud();resize();last=performance.now();requestAnimationFrame(tick);
 })();
 </script>

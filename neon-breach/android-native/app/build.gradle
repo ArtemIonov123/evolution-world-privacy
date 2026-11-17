@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'io.github.artemionov123.neonbreach.ar'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'io.github.artemionov123.neonbreach.ar'
+        minSdk 24
+        targetSdk 34
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
+        versionName '2.2-arcore'
+    }
+    // Same test key as the Chrome build (see ../android). For Google Play use a secret key.
+    signingConfigs {
+        release {
+            storeFile file('../../android/neon-breach.keystore')
+            storePassword 'neonbreach'
+            keyAlias 'neonbreach'
+            keyPassword 'neonbreach'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.ar:core:1.41.0'
+}
