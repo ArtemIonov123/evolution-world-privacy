@@ -8,7 +8,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
-        versionName '2.4-ar-vr'
+        versionName '2.5-ar-vr'
     }
     // Same test key as the Chrome build (see ../android). For Google Play use a secret key.
     signingConfigs {

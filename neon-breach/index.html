@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#050b13">
-<title>NEON BREACH — WEBGL 3D v2.4 AR+VR</title>
+<title>NEON BREACH — WEBGL 3D v2.5 AR+VR</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020509;color:#edf6ff;font:500 13px system-ui,Segoe UI,sans-serif;touch-action:none;user-select:none}#scene{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}#grain{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 28%,#03070a89 100%);z-index:2}#xrOverlay{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:hidden}#xrOverlay:xr-overlay{background:transparent;width:100%;height:100%}#hud{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#top{position:absolute;top:calc(9px + env(safe-area-inset-top));left:calc(9px + env(safe-area-inset-left));right:calc(9px + env(safe-area-inset-right));display:flex;gap:7px;align-items:center;justify-content:space-between}#brand{font-weight:1000;letter-spacing:1.8px;font-size:clamp(13px,1.9vw,20px);text-shadow:0 2px 9px #000}#brand b{color:#fc655d}#topMid{text-align:center;border:1px solid #49798a77;border-radius:4px;background:#051522be;padding:7px 12px;font-size:10px;letter-spacing:2px;color:#b1dbe5}#buttons{display:flex;gap:5px;pointer-events:auto}#buttons .arOnly{display:none}body.xr-active #buttons .arOnly{display:inline-block}button{cursor:pointer;border:1px solid #547a88;background:#0a202fdd;color:#e8f7ff;font-weight:850;padding:9px 11px;border-radius:6px;letter-spacing:.3px;touch-action:manipulation}button:active{transform:scale(.97)}button.on{border-color:#58e2d5;color:#9dfdf2;background:#103b46}#bottom{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:11px;min-width:260px;justify-content:center}#bottom>div{padding:7px 13px;background:linear-gradient(#153240dd,#060b14e8);border:1px solid #4e8fa499;border-radius:5px;min-width:80px;display:flex;align-items:center;gap:8px}#bottom label{font-size:9px;display:block;color:#8cbbcb;letter-spacing:1.5px}#bottom strong{font-size:22px;font-variant-numeric:tabular-nums}#health{color:#ff7669}#ammo{color:#ffcf79}#kill{color:#9ff8ed}#aim{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:23px;height:23px;opacity:.88;pointer-events:none}#aim:before,#aim:after{content:"";position:absolute;background:#aefcff;box-shadow:0 0 8px #4ff5ef}#aim:before{width:2px;height:23px;left:10px}#aim:after{height:2px;width:23px;top:10px}#aim i{position:absolute;left:9px;top:9px;width:5px;height:5px;background:#ff594b}#status{position:absolute;top:calc(57px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);border:1px solid #489da054;background:#071420cb;color:#b0e4eb;padding:5px 10px;border-radius:5px;max-width:65vw;text-align:center;font:700 10px monospace;white-space:nowrap}#notice{position:absolute;top:28%;left:50%;transform:translateX(-50%);background:#0b2639ef;border:1px solid #81cfdf;color:#fff;font-weight:850;letter-spacing:.4px;padding:12px 18px;border-radius:5px;opacity:0;transition:opacity .2s;text-align:center;max-width:85vw}#notice.visible{opacity:1}#hurt{position:absolute;inset:0;pointer-events:none;background:#df10004a;opacity:0}#intro,#settings{position:absolute;inset:0;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:radial-gradient(ellipse at center,#11283be0,#020509f8 77%)}#intro.hidden,#settings.hidden{display:none}#settings{z-index:4} .card{width:min(530px,98vw);background:linear-gradient(145deg,#13293a,#07121e 72%);border:1px solid #50798c;border-radius:12px;box-shadow:0 17px 65px #000c,inset 0 1px 0 #a3eefa16;padding:clamp(17px,3.8vw,30px);text-align:center}.micro{color:#5de7de;letter-spacing:3.4px;font-weight:900;font-size:11px}.card h1{font-size:clamp(38px,9vw,64px);font-weight:1000;letter-spacing:2px;line-height:1;margin:12px 0;color:#f2f9ff;text-shadow:0 3px 0 #000}.card h1 span{color:#fc675b}.card p{line-height:1.6;color:#acbeca;font-size:13px}.cta{background:linear-gradient(#ff6759,#b92329);border:1px solid #ff9e92;color:white;padding:13px 30px;letter-spacing:1.5px;box-shadow:0 6px 24px #e828214d;font-size:14px}.card .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:13px}.tip{font-size:11px!important;color:#7fa1b8!important}.card h2{margin:0 0 10px;font-size:24px}.setting{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:9px 0;padding:8px 0;border-bottom:1px solid #42596a55;text-align:left}.setting span{font-size:12px;color:#b3d1de}.setting button{white-space:nowrap}#touch{display:none;pointer-events:none}#stick{position:absolute;left:16px;bottom:80px;width:108px;height:108px;border-radius:50%;border:2px solid #6dd6dd8c;background:#11425465;pointer-events:auto;touch-action:none}#nub{position:absolute;left:32px;top:32px;width:40px;height:40px;border:2px solid #cdffff;background:#88f4e581;border-radius:50%;pointer-events:none}#lookzone{position:absolute;right:0;top:14%;height:68%;width:44%;pointer-events:auto;touch-action:none}#fire{position:absolute;right:17px;bottom:91px;width:88px;height:88px;border-radius:50%;border:2px solid #ffaf85;background:radial-gradient(#f95f47e8,#761a25db);color:white;pointer-events:auto;touch-action:none;box-shadow:0 0 27px #fa4a3877}#weapon{position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);width:min(28vw,210px);height:min(19vw,128px);pointer-events:none;filter:drop-shadow(0 0 8px #000)}#weapon:before{content:"";position:absolute;bottom:0;left:28%;width:44%;height:108%;clip-path:polygon(32% 0,68% 0,80% 44%,95% 67%,100% 100%,0 100%,5% 67%,20% 44%);background:linear-gradient(90deg,#111a20,#526c73 22%,#18252b 35%,#879aa0 50%,#253843 65%,#162127 82%,#09161c);border-top:6px solid #1b2f3b}#weapon:after{content:"";position:absolute;bottom:12%;left:44%;width:12%;height:84%;background:linear-gradient(90deg,#06131b,#2c4453 48%,#0b1c24);box-shadow:0 0 8px #151c1b}#weapon.firing{filter:drop-shadow(0 -9px 20px #ffb064);transform:translateX(-50%) translateY(13px)}#flash{position:absolute;left:50%;bottom:min(18vw,140px);transform:translateX(-50%);width:72px;height:72px;pointer-events:none;opacity:0;background:radial-gradient(ellipse,#fff7bd,#ffac45a8 30%,transparent 68%);filter:blur(6px)}#flash.show{opacity:1}@media(pointer:coarse){#touch{display:block}}@media(max-width:700px){#topMid{display:none}#brand{font-size:12px;letter-spacing:1px}#buttons button{font-size:10px;padding:7px 8px}#bottom{gap:5px}#bottom>div{min-width:65px;padding:5px 7px;gap:2px}#bottom strong{font-size:16px}#bottom label{font-size:8px}#weapon{width:145px;height:100px}}@media(orientation:portrait) and (pointer:coarse){#status{top:calc(60px + env(safe-area-inset-top));font-size:9px}#bottom{bottom:22px}#fire{bottom:105px}#stick{bottom:100px}}
 
@@ -40,16 +40,16 @@ body.xr-active #padPanel{z-index:45}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BREACH</b> <small style="color:#77e5d9;font-size:8px">WEBGL 3D v2.4 AR+VR</small></div><div id="topMid">ЗАБРОШЕННАЯ СТАНЦИЯ • СЕКТОР 07</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>▣</span><span><label>ПАТРОНЫ</label><strong id="ammo">60</strong></span></div><div><span>◎</span><span><label>ЦЕЛИ</label><strong id="kill">0/6</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">ОГОНЬ</button></div></div>
-<div id="intro"><div class="card"><div class="micro">WEBGL 3D • V2.4 / GAMEPAD + AR + VR</div><h1>NEON <span>BREACH</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">TRUE WEBGL 3D • SCI-FI HORROR</div><p>Настоящая объёмная станция с освещением, 3D-оборудованием, монстрами и физикой попаданий. Один экран. Работает по HTTPS-ссылке.</p><button id="startBtn" class="cta">НАЧАТЬ МИССИЮ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, мышь, ЛКМ • Телефон: экранные стики или Bluetooth-геймпад (🎮 тест). В AR левый стик добавляет движение к реальной ходьбе, RT/R2 стреляет. AR: камера отслеживает реальное движение. Для AR нужен HTTPS.</p></div></div>
-<div id="settings" class="hidden"><div class="card"><div class="micro">СИСТЕМА СТАНЦИИ</div><h2>НАСТРОЙКИ</h2><div class="setting"><span>Качество рендера</span><button id="quality">ВЫСОКОЕ</button></div><div class="setting"><span>VR-очки (VR Box / Cardboard), стерео</span><button id="vrBtn">VR: ВЫКЛ</button></div><div class="setting"><span>Линзы, IPD, масштаб</span><button id="vrSettingsBtn">VR SETTINGS</button></div><div class="setting"><span>Геймпад: проверка и назначение кнопок</span><button id="settingsPad">🎮 ТЕСТ / КНОПКИ</button></div><div class="setting"><span>Экранные стики при геймпаде</span><button id="touchModeBtn">АВТО</button></div><div class="setting"><span>Взгляд с гироскопом (без AR)</span><button id="gyroBtn">ВЫКЛ</button></div><div class="setting"><span>Реальная камера и предупреждения</span><button id="cameraBtn">ВЫКЛ</button></div><div class="setting"><span>Полноэкранный режим (не во время AR)</span><button id="fullBtn">ЭКРАН</button></div><div class="setting"><span>Сброс положения головы / AR</span><button id="calibrateBtn">КАЛИБРОВКА</button></div><p class="tip">При запуске AR игра сама запрашивает горизонтальную ориентацию. Если Chrome сохраняет портретный режим, включи «Автоповорот» в настройках Samsung, поверни телефон и нажми «↻ ГОРИЗ.» ещё раз. Мы НЕ растягиваем или не вращаем сцену вручную, чтобы сохранить кнопки и правильные пропорции. ARCore в браузере использует камеру для трекинга даже когда её изображение скрыто. Этот режим не обнаруживает реальные препятствия и не является защитой от столкновений. Двигайся только с открытым обзором.</p><div class="row"><button id="resumeBtn" class="cta">ПРОДОЛЖИТЬ</button><button id="resetBtn">НАЧАТЬ ЗАНОВО</button></div></div></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BREACH</b> <small style="color:#77e5d9;font-size:8px">WEBGL 3D v2.5 AR+VR</small></div><div id="topMid">ЗАБРОШЕННАЯ СТАНЦИЯ • СЕКТОР 07</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>▣</span><span><label>ПАТРОНЫ</label><strong id="ammo">60</strong></span></div><div><span>◎</span><span><label>ЦЕЛИ</label><strong id="kill">0/6</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">ОГОНЬ</button></div></div>
+<div id="intro"><div class="card"><div class="micro">WEBGL 3D • V2.5 / GAMEPAD + AR + VR</div><h1>NEON <span>BREACH</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">TRUE WEBGL 3D • SCI-FI HORROR</div><p>Настоящая объёмная станция с освещением, 3D-оборудованием, монстрами и физикой попаданий. Один экран. Работает по HTTPS-ссылке.</p><button id="startBtn" class="cta">НАЧАТЬ МИССИЮ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, мышь, ЛКМ • Телефон: экранные стики или Bluetooth-геймпад (🎮 тест). В AR левый стик добавляет движение к реальной ходьбе, RT/R2 стреляет. AR: камера отслеживает реальное движение. Для AR нужен HTTPS.</p></div></div>
+<div id="settings" class="hidden"><div class="card"><div class="micro">СИСТЕМА СТАНЦИИ</div><h2>НАСТРОЙКИ</h2><div class="setting"><span>Качество рендера</span><button id="quality">ВЫСОКОЕ</button></div><div class="setting"><span>VR-очки (VR Box / Cardboard), стерео</span><button id="vrBtn">VR: ВЫКЛ</button></div><div class="setting"><span>Линзы, IPD, масштаб</span><button id="vrSettingsBtn">VR SETTINGS</button></div><div class="setting"><span>Настройка линз прямо в очках</span><button id="vrCalibBtn">🥽 НАСТРОИТЬ В ОЧКАХ</button></div><div class="setting"><span>Геймпад: проверка и назначение кнопок</span><button id="settingsPad">🎮 ТЕСТ / КНОПКИ</button></div><div class="setting"><span>Экранные стики при геймпаде</span><button id="touchModeBtn">АВТО</button></div><div class="setting"><span>Взгляд с гироскопом (без AR)</span><button id="gyroBtn">ВЫКЛ</button></div><div class="setting"><span>Реальная камера и предупреждения</span><button id="cameraBtn">ВЫКЛ</button></div><div class="setting"><span>Полноэкранный режим (не во время AR)</span><button id="fullBtn">ЭКРАН</button></div><div class="setting"><span>Сброс положения головы / AR</span><button id="calibrateBtn">КАЛИБРОВКА</button></div><p class="tip">При запуске AR игра сама запрашивает горизонтальную ориентацию. Если Chrome сохраняет портретный режим, включи «Автоповорот» в настройках Samsung, поверни телефон и нажми «↻ ГОРИЗ.» ещё раз. Мы НЕ растягиваем или не вращаем сцену вручную, чтобы сохранить кнопки и правильные пропорции. ARCore в браузере использует камеру для трекинга даже когда её изображение скрыто. Этот режим не обнаруживает реальные препятствия и не является защитой от столкновений. Двигайся только с открытым обзором.</p><div class="row"><button id="resumeBtn" class="cta">ПРОДОЛЖИТЬ</button><button id="resetBtn">НАЧАТЬ ЗАНОВО</button></div></div></div>
 </div>
 
 <div id="vrPanel" class="hidden" role="dialog" aria-label="Настройки VR">
  <div class="padCard">
   <div class="padHead"><h2>🥽 VR SETTINGS</h2><button id="vrClose">✕ ЗАКРЫТЬ</button></div>
   <p class="padDesc">Два отдельных изображения для левого и правого глаза + коррекция линз. ARCore при включении/выключении VR не перезапускается. Меняй значения прямо в очках: изменения видны сразу и сохраняются.</p>
-  <div class="padRow"><button id="vrPanelToggle">VR: ВЫКЛ</button><button id="vrCenter">⊙ ЦЕНТР VR</button><button id="vrReset">СБРОС НАСТРОЕК</button></div>
+  <div class="padRow"><button id="vrPanelToggle">VR: ВЫКЛ</button><button id="vrInHeadset" class="cta">🥽 НАСТРОИТЬ В ОЧКАХ</button><button id="vrCenter">⊙ ЦЕНТР VR</button><button id="vrReset">СБРОС НАСТРОЕК</button></div>
   <div class="padOptions"><div class="padOption"><label for="vr_ipd">IPD — расстояние между зрачками: <b id="vr_ipd_v"></b></label><input id="vr_ipd" type="range" min="55" max="75" step="0.5"></div><div class="padOption"><label for="vr_sep">Межлинзовое расстояние очков: <b id="vr_sep_v"></b></label><input id="vr_sep" type="range" min="50" max="75" step="0.5"></div><div class="padOption"><label for="vr_hOff">Горизонтальное положение центров линз: <b id="vr_hOff_v"></b></label><input id="vr_hOff" type="range" min="-10" max="10" step="0.5"></div><div class="padOption"><label for="vr_vOff">Вертикальное положение изображения: <b id="vr_vOff_v"></b></label><input id="vr_vOff" type="range" min="-15" max="15" step="0.5"></div><div class="padOption"><label for="vr_k">Сила коррекции линз: <b id="vr_k_v"></b></label><input id="vr_k" type="range" min="0" max="1.6" step="0.05"></div><div class="padOption"><label for="vr_scale">Масштаб изображения: <b id="vr_scale_v"></b></label><input id="vr_scale" type="range" min="0.6" max="1.5" step="0.01"></div><div class="padOption"><label for="vr_fov">Угол обзора в очках: <b id="vr_fov_v"></b></label><input id="vr_fov" type="range" min="70" max="110" step="1"></div></div>
   <p class="padDesc">Геймпад: ↑↓ — выбор, ←→ — изменить ползунок, A — нажать, B — назад. В VR: ⏸ (Start) или тап по экрану — меню VR; кнопка VR (по умолчанию Select/Back) — выход из VR. Ходи только там, где нет препятствий: игра не гарантирует безопасность в закрытых очках.</p>
   <div class="padRow"><button id="vrDone" class="cta">ГОТОВО</button></div>
@@ -364,7 +364,7 @@ window.addEventListener('orientationchange',()=>{
 // (parallel cameras, off-axis projection centred on each lens) -> per-eye lens correction pass.
 const VR_KEY='neon-vr-v1';
 const VR_DEFAULTS={ipd:63,k:1.0,scale:1.0,vOff:0,hOff:0,sep:63,fov:90};
-const vr={on:false,cfg:{...VR_DEFAULTS},menu:false,menuIndex:0,menuWasPaused:false,
+const vr={on:false,cfg:{...VR_DEFAULTS},menu:false,calib:false,calibIndex:0,calRep:0,menuIndex:0,menuWasPaused:false,
  fbo:null,tex:null,depth:null,fw:0,fh:0,hudCanvas:null,hudCtx:null,hudTex:null,hudW:0,hudH:0,hudAt:0,hudDirty:true,
  prog:null,vao:null,u:{},frameNo:0,errAt:0,lastErr:''};
 try{const o=JSON.parse(localStorage.getItem(VR_KEY)||'null');if(o&&typeof o==='object')for(const k of Object.keys(VR_DEFAULTS))if(Number.isFinite(o[k]))vr.cfg[k]=o[k]}catch(e){}
@@ -427,7 +427,13 @@ function vrTargets(w,h){
  if(st!==gl.FRAMEBUFFER_COMPLETE){toast('VR: буфер рендера недоступен ('+st+')',4000);vr.on=false;syncVRUi()}
 }
 // HUD: drawn once into a small 2D canvas, shown inside each eye at a fixed depth (lens-corrected too).
-const VR_MENU=['ПРОДОЛЖИТЬ','⊙ ЦЕНТР VR','ВЫЙТИ ИЗ VR','НАСТРОЙКИ VR'];
+const VR_MENU=['ПРОДОЛЖИТЬ','НАСТРОЙКА ЛИНЗ','⊙ ЦЕНТР VR','ВЫЙТИ ИЗ VR'];
+// In-headset lens calibration: values change live while you look through the lenses.
+const VR_CAL=[['ipd','IPD',0.5],['sep','МЕЖЛИНЗОВОЕ',0.5],['hOff','ЦЕНТР ЛИНЗ ↔',0.5],['vOff','ВЫСОТА ↕',0.5],['k','КОРРЕКЦИЯ ЛИНЗ',0.05],['scale','МАСШТАБ',0.01],['fov','УГОЛ ОБЗОРА',1],['#center','⊙ ЦЕНТР VR'],['#reset','СБРОС'],['#done','ГОТОВО']];
+function vrCalib(open){vr.calib=open;vr.calibIndex=0;vr.hudDirty=true;if(open){if(!vr.menu){vr.menuWasPaused=paused}vr.menu=false;paused=true}else paused=vr.menuWasPaused}
+function vrCalStep(dir,mult=1){const it=VR_CAL[vr.calibIndex];if(!it||it[0][0]==='#')return;const k=it[0],lim=VR_LIMITS[k];
+ vr.cfg[k]=clamp(Math.round((vr.cfg[k]+dir*it[2]*mult)/it[2])*it[2],lim[0],lim[1]);vr.hudDirty=true;saveVR();syncVRUi()}
+function vrCalAction(){const k=VR_CAL[vr.calibIndex][0];if(k==='#center')recenter();else if(k==='#reset'){vr.cfg={...VR_DEFAULTS};saveVR();syncVRUi();toast('Настройки VR сброшены')}else if(k==='#done'){vrCalib(false);toast('Настройки VR сохранены')}vr.hudDirty=true}
 function vrHud(aspect,now){
  const W=768,H=Math.max(256,Math.round(W/aspect));
  if(!vr.hudCanvas){vr.hudCanvas=document.createElement('canvas');vr.hudCtx=vr.hudCanvas.getContext('2d');vr.hudTex=gl.createTexture();
@@ -442,12 +448,29 @@ function vrHud(aspect,now){
  // health / ammo near the centre (corners are hard to read through lenses)
  g.font='900 26px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';
  const hp=Math.max(0,Math.ceil(player.hp)),txt='♥ '+hp+'     ▣ '+player.ammo+'     ◎ '+kills+'/'+enemies.length;
- g.fillStyle='#04121cc8';const tw=g.measureText(txt).width+34;g.fillRect(cx-tw/2,cy+H*.25-22,tw,44);
- g.fillStyle=hp<30?'#ff7669':'#e8f7ff';g.fillText(txt,cx,cy+H*.25);
+ if(!vr.calib){g.fillStyle='#04121cc8';const tw=g.measureText(txt).width+34;g.fillRect(cx-tw/2,cy+H*.25-22,tw,44);
+ g.fillStyle=hp<30?'#ff7669':'#e8f7ff';g.fillText(txt,cx,cy+H*.25);}
  const n=$('notice');
  if(n.classList.contains('visible')&&n.textContent){g.font='800 22px system-ui,sans-serif';const t=n.textContent.slice(0,46),w2=g.measureText(t).width+30;
   g.fillStyle='#0b2639e8';g.fillRect(cx-w2/2,cy-H*.24-20,w2,40);g.fillStyle='#fff';g.fillText(t,cx,cy-H*.24)}
  g.font='700 15px monospace';g.fillStyle='#8fd8e0';g.fillText(fps+' FPS'+(nativeAR.on?' · '+xr.status:''),cx,cy+H*.25+38);
+ if(vr.calib){
+  // straight reference grid: through correctly calibrated lenses the lines look straight
+  g.strokeStyle='#5de7de66';g.lineWidth=2;const step=Math.round(H/8);
+  for(let x=cx%step;x<W;x+=step){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}
+  for(let y=cy%step;y<H;y+=step){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}
+  g.strokeStyle='#ffcf79';g.lineWidth=3;g.beginPath();g.arc(cx,cy,step*.35,0,Math.PI*2);g.stroke();
+  // compact list (previous / current / next) below the centre, so the middle of the view stays clear
+  const rh=30,pw=440,ph=rh*3+34,px=cx-pw/2,py=cy+H*.12;
+  g.fillStyle='#03101be6';g.fillRect(px,py,pw,ph);g.strokeStyle='#5de7de';g.lineWidth=2;g.strokeRect(px,py,pw,ph);
+  g.font='900 14px system-ui,sans-serif';g.fillStyle='#5de7de';g.textAlign='center';g.fillText('НАСТРОЙКА ЛИНЗ · ↑↓ пункт · ←→ значение · A/B',cx,py+15);
+  for(let r=-1;r<=1;r++){const i=(vr.calibIndex+r+VR_CAL.length)%VR_CAL.length,it=VR_CAL[i],y=py+34+(r+1)*rh+rh/2-6,sel=r===0;
+   if(sel){g.fillStyle='#ff6759';g.fillRect(px+8,y-rh/2+2,pw-16,rh-4)}
+   g.fillStyle=sel?'#fff':'#9fb9c6';g.font=(sel?'900 19px':'700 15px')+' system-ui,sans-serif';
+   if(it[0][0]==='#'){g.textAlign='center';g.fillText(it[1],cx,y)}
+   else{g.textAlign='left';g.fillText(it[1],px+22,y);g.textAlign='right';g.fillText((sel?'◀ ':'')+vrFmt(it[0],vr.cfg[it[0]])+(sel?' ▶':''),px+pw-22,y)}}
+  g.textAlign='center';
+ }
  if(vr.menu){
   const mw=330,mh=VR_MENU.length*48+56;g.fillStyle='#03101bf0';g.fillRect(cx-mw/2,cy-mh/2,mw,mh);g.strokeStyle='#5de7de';g.lineWidth=2;g.strokeRect(cx-mw/2,cy-mh/2,mw,mh);
   g.font='900 17px system-ui,sans-serif';g.fillStyle='#5de7de';g.fillText('МЕНЮ VR',cx,cy-mh/2+24);
@@ -494,7 +517,7 @@ function renderVR(c){
 }
 function setVR(on){
  if(on&&xr.session){toast('VR-стерео работает в APK (ARCore) и без AR; в Chrome WebXR — выключи AR',3800);return}
- if(vr.menu)vrMenu(false);
+ if(vr.menu)vrMenu(false);if(vr.calib)vrCalib(false);
  vr.on=!!on;vr.hudDirty=true;document.body.classList.toggle('vr',vr.on);
  if(vr.on&&!vrProgram())return;
  if(vr.on){$('settings').classList.add('hidden');if(!active)$('startBtn').click();else if($('vrPanel').classList.contains('hidden')&&!padVisible())paused=false}
@@ -514,13 +537,17 @@ function vrMenu(open){
 }
 function vrMenuSelect(){
  const i=vr.menuIndex;vrMenu(false);
- if(i===1)recenter();else if(i===2)setVR(false);else if(i===3){setVR(false);openVRPanel()}
+ if(i===1)vrCalib(true);else if(i===2)recenter();else if(i===3)setVR(false)
 }
 // Cardboard-style input: tap opens the menu, tap moves the selection, long press (0.6 s) selects.
 let vrTapTimer=null,vrLong=false;
 $('vrTap').addEventListener('pointerdown',e=>{e.preventDefault();clearTimeout(vrTapTimer);vrLong=false;
- if(vr.menu)vrTapTimer=setTimeout(()=>{vrTapTimer=null;vrLong=true;vrMenuSelect()},600)});
+ if(vr.calib)vrTapTimer=setTimeout(()=>{vrTapTimer=null;vrLong=true;vrCalib(false);toast('Настройки VR сохранены')},700);
+ else if(vr.menu)vrTapTimer=setTimeout(()=>{vrTapTimer=null;vrLong=true;vrMenuSelect()},600)});
 $('vrTap').addEventListener('pointerup',e=>{e.preventDefault();clearTimeout(vrTapTimer);vrTapTimer=null;if(vrLong){vrLong=false;return}
+ if(vr.calib){const fx=e.clientX/Math.max(1,innerWidth),it=VR_CAL[vr.calibIndex];
+  if(fx<.33)vrCalStep(-1);else if(fx>.67)vrCalStep(1);else if(it[0][0]==='#')vrCalAction();else{vr.calibIndex=(vr.calibIndex+1)%VR_CAL.length;vr.hudDirty=true}
+  return}
  if(!vr.menu)vrMenu(true);else{vr.menuIndex=(vr.menuIndex+1)%VR_MENU.length;vr.hudDirty=true}});
 // Gamepad: VR toggle button, VR menu, and menu navigation in normal (DOM) panels.
 let navRepeat=0;
@@ -532,6 +559,16 @@ function padNav(gp,downs,old,dt){
  let dir=0;if(pressed(12))dir=-1;else if(pressed(13))dir=1;else if(Math.abs(ly)>.6&&navRepeat<=0){dir=Math.sign(ly);navRepeat=.28}
  if(Math.abs(ly)<.3)navRepeat=0;
  if(vr.on){
+  if(vr.calib){
+   if(dir){vr.calibIndex=(vr.calibIndex+dir+VR_CAL.length)%VR_CAL.length;vr.hudDirty=true}
+   const lx=padAxis(gp,0);vr.calRep=(vr.calRep||0)-dt;
+   if(pressed(14))vrCalStep(-1);else if(pressed(15))vrCalStep(1);
+   else if((downs[14]||downs[15]||Math.abs(lx)>.5)&&vr.calRep<=0){vrCalStep(downs[14]||lx<0?-1:1,Math.abs(lx)>.9?3:1);vr.calRep=.12}
+   if(!downs[14]&&!downs[15]&&Math.abs(lx)<.3)vr.calRep=.35;
+   if(pressed(0))vrCalAction();
+   if(pressed(1)||pressed(padConfig.buttons.pause)){vrCalib(false);toast('Настройки VR сохранены')}
+   return true;
+  }
   if(pressed(padConfig.buttons.pause)){vrMenu(!vr.menu);return true}
   if(vr.menu){
    if(dir){vr.menuIndex=(vr.menuIndex+dir+VR_MENU.length)%VR_MENU.length;vr.hudDirty=true}
@@ -557,8 +594,8 @@ function padNav(gp,downs,old,dt){
 // UI wiring
 $('vrBtn').addEventListener('click',()=>setVR(!vr.on));
 $('vrPanelToggle').addEventListener('click',()=>setVR(!vr.on));
-$('vrSettingsBtn').addEventListener('click',openVRPanel);
-$('vrClose').addEventListener('click',closeVRPanel);$('vrDone').addEventListener('click',closeVRPanel);
+$('vrSettingsBtn').addEventListener('click',openVRPanel);$('vrCalibBtn').addEventListener('click',()=>{if(!vr.on)setVR(true);if(vr.on)vrCalib(true)});
+$('vrClose').addEventListener('click',closeVRPanel);$('vrInHeadset').addEventListener('click',()=>{closeVRPanel();if(!vr.on)setVR(true);if(vr.on)vrCalib(true)});$('vrDone').addEventListener('click',closeVRPanel);
 $('vrCenter').addEventListener('click',()=>{recenter()});
 $('vrReset').addEventListener('click',()=>{vr.cfg={...VR_DEFAULTS};saveVR();syncVRUi();toast('Настройки VR сброшены')});
 for(const k of Object.keys(VR_LIMITS)){const el=$('vr_'+k);if(!el)continue;el.addEventListener('input',()=>{vr.cfg[k]=clamp(+el.value,VR_LIMITS[k][0],VR_LIMITS[k][1]);$('vr_'+k+'_v').textContent=vrFmt(k,vr.cfg[k]);saveVR()})}
