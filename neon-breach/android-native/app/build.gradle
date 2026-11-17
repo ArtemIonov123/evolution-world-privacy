@@ -4,11 +4,13 @@ android {
     namespace 'io.github.artemionov123.neonbreach.ar'
     compileSdk 34
     defaultConfig {
-        applicationId 'io.github.artemionov123.neonbreach.ar'
+        // The same native ARCore shell builds several games: -PappId=... -PappName=... -PappVersion=...
+        applicationId(project.findProperty('appId') ?: 'io.github.artemionov123.neonbreach.ar')
+        resValue 'string', 'app_name', (project.findProperty('appName') ?: 'NEON BREACH AR+VR')
         minSdk 24
         targetSdk 34
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
-        versionName '2.5-ar-vr'
+        versionName(project.findProperty('appVersion') ?: '2.5-ar-vr')
     }
     // Same test key as the Chrome build (see ../android). For Google Play use a secret key.
     signingConfigs {
