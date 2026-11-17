@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'io.github.artemionov123.neonbreach'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'io.github.artemionov123.neonbreach'
+        minSdk 24
+        targetSdk 34
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
+        versionName '2.2'
+    }
+    // Test-only key, kept in the repo so every build can update the installed app.
+    // For Google Play make a new key and keep it in GitHub Secrets.
+    signingConfigs {
+        release {
+            storeFile file('../neon-breach.keystore')
+            storePassword 'neonbreach'
+            keyAlias 'neonbreach'
+            keyPassword 'neonbreach'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
