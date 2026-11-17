@@ -8,7 +8,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
-        versionName '2.2'
+        versionName '2.3'
     }
     // Test-only key, kept in the repo so every build can update the installed app.
     // For Google Play make a new key and keep it in GitHub Secrets.
