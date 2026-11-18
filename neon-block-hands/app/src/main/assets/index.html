@@ -71,7 +71,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.3 HD HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.4 HD HANDS • GRAB</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
 <div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>⛏</span><span><label>ДОБЫТО</label><strong id="ammo">0</strong></span></div><div><span>☠</span><span><label>МОБЫ</label><strong id="kill">0/5</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">⛏ КИРКА</button></div></div>
 <div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.5.3 / AR + VR • HD HANDS</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
 <video id="handCam" autoplay muted playsinline aria-hidden="true" style="display:none"></video>
@@ -87,7 +87,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 <div class="setting walkSetting"><span>🚶 Реальная ходьба ARCore / VR: <strong id="realWalkVal">×1.00</strong><br><small>1 метр в комнате = выбранное число метров в игре</small></span><input id="realWalk" aria-label="Масштаб реальной ходьбы AR" type="range" min="0.5" max="6" step="0.25" value="1"></div>
 <div class="setting walkSetting"><span>🎮 Скорость левого стика: <strong id="padWalkVal">×1.00</strong></span><input id="padWalk" aria-label="Скорость ходьбы геймпадом" type="range" min="0.5" max="3" step="0.1" value="1"></div>
 <div class="setting"><span>Скорость ходьбы</span><button id="resetWalk">↺ СБРОС ХОДЬБЫ</button></div><div class="setting"><span>Цикл дня и ночи (проверка освещения)</span><button id="timeToggle">🌙 ПОКАЗАТЬ НОЧЬ</button></div><div class="setting"><span>Факел в руке • L2 / клавиша H</span><button id="settingsTorch">🔥 ДОСТАТЬ ФАКЕЛ</button></div><div class="setting"><span>VR-очки (VR Box / Cardboard), стерео</span><button id="vrBtn">VR: ВЫКЛ</button></div><div class="setting"><span>Линзы, IPD, масштаб</span><button id="vrSettingsBtn">VR SETTINGS</button></div><div class="setting"><span>Настройка линз прямо в очках</span><button id="vrCalibBtn">🥽 НАСТРОИТЬ В ОЧКАХ</button></div><div class="setting"><span>🖐 3D-руки персонажа (камера) <small id="handStatus" style="display:block;opacity:.8">Выключено</small></span><button id="handToggle" aria-label="Включить или выключить отслеживание рук">РУКИ: ВЫКЛ</button></div>
-<div class="setting"><span>🧪 Проверить 3D-модели рук без камеры</span><button id="handDemoBtn">ТЕСТ РУК: ВЫКЛ</button></div>
+<div class="setting"><span>🧪 Проверить 3D-модели рук без камеры</span><button id="handDemoBtn">ТЕСТ РУК: ВЫКЛ</button><button id="propsBtn">🧺 ПРЕДМЕТЫ СЮДА</button></div>
 <div class="setting"><span>В APK отслеживание рук работает через ARCore и MediaPipe. В игре отображаются 3D-руки персонажа, а не изображение настоящих рук.</span></div>
 <div class="setting"><span>Геймпад: проверка и назначение кнопок</span><button id="settingsPad">🎮 ТЕСТ / КНОПКИ</button></div><div class="setting"><span>Экранные стики при геймпаде</span><button id="touchModeBtn">АВТО</button></div><div class="setting"><span>Взгляд с гироскопом (без AR)</span><button id="gyroBtn">ВЫКЛ</button></div><div class="setting"><span>Реальная камера и предупреждения</span><button id="cameraBtn">ВЫКЛ</button></div><div class="setting"><span>Полноэкранный режим (не во время AR)</span><button id="fullBtn">ЭКРАН</button></div><div class="setting"><span>Сброс положения головы / AR</span><button id="calibrateBtn">КАЛИБРОВКА</button></div><p class="tip">При запуске AR игра сама запрашивает горизонтальную ориентацию. Если Chrome сохраняет портретный режим, включи «Автоповорот» в настройках Samsung, поверни телефон и нажми «↻ ГОРИЗ.» ещё раз. Мы НЕ растягиваем или не вращаем сцену вручную, чтобы сохранить кнопки и правильные пропорции. ARCore в браузере использует камеру для трекинга даже когда её изображение скрыто. Горы теперь имеют настоящую ступенчатую высоту: по склону можно подниматься, но отвесные уступы выше одного блока недоступны. Озёра имеют глубину: игрок погружается, удерживай B или клавишу B, чтобы всплывать. Карта подгружается участками 16×16. Цикл дня и ночи длится 8 минут, ночь темнее, а факел L2 освещает пространство вокруг. Мобы активнее ночью; здоровье рядом с деревней днём медленно восстанавливается. Масштаб реальной ходьбы AR относится только к горизонтальному движению; повороты головы и приседание не ускоряются. Игровые стены блокируют перемещение, но игра не обнаруживает реальные препятствия. Ходи с открытым обзором.</p><div class="row"><button id="resumeBtn" class="cta">ПРОДОЛЖИТЬ</button><button id="resetBtn">НАЧАТЬ ЗАНОВО</button></div></div></div>
 </div>
@@ -96,7 +96,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
  <div class="padCard">
   <div class="padHead"><h2>🥽 VR SETTINGS</h2><button id="vrClose">✕ ЗАКРЫТЬ</button></div>
   <p class="padDesc">Два отдельных изображения для левого и правого глаза + коррекция линз. ARCore при включении/выключении VR не перезапускается. Меняй значения прямо в очках: изменения видны сразу и сохраняются.</p>
-  <div class="padRow"><button id="vrHandDemo">🧪 ТЕСТ 3D РУК</button><button id="vrHandsToggle">🖐 РУКИ: ВЫКЛ</button><span id="vrHandStatus" style="font-size:11px;color:#91d9c7;align-self:center">Отслеживание рук выключено</span></div>
+  <div class="padRow"><button id="vrHandDemo">🧪 ТЕСТ 3D РУК</button><button id="vrPropsBtn">🧺 ПРЕДМЕТЫ СЮДА</button><button id="vrHandsToggle">🖐 РУКИ: ВЫКЛ</button><span id="vrHandStatus" style="font-size:11px;color:#91d9c7;align-self:center">Отслеживание рук выключено</span></div>
 <div class="padRow"><button id="vrPanelToggle">VR: ВЫКЛ</button><button id="vrInHeadset" class="cta">🥽 НАСТРОИТЬ В ОЧКАХ</button><button id="vrCenter">⊙ ЦЕНТР VR</button><button id="vrReset">СБРОС НАСТРОЕК</button></div>
   <div class="padOptions"><div class="padOption"><label for="vr_music">🎵 Музыка: <b id="vr_music_v">18%</b></label><input id="vr_music" type="range" min="0" max="100" step="5"></div><div class="padOption"><label for="vr_env">🌧 Атмосфера: <b id="vr_env_v">45%</b></label><input id="vr_env" type="range" min="0" max="100" step="5"></div><div class="padOption"><label for="vr_creatures">🐄 3D-животные: <b id="vr_creatures_v">70%</b></label><input id="vr_creatures" type="range" min="0" max="100" step="5"></div><div class="padOption"><label for="vr_effects">⛏ Эффекты: <b id="vr_effects_v">65%</b></label><input id="vr_effects" type="range" min="0" max="100" step="5"></div></div>
  <div class="padRow"><button id="vrWeather">🌦 СМЕНИТЬ ПОГОДУ</button><button id="vrSoundTest">🎧 3D-ТЕСТ</button></div>
@@ -599,7 +599,7 @@ function editBlock(place,quiet=false){
   const mat=voxelMat(t.x,t.y,t.z),need=mat===2||mat===8?1:mat===9||mat===7?2:3;
   const n=(mineHits.get(key)||0)+1;
   if(n<need){mineHits.set(key,n);spawnVoxelParticles(t.x,t.y,t.z,mat,5);toast('⛏ УДАР '+n+'/'+need,500);return true}
-  mineHits.delete(key);spawnVoxelParticles(t.x,t.y,t.z,mat,16);
+  mineHits.delete(key);spawnVoxelParticles(t.x,t.y,t.z,mat,16);dropProp(t.x,t.y,t.z,mat);
  }
  blockEdits.set(key,place?blockPalette[chosenBlock][1]:-1);
  if(place)blocksPlaced++;else blocksBroken++;sfx(place?'wood':t.mat===9||t.mat===7?'wood':'rock');
@@ -1324,7 +1324,7 @@ function applyHandFrame(input){
  }
  handVision.hands=dets.map(d=>({label:'',landmarks:d.lm}));handVision.frameAt=now;
  document.body.classList.toggle('hand-tracked',dets.length>0);
- handsStatus(dets.length?'Найдены руки: '+dets.length+' • бей рукой по блокам, деревьям, мобам':'Камера работает • покажи ладони');
+ handsStatus(dets.length?'Найдены руки: '+dets.length+' • бей рукой • сожми кисть у предмета — возьмёшь':'Камера работает • покажи ладони');
 }
 // Per render frame: predicted hand points in the CURRENT camera frame (meters).
 const _invRaw={m:null,frame:-1};
@@ -1519,7 +1519,7 @@ function handMine(x,y,z,prev){
  if(n<need){mineHits.set(key,n);spawnVoxelParticles(x,y,z,mat,5);
   handVision.crack={hit:{x,y,z},prev,stage:Math.max(1,Math.round(n/need*2)),at:performance.now()};toast('✊ '+n+'/'+need,380);return}
  mineHits.delete(key);handVision.crack=null;spawnVoxelParticles(x,y,z,mat,16);
- blockEdits.set(key,-1);blocksBroken++;saveBlocks();
+ blockEdits.set(key,-1);blocksBroken++;saveBlocks();dropProp(x,y,z,mat);
  if(innerWorld(x,z))rebuildVoxelScene();else refreshChunkAt(x,z);
  hud();toast('✊ БЛОК ДОБЫТ РУКОЙ',700);
 }
@@ -1530,6 +1530,7 @@ function handContact(s,P,dt,now){
  const prev=s.prevK;s.prevK=k;if(!prev)return;
  const v=[(k[0]-prev[0])/dt,(k[1]-prev[1])/dt,(k[2]-prev[2])/dt],speed=Math.hypot(v[0],v[1],v[2]);
  s.speed=(s.speed||0)*.6+speed*.4;
+ if(handGrab(s,P,dt,now))return;
  if(now<(s.coolUntil||0)||s.speed<PUNCH.speed)return;
  // mobs first
  for(const e of enemies){if(!mobVisible(e))continue;const top=e.type==='golem'?2.4:1.9;
@@ -1541,11 +1542,181 @@ function handContact(s,P,dt,now){
  // tree trunk or crown
  const t=treeAtPoint(k);if(t){hitTree(t,1,'hand');s.coolUntil=now+PUNCH.cool*1000}
 }
+// ===== v3.5.4: GRAB WITH REAL HANDS — squeeze the hand next to an item to pick it up =====
+// Close the hand (fist) or pinch thumb+index right where an item is -> it sticks to the hand,
+// follows its position AND rotation (turn the wrist to look at it from all sides).
+// Open the hand -> the item drops with the speed of the hand (you can toss it).
+const PROP_SAVE='neon-block-props-v354';
+const PROP_KINDS={stone:{n:'КАМЕНЬ',m:0,s:[.16,.16,.16]},plank:{n:'ДОСКА',m:7,s:[.34,.05,.13]},log:{n:'ПОЛЕНО',m:9,s:[.30,.10,.10]},
+ cobble:{n:'БУЛЫЖНИК',m:10,s:[.13,.13,.13]},dirt:{n:'ЗЕМЛЯ',m:2,s:[.14,.14,.14]},crystal:{n:'КРИСТАЛЛ',m:4,s:[.07,.17,.07],c:[.45,.95,1.15]}};
+const GRAB={reach:.10,hoverReach:.17,closeRatio:1.45,openRatio:1.66,pinchOn:.028,pinchOff:.055,maxThrow:8};
+let props=[],propTable=null,propsInit=false,propSaveAt=0,propsAsked=false;
+const _pv=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],_pl=a=>Math.hypot(a[0],a[1],a[2]),_pn=a=>{const l=_pl(a)||1;return [a[0]/l,a[1]/l,a[2]/l]};
+const _px=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],_pd=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+function propOrtho(ax){const x=_pn(ax[0]);let y=_pv(ax[1],x.map(v=>v*_pd(ax[1],x)));y=_pn(y);return [x,y,_px(x,y)]}
+function propRotate(v,k,ang){const c=Math.cos(ang),s=Math.sin(ang),d=_pd(k,v),kx=_px(k,v);
+ return [v[0]*c+kx[0]*s+k[0]*d*(1-c),v[1]*c+kx[1]*s+k[1]*d*(1-c),v[2]*c+kx[2]*s+k[2]*d*(1-c)]}
+function makeProp(kind,x,y,z,yaw=0,mat=null,name=null,size=null){const K=PROP_KINDS[kind]||PROP_KINDS.stone,c=Math.cos(yaw),s=Math.sin(yaw);
+ return {kind,n:name||K.n,m:mat??K.m,s:size||K.s.slice(),c:K.c||[1,1,1],p:[x,y,z],v:[0,0,0],ax:[[c,0,s],[0,1,0],[-s,0,c]],rest:false,held:null,wake:0}}
+function propHalf(P){return P.s.map(v=>v/2)}
+function propRadius(P){return Math.max(...P.s)/2}
+function propExtY(P){const h=propHalf(P);return Math.abs(P.ax[0][1])*h[0]+Math.abs(P.ax[1][1])*h[1]+Math.abs(P.ax[2][1])*h[2]}
+function propSupport(P){const x=P.p[0],z=P.p[2];let sup=isWaterAt(x,z)?-.6:0;
+ for(let y=Math.min(7,Math.floor(P.p[1]));y>=0;y--)if(voxelMat(Math.floor(x),y,Math.floor(z))>=0){sup=y+1;break}
+ const T=propTable;if(T&&Math.abs(x-T.x)<T.w/2+.02&&Math.abs(z-T.z)<T.d/2+.02&&P.p[1]>T.top-.06)sup=Math.max(sup,T.top);
+ return sup}
+function saveProps(force){const now=performance.now();if(!force&&now-propSaveAt<1500)return;propSaveAt=now;
+ try{localStorage.setItem(PROP_SAVE,JSON.stringify({t:propTable,p:props.map(P=>({k:P.kind,n:P.n,m:P.m,s:P.s,p:P.p.map(v=>+v.toFixed(3)),a:P.ax.map(a=>a.map(v=>+v.toFixed(3)))}))}))}catch(e){}}
+function loadProps(){try{const d=JSON.parse(localStorage.getItem(PROP_SAVE)||'null');if(!d||!Array.isArray(d.p))return false;
+ propTable=d.t&&Number.isFinite(d.t.x)?d.t:null;
+ props=d.p.filter(q=>Array.isArray(q.p)&&q.p.every(Number.isFinite)).map(q=>{const P=makeProp(q.k,q.p[0],q.p[1],q.p[2],0,q.m,q.n,q.s);if(Array.isArray(q.a)&&q.a.length===3)P.ax=propOrtho(q.a);return P});
+ return props.length>0||!!propTable}catch(e){return false}}
+function propEye(){const ar=(xr.session||nativeAR.on)&&xr.lastPose;
+ return ar?{eye:xr.lastPose.eye,dir:xr.lastPose.dir}:{eye:[player.x,player.eye+(player.groundY||0),player.z],dir:cameraDir()}}
+// Put a small wooden table with items right in front of you (at hand height).
+function summonProps(quiet){
+ const {eye,dir}=propEye();let fx=dir[0],fz=dir[2];const fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;
+ let tx=eye[0]+fx*.56,tz=eye[2]+fz*.56;
+ const g=Math.max(0,landHeightAt(tx,tz)),top=Math.max(g+.72,eye[1]-.72);
+ propTable={x:tx,z:tz,w:.82,d:.82,top,g};
+ const rx=-fz,rz=fx,yaw=Math.atan2(fz,fx);
+ props=props.filter(P=>P.held||Math.hypot(P.p[0]-tx,P.p[2]-tz)>.6);
+ const lay=[['stone',-.25,-.12],['plank',.02,-.20],['log',.24,-.06],['cobble',-.22,.17],['crystal',.04,.10],['dirt',.25,.22]];
+ for(const [k,a,b] of lay){const P=makeProp(k,tx+rx*a+fx*b,0,tz+rz*a+fz*b,yaw+(Math.random()-.5)*.5);P.p[1]=top+propExtY(P);P.rest=true;props.push(P)}
+ propsInit=true;saveProps(true);
+ if(!quiet)toast('🧺 СТОЛ С ПРЕДМЕТАМИ ПЕРЕД ТОБОЙ • СОЖМИ РУКУ У ПРЕДМЕТА',2600);
+}
+// A broken block leaves a small cube you can pick up.
+function dropProp(x,y,z,mat){
+ const name=(blockPalette.find(b=>b[1]===mat)||['БЛОК'])[0];
+ const P=makeProp('stone',x+.5,y+.45,z+.5,Math.random()*TAU,mat,name,[.2,.2,.2]);
+ P.v=[(Math.random()-.5)*1.2,2.2,(Math.random()-.5)*1.2];props.push(P);
+ const free=props.filter(q=>!q.held);if(props.length>36){const old=free[0];props.splice(props.indexOf(old),1)}
+}
+function handGripState(s,P,side){
+ const w=P[0];let sum=0,curled=0;
+ for(const [tip,kn] of [[8,5],[12,9],[16,13],[20,17]]){const r=_pl(_pv(P[tip],w))/Math.max(.02,_pl(_pv(P[kn],w)));sum+=r;if(r<GRAB.closeRatio)curled++}
+ const ratio=sum/4,pinch=_pl(_pv(P[4],P[8]));
+ const n0=_pn(_px(_pv(P[5],P[0]),_pv(P[17],P[0]))),pn=side>0?n0:n0.map(v=>-v);
+ const palm=[0,5,9,13,17].reduce((a,i)=>[a[0]+P[i][0]/5,a[1]+P[i][1]/5,a[2]+P[i][2]/5],[0,0,0]);
+ const fist=ratio<GRAB.closeRatio||curled>=3,pinching=pinch<GRAB.pinchOn&&!fist;
+ const open=ratio>GRAB.openRatio&&pinch>GRAB.pinchOff&&curled<=1;
+ const G=pinching?[(P[4][0]+P[8][0])/2,(P[4][1]+P[8][1])/2,(P[4][2]+P[8][2])/2]:[palm[0]+pn[0]*.035,palm[1]+pn[1]*.035,palm[2]+pn[2]*.035];
+ // hand orientation frame: X across the knuckles, Y wrist->middle knuckle, Z out of the palm
+ const X=_pn(_pv(P[17],P[5])),Yh=_pn(_pv(P[9],P[0])),Z=_pn(_px(X,Yh)),Y=_px(Z,X);
+ return {closed:fist||pinching,open,G,F:[X,Y,Z],ratio,pinch}
+}
+function nearestProp(G,extra){let best=null,bd=1e9;
+ for(const P of props){const d=_pl(_pv(P.p,G))-propRadius(P);if(d<extra&&d<bd){bd=d;best=P}}return best}
+function grabProp(s,P,st,now){
+ for(const o of handSlots)if(o&&o!==s&&o.held===P){o.held=null}       // pass from one hand to the other
+ const [X,Y,Z]=st.F,d=_pv(P.p,st.G);
+ s.held=P;P.held=s;P.rest=false;P.v=[0,0,0];
+ s.hOff=[_pd(d,X),_pd(d,Y),_pd(d,Z)];
+ s.hRot=P.ax.map(a=>[_pd(a,X),_pd(a,Y),_pd(a,Z)]);
+ s.hVel=[0,0,0];s.hPrev=P.p.slice();
+ sfx(P.m===7||P.m===9?'wood':'rock',P.p);
+ if(navigator.vibrate)try{navigator.vibrate(18)}catch(e){}
+ toast('✊ ВЗЯЛ: '+P.n+' • КРУТИ РУКОЙ • РАЗОЖМИ — БРОСИТЬ',1400);
+}
+function releaseProp(s,throwIt=true){
+ const P=s.held;if(!P)return;s.held=null;P.held=null;P.rest=false;P.wake=0;
+ if(throwIt){let v=s.hVel||[0,0,0];const sp=_pl(v);if(sp>GRAB.maxThrow)v=v.map(x=>x*GRAB.maxThrow/sp);P.v=v.slice();
+  P.spin=sp>1.2?[(Math.random()-.5)*sp*2,(Math.random()-.5)*sp*2,(Math.random()-.5)*sp*2]:null}
+ saveProps(true);
+}
+// Called from handContact each frame. Returns true while the hand holds something (no punching then).
+function handGrab(s,P,dt,now){
+ const side=handSlots.indexOf(s)===0?-1:1,st=handGripState(s,P,side);s.grip=st;
+ if(s.held){
+  if(st.open){releaseProp(s,true);s.closedLatch=false;return false}
+  const H=s.held,[X,Y,Z]=st.F;
+  // the item settles into the palm a little, but keeps the place where you took it
+  const lim=propRadius(H)*.55+.02,ol=_pl(s.hOff);if(ol>lim)s.hOff=s.hOff.map(v=>v*Math.max(lim/ol,1-dt*3));
+  const o=s.hOff,tgt=[st.G[0]+X[0]*o[0]+Y[0]*o[1]+Z[0]*o[2],st.G[1]+X[1]*o[0]+Y[1]*o[1]+Z[1]*o[2],st.G[2]+X[2]*o[0]+Y[2]*o[1]+Z[2]*o[2]];
+  const k=1-Math.exp(-dt*34);
+  for(let j=0;j<3;j++)H.p[j]+=(tgt[j]-H.p[j])*k;
+  const R=s.hRot.map(r=>[X[0]*r[0]+Y[0]*r[1]+Z[0]*r[2],X[1]*r[0]+Y[1]*r[1]+Z[1]*r[2],X[2]*r[0]+Y[2]*r[1]+Z[2]*r[2]]);
+  const kr=1-Math.exp(-dt*26);H.ax=propOrtho(H.ax.map((a,i)=>[a[0]+(R[i][0]-a[0])*kr,a[1]+(R[i][1]-a[1])*kr,a[2]+(R[i][2]-a[2])*kr]));
+  if(dt>.001){const v=_pv(H.p,s.hPrev).map(x=>x/dt);s.hVel=s.hVel.map((x,i)=>x+(v[i]-x)*.35)}
+  s.hPrev=H.p.slice();
+  return true;
+ }
+ // open hand near an item -> remember it (highlight); closing soon after picks it up
+ if(!st.closed){const c=nearestProp(st.G,GRAB.hoverReach);s.hover=c;if(c){s.lastHover=c;s.hoverAt=now}s.closedLatch=false;return false}
+ if(s.closedLatch)return false;           // fist made far from items: must open again first
+ s.closedLatch=true;
+ let c=nearestProp(st.G,GRAB.reach);
+ const lh=s.lastHover;if(!c&&lh&&!lh.held&&now-(s.hoverAt||0)<600&&_pl(_pv(lh.p,st.G))-propRadius(lh)<GRAB.hoverReach+.04)c=lh;
+ if(c){grabProp(s,c,st,now);return true}
+ return false;
+}
+function updateProps(dt){
+ if(!active)return;
+ if(!propsInit){propsInit=true;if(!loadProps())propsAsked=true}
+ if(propsAsked&&(xr.session||nativeAR.on?!!xr.lastPose:true)&&time>1.2){propsAsked=false;summonProps(true)}
+ const now=performance.now();
+ for(const s of handSlots)if(s&&s.held&&now-s.seen>600)releaseProp(s,false);  // hand lost -> item falls
+ for(const P of props){
+  if(P.held)continue;
+  if(P.rest){P.wake-=dt;if(P.wake<=0){P.wake=.4;const sup=propSupport(P);if(P.p[1]-propExtY(P)>sup+.03)P.rest=false}if(P.rest)continue}
+  const steps=Math.max(1,Math.ceil(_pl(P.v)*dt/.06));const h=dt/steps;
+  for(let i=0;i<steps;i++){
+   P.v[1]-=9.6*h;
+   const nx=P.p[0]+P.v[0]*h,nz=P.p[2]+P.v[2]*h,ny=P.p[1]+P.v[1]*h,ext=propExtY(P);
+   // side walls of voxels
+   const yb=Math.floor(ny-ext*.4);
+   if(yb>=0&&yb<=7&&voxelMat(Math.floor(nx),yb,Math.floor(P.p[2]))>=0){P.v[0]*=-.3}else P.p[0]=nx;
+   if(yb>=0&&yb<=7&&voxelMat(Math.floor(P.p[0]),yb,Math.floor(nz))>=0){P.v[2]*=-.3}else P.p[2]=nz;
+   P.p[1]=ny;
+   const sup=propSupport(P);
+   if(P.p[1]-ext<=sup){P.p[1]=sup+ext;
+    if(P.v[1]<-1.6){P.v[1]*=-.28;sfx(P.m===7||P.m===9?'wood':'rock',P.p)}else P.v[1]=0;
+    P.v[0]*=1-Math.min(1,h*7);P.v[2]*=1-Math.min(1,h*7);P.spin=null;
+    // tip over onto the flattest face
+    let best=0,bv=0;for(let k=0;k<3;k++)if(Math.abs(P.ax[k][1])>bv){bv=Math.abs(P.ax[k][1]);best=k}
+    const want=[0,Math.sign(P.ax[best][1])||1,0],axis=_px(P.ax[best],want),sl=_pl(axis);
+    if(sl>1e-4){const ang=Math.asin(Math.min(1,sl))*(1-Math.exp(-h*9)),k=axis.map(v=>v/sl);P.ax=propOrtho(P.ax.map(a=>propRotate(a,k,ang)))}
+    if(_pl(P.v)<.12&&sl<.02){P.v=[0,0,0];P.rest=true;P.wake=.4;saveProps(false)}
+   }
+   else if(P.spin){const sp=_pl(P.spin);if(sp>.01){const k=P.spin.map(v=>v/sp);P.ax=propOrtho(P.ax.map(a=>propRotate(a,k,sp*h)))}}
+   if(P.p[1]<-8){P.p=[player.x,4,player.z];P.v=[0,0,0]}
+  }
+  // a thrown item hits mobs
+  const sp=Math.hypot(P.v[0],P.v[2]);
+  if(sp>3)for(const e of enemies){if(!mobVisible(e))continue;
+   if(Math.hypot(P.p[0]-e.x,P.p[2]-e.z)<.55&&P.p[1]>.1&&P.p[1]<2){hitMob(e,10+sp*3,[P.v[0]/sp*.3,P.v[2]/sp*.3],'hand');P.v[0]*=-.25;P.v[2]*=-.25;break}}
+ }
+}
+function propFaces(mesh,P,col){
+ const h=propHalf(P),[X,Y,Z]=P.ax,c=P.p;
+ const pt=(a,b,d)=>[c[0]+X[0]*a*h[0]+Y[0]*b*h[1]+Z[0]*d*h[2],c[1]+X[1]*a*h[0]+Y[1]*b*h[1]+Z[1]*d*h[2],c[2]+X[2]*a*h[0]+Y[2]*b*h[1]+Z[2]*d*h[2]];
+ const N=v=>v.map(x=>-x);
+ const F=[[N(Z),[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]],[Z,[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]],
+  [N(X),[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]],[X,[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1]],
+  [Y,[-1,1,-1],[-1,1,1],[1,1,1],[1,1,-1]],[N(Y),[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]]];
+ for(const [n,a,b,cc,d] of F)face(mesh,pt(...a),pt(...b),pt(...cc),pt(...d),n,P.m,col);
+}
+function drawProps(mesh){
+ const T=propTable;
+ if(T&&Math.hypot(T.x-player.x,T.z-player.z)<40){const y=T.top,lg=y-T.g;
+  box(mesh,T.x,y-.025,T.z,T.w,.05,T.d,7,[1,1,1]);
+  for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])box(mesh,T.x+a*(T.w/2-.06),T.g+(lg-.05)/2,T.z+b*(T.d/2-.06),.06,lg-.05,.06,9,[1,1,1]);
+ }
+ const hov=new Set();for(const s of handSlots)if(s&&!s.held&&s.hover&&performance.now()-(s.hoverAt||0)<250)hov.add(s.hover);
+ for(const P of props){if(Math.hypot(P.p[0]-player.x,P.p[2]-player.z)>40)continue;
+  const glow=P.held?1.12:hov.has(P)?1.45+.15*Math.sin(performance.now()*.012):1;
+  propFaces(mesh,P,P.c.map(v=>v*glow));
+ }
+}
+window.__neonGrabTest={props:()=>props.map(P=>({n:P.n,p:P.p.map(v=>+v.toFixed(3)),held:!!P.held,rest:P.rest,ax:P.ax.map(a=>a.map(v=>+v.toFixed(2)))})),
+ table:()=>propTable,summon:()=>summonProps(true),pitch:v=>{player.pitch=v},camM:()=>Array.from(handVision.cam.camM||invert(handVision.cam.view)),grip:i=>{const s=handSlots[i];return s&&s.grip?{closed:s.grip.closed,open:s.grip.open,G:s.grip.G,ratio:s.grip.ratio,pinch:s.grip.pinch,held:!!s.held}:null}};
 window.__neonPunchTest={slot:i=>{const s=handSlots[i];return s&&s.cur?{cur:s.cur[0].slice(),raw:s.pts[0].slice()}:null},place:(x,y,z,m)=>{blockEdits.set(blockKey(x,y,z),m);if(innerWorld(x,z))rebuildVoxelScene();else refreshChunkAt(x,z)},mat:(x,y,z)=>voxelMat(x,y,z),
  stand:(x,z,a)=>{player.x=x;player.z=z;player.a=a;player.pitch=0},broken:()=>blocksBroken,fallen:()=>fallenTrees.size,
  tree:()=>{const t=allTreesNear(player.x,player.z,40).sort((a,b)=>Math.hypot(a.x-player.x,a.z-player.z)-Math.hypot(b.x-player.x,b.z-player.z))[0];return t&&{x:t.x,z:t.z,top:t.top,village:t.village}}};
 window.__neonHandsTest={frame:applyHandFrame,info:()=>({enabled:handVision.enabled,status:handVision.status,hands:handVision.hands.length,points:handVision.hands.map(h=>h.landmarks.length),frameAt:handVision.frameAt}),toggle:toggleHands};
 $('handDemoBtn').addEventListener('click',toggleHandDemo);
+$('propsBtn').addEventListener('click',()=>{if(active)summonProps()});$('vrPropsBtn').addEventListener('click',()=>{if(active)summonProps()});
 $('vrHandDemo').addEventListener('click',toggleHandDemo);
 $('handToggle').addEventListener('click',toggleHands);
 $('vrHandsToggle').addEventListener('click',toggleHands);
@@ -1656,6 +1827,7 @@ function dynamic(){const mesh=newGeometry();
   for(const v of [-.505,.505]){box(mesh,x+v,y-.5,z, t,t,1.03,4,[1,.85,.35]);box(mesh,x+v,y+.5,z,t,t,1.03,4,[1,.85,.35]);
    box(mesh,x,y-.5,z+v,1.03,t,t,4,[1,.85,.35]);box(mesh,x,y+.5,z+v,1.03,t,t,4,[1,.85,.35]);
    box(mesh,x+v,y,z-.5,t,1.03,t,4,[1,.85,.35]);box(mesh,x+v,y,z+.5,t,1.03,t,4,[1,.85,.35]);}}
+ drawProps(mesh);
  drawVoxelHands(mesh);
  return mesh;}
 let frameId=0,dynFrame=-1,dynCount=0,dynArr=new Float32Array(4096);
@@ -1786,7 +1958,7 @@ function update(dt){time+=dt;pickSwing=Math.max(0,pickSwing-dt);shotFlash=0;hurt
  if(wasNight!==night){toast(night?'🌙 НАСТУПИЛА НОЧЬ • ЗАЖГЛИСЬ ФАКЕЛЫ':'☀ РАССВЕТ • ЖИВОТНЫЕ ПРОСЫПАЮТСЯ',2400);
   if(night)for(const e of enemies)if(!e.alive&&e.type!=='golem'&&Math.hypot(e.x-player.x,e.z-player.z)>9){e.hp=55;e.alive=true}
   hud();}
- updateStones(dt);updateSkyLife(dt);updateVoxelParticles(dt);
+ updateStones(dt);updateProps(dt);updateSkyLife(dt);updateVoxelParticles(dt);
  for(const a of animals)updateAnimal(a,dt);
  for(const a of villagers)updateVillager(a,dt);
  for(const e of enemies){if(!mobVisible(e))continue;e.hit=Math.max(0,e.hit-dt);e.phase+=dt*2;e.atk-=dt;const d=Math.hypot(e.x-player.x,e.z-player.z);
