@@ -27,6 +27,9 @@ import com.google.ar.core.Camera;
 import com.google.ar.core.CameraIntrinsics;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
+import com.google.ar.core.CameraConfig;
+import com.google.ar.core.CameraConfigFilter;
+import com.google.ar.core.Config;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.NotYetAvailableException;
 
@@ -125,6 +128,26 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer {
             synchronized(arLock){
             if(session==null){
                 session=new Session(this);
+                // v3.8.11: sharper hands — a bigger CPU camera image (default is only 640x480) and autofocus
+                // (default focus is FIXED, so a hand 30-50 cm from the phone was blurry).
+                try {
+                    CameraConfigFilter filter=new CameraConfigFilter(session);
+                    filter.setFacingDirection(CameraConfig.FacingDirection.BACK);
+                    java.util.List<CameraConfig> cfgs=session.getSupportedCameraConfigs(filter);
+                    CameraConfig best=null;int bestScore=Integer.MAX_VALUE;
+                    for(CameraConfig c:cfgs){
+                        int w=Math.max(c.getImageSize().getWidth(),c.getImageSize().getHeight());
+                        int score=Math.abs(w-1280)+(w<900?5000:0)+(w>1920?3000:0);
+                        if(score<bestScore){bestScore=score;best=c;}
+                    }
+                    if(best!=null){session.setCameraConfig(best);
+                        Log.i(TAG,"camera config CPU "+best.getImageSize()+" GPU "+best.getTextureSize());}
+                }catch(Exception e){Log.w(TAG,"camera config",e);}
+                try {
+                    Config cfg=new Config(session);
+                    cfg.setFocusMode(Config.FocusMode.AUTO);
+                    session.configure(cfg);
+                }catch(Exception e){Log.w(TAG,"autofocus",e);}
                 try {
                     String id=session.getCameraConfig().getCameraId();
                     CameraManager mgr=(CameraManager)getSystemService(CAMERA_SERVICE);

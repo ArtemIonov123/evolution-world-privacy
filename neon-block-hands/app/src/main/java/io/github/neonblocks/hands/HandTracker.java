@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 final class HandTracker {
     interface OnHands { void frame(JSONObject hands); void error(String problem); }
 
-    private static final int MAX_SIDE = 640;
+    private static final int MAX_SIDE = 1280;
     private final Context context;
     private final OnHands listener;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
