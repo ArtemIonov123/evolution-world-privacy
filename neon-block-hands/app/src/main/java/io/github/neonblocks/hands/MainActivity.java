@@ -189,20 +189,22 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer {
             s.setDisplayGeometry(rotation,viewW,viewH);
             Frame f=s.update();
             Camera c=f.getCamera();
+            float[] poseM=null;
             if(c.getTrackingState()==TrackingState.TRACKING){
-                float[] m=new float[16];c.getDisplayOrientedPose().toMatrix(m,0);
+                float[] m=new float[16];c.getDisplayOrientedPose().toMatrix(m,0);poseM=m;
                 StringBuilder result=new StringBuilder(208).append("T");
                 for(float n:m)result.append(',').append(String.format(Locale.US,"%.6f",n));
                 pose.set(result.toString());
             }else{pose.set("P,tracking");}
             long now=android.os.SystemClock.elapsedRealtimeNanos();
-            if(tracker.wantsFrames() && now-lastHandsNs>55_000_000L){   // ~18 Hz
+            // as fast as MediaPipe can keep up (the tracker drops frames while it is busy), max ~30 Hz
+            if(tracker.wantsFrames() && now-lastHandsNs>30_000_000L){
                 lastHandsNs=now;
                 try{
                     int rot=imageRotationDegrees();
                     float[] intr=normalizedIntrinsics(c.getImageIntrinsics(),rot);
                     Image image=f.acquireCameraImage();
-                    tracker.onCameraImage(image,rot,intr);
+                    tracker.onCameraImage(image,rot,intr,poseM,now);
                 }catch(NotYetAvailableException ignore){ }
                 catch(Exception e){Log.w(TAG,"CPU frame",e);}
             }
