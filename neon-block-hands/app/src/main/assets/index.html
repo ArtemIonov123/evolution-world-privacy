@@ -71,7 +71,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.4.8 HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.4.9 HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
 <div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>⛏</span><span><label>ДОБЫТО</label><strong id="ammo">0</strong></span></div><div><span>☠</span><span><label>МОБЫ</label><strong id="kill">0/5</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">⛏ КИРКА</button></div></div>
 <div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.4.5 / AR + VR</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
 <video id="handCam" autoplay muted playsinline aria-hidden="true" style="display:none"></video>
@@ -184,7 +184,8 @@ void main(){
  float large=hash(vec3(floor(vUV*4.0),float(vMaterial)*3.0));
  vec3 c=vColor;
  float pix=0.83+noise*0.27+large*.08;
- if(vMaterial==1){ // grass-covered dirt blocks
+ if(vMaterial==19){ /* smooth hands: keep vertex colour */ }
+ else if(vMaterial==1){ // grass-covered dirt blocks
    if(n.y>.4) c=vec3(.20,.91,.15)*(0.82+noise*.37);
    else {c=vec3(.47,.29,.15)*pix;float grassLine=step(.71,fract(vUV.y));c=mix(c,vec3(.17,.76,.12)*pix,grassLine);}
  }else if(vMaterial==2){ // compact dirt
@@ -1268,6 +1269,28 @@ function applyHandFrame(input){
  document.body.classList.toggle('hand-tracked',dets.length>0);
  handsStatus(dets.length?'Найдены руки: '+dets.length+' • кулак + взмах = удар':'Камера работает • покажи ладони');
 }
+
+// Smooth capsule (rounded tube) with per-vertex normals: hands are no longer made of boxes.
+// ra/rb: radius at a/b; flatAxis+flat: elliptical cross-section (palm is flatter than a finger).
+function _hvert(mesh,p,n,mat,col){mesh.v.push(p[0],p[1],p[2],n[0],n[1],n[2],0,0,mat,col[0],col[1],col[2],1);mesh.count++}
+function capsule(mesh,a,b,ra,rb,col,mat=19,flatAxis=null,flat=1,seg=10){
+ const d=_hv3(b,a),len=_hlength(d);if(len<1e-4)return;const Y=d.map(v=>v/len);
+ let X;if(flatAxis){const k=flatAxis[0]*Y[0]+flatAxis[1]*Y[1]+flatAxis[2]*Y[2];X=_hnorm([flatAxis[0]-Y[0]*k,flatAxis[1]-Y[1]*k,flatAxis[2]-Y[2]*k])}
+ else{const N=Math.abs(Y[1])>.9?[1,0,0]:[0,1,0];X=_hnorm(_hcross(N,Y))}
+ const Z=_hcross(Y,X),rings=[];
+ for(const ph of [-90,-60,-30,0])rings.push({c:a,r:ra,ph:ph*Math.PI/180});
+ for(const ph of [0,30,60,90])rings.push({c:b,r:rb,ph:ph*Math.PI/180});
+ const pts=rings.map(R=>{const cp=Math.cos(R.ph),sp=Math.sin(R.ph),row=[];
+  for(let i=0;i<=seg;i++){const t=i/seg*Math.PI*2,ct=Math.cos(t),st=Math.sin(t);
+   const o=[X[0]*ct*R.r*flat+Z[0]*st*R.r,X[1]*ct*R.r*flat+Z[1]*st*R.r,X[2]*ct*R.r*flat+Z[2]*st*R.r];
+   const p=[R.c[0]+o[0]*cp+Y[0]*R.r*sp,R.c[1]+o[1]*cp+Y[1]*R.r*sp,R.c[2]+o[2]*cp+Y[2]*R.r*sp];
+   const n=_hnorm([(X[0]*ct/flat+Z[0]*st)*cp+Y[0]*sp,(X[1]*ct/flat+Z[1]*st)*cp+Y[1]*sp,(X[2]*ct/flat+Z[2]*st)*cp+Y[2]*sp]);
+   row.push([p,n])}return row});
+ for(let r=0;r<pts.length-1;r++){const A=pts[r],B=pts[r+1];if(A[0][0]===B[0][0])continue;
+  for(let i=0;i<seg;i++){const q=[A[i],A[i+1],B[i+1],B[i]];
+   _hvert(mesh,q[0][0],q[0][1],mat,col);_hvert(mesh,q[1][0],q[1][1],mat,col);_hvert(mesh,q[2][0],q[2][1],mat,col);
+   _hvert(mesh,q[0][0],q[0][1],mat,col);_hvert(mesh,q[2][0],q[2][1],mat,col);_hvert(mesh,q[3][0],q[3][1],mat,col)}}
+}
 function drawVoxelHands(mesh){
  if(!handVision.enabled||!handVision.cam)return;
  const now=performance.now(),dt=clamp((now-(handVision.drawAt||now))/1000,0,.1);handVision.drawAt=now;
@@ -1275,7 +1298,7 @@ function drawVoxelHands(mesh){
  const toW=p=>[head[12]+head[0]*p[0]+head[4]*p[1]+head[8]*p[2],head[13]+head[1]*p[0]+head[5]*p[1]+head[9]*p[2],head[14]+head[2]*p[0]+head[6]*p[1]+head[10]*p[2]];
  // body frame: shoulders follow head position and heading, not head tilt
  let fx=-head[8],fz=-head[10];const fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;const rx=-fz,rz=fx;
- const skin=[.85,.62,.43],finger=[.90,.70,.51],sleeve=[.13,.30,.43],sleeve2=[.10,.24,.35],trim=[.23,.62,.57];
+ const skin=[.80,.57,.41],finger=[.84,.61,.45],sleeve=[.13,.30,.43],sleeve2=[.10,.24,.35],trim=[.23,.62,.57];
  for(let si=0;si<2;si++){
   const s=handSlots[si];if(!s||now-s.seen>450)continue;
   for(let i=0;i<21;i++)for(let j=0;j<3;j++)s.cur[i][j]+=(s.target[i][j]-s.cur[i][j])*k;
@@ -1289,17 +1312,24 @@ function drawVoxelHands(mesh){
    const hint=[rx*side*.5-fx*.25,-.8,rz*side*.5-fz*.25],dot=hint[0]*u[0]+hint[1]*u[1]+hint[2]*u[2];
    const b=_hnorm([hint[0]-u[0]*dot,hint[1]-u[1]*dot,hint[2]-u[2]*dot]);
    E=[S[0]+u[0]*a+b[0]*h,S[1]+u[1]*a+b[1]*h,S[2]+u[2]*a+b[2]*h];}
-  voxelLimb(mesh,S,E,.105,.095,sleeve2);
-  voxelLimb(mesh,E,Wr,.088,.08,sleeve);
-  const cuff=[Wr[0]+(E[0]-Wr[0])*.12,Wr[1]+(E[1]-Wr[1])*.12,Wr[2]+(E[2]-Wr[2])*.12];
-  voxelLimb(mesh,cuff,Wr,.096,.088,trim);
-  // palm and fingers (real size: ~8 cm palm)
-  const mid=P[9];
-  voxelLimb(mesh,Wr,mid,.075,.032,skin);
-  voxelLimb(mesh,Wr,P[5],.045,.028,skin);
-  voxelLimb(mesh,Wr,P[17],.042,.028,skin);
-  for(const [fi,ids] of [[0,1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]].entries())
-   for(let n=0;n<ids.length-1;n++){const w=(fi===0?.022:fi===4?.015:.018)*(1-n*.1);voxelLimb(mesh,P[ids[n]],P[ids[n+1]],w,w*.95,n===0?skin:finger)}
+  // sleeve: upper arm + forearm, tapering towards the wrist, with a soft cuff
+  capsule(mesh,S,E,.058,.05,sleeve2,19,null,1,10);
+  const cuff=[Wr[0]+(E[0]-Wr[0])*.16,Wr[1]+(E[1]-Wr[1])*.16,Wr[2]+(E[2]-Wr[2])*.16];
+  capsule(mesh,E,cuff,.049,.042,sleeve,19,null,1,10);
+  capsule(mesh,cuff,[cuff[0]+(Wr[0]-cuff[0])*.45,cuff[1]+(Wr[1]-cuff[1])*.45,cuff[2]+(Wr[2]-cuff[2])*.45],.045,.044,trim,19,null,1,10);
+  // palm: flattened rounded shape built from overlapping capsules along the palm plane
+  const pn=_hnorm(_hcross(_hv3(P[5],P[0]),_hv3(P[17],P[0]))),across=_hnorm(_hv3(P[5],P[17]));
+  const wristIn=[Wr[0]+(P[9][0]-Wr[0])*.12,Wr[1]+(P[9][1]-Wr[1])*.12,Wr[2]+(P[9][2]-Wr[2])*.12];
+  capsule(mesh,Wr,wristIn,.03,.032,skin,19,across,1.15,10);
+  capsule(mesh,wristIn,P[9],.034,.03,skin,19,across,1.45,10);
+  capsule(mesh,wristIn,P[5],.022,.021,skin,19,pn,.75,8);
+  capsule(mesh,wristIn,P[17],.021,.019,skin,19,pn,.75,8);
+  capsule(mesh,P[5],P[17],.019,.017,skin,19,null,1,8);
+  capsule(mesh,wristIn,P[1],.02,.019,skin,19,null,1,8);   // thumb base (thenar)
+  // fingers: tapered rounded segments, rounded fingertips
+  const R=[[.0125,.011,.0098,.009],[.0098,.0090,.0080,.0072],[.0102,.0094,.0084,.0075],[.0096,.0088,.0078,.0070],[.0085,.0077,.0069,.0062]];
+  for(const [fi,ids] of [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]].entries())
+   for(let n=0;n<ids.length-1;n++)capsule(mesh,P[ids[n]],P[ids[n+1]],R[fi][n],R[fi][n+1],finger,19,null,1,8);
  }
 }
 window.__neonHandsTest={frame:applyHandFrame,info:()=>({enabled:handVision.enabled,status:handVision.status,hands:handVision.hands.length,points:handVision.hands.map(h=>h.landmarks.length),frameAt:handVision.frameAt}),toggle:toggleHands};

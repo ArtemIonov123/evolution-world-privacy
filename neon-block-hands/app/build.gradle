@@ -8,7 +8,7 @@ android {
         minSdk 29
         targetSdk 33
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '347').toInteger())
-        versionName '3.4.8-hands'
+        versionName '3.4.9-hands'
     }
     // Test key from this repository (same as the other NEON APKs) so updates install over each other.
     signingConfigs {
