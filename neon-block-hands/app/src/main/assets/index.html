@@ -71,7 +71,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.4 HD HANDS • GRAB</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.5 HD HANDS • GRAB</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
 <div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>⛏</span><span><label>ДОБЫТО</label><strong id="ammo">0</strong></span></div><div><span>☠</span><span><label>МОБЫ</label><strong id="kill">0/5</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">⛏ КИРКА</button></div></div>
 <div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.5.3 / AR + VR • HD HANDS</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
 <video id="handCam" autoplay muted playsinline aria-hidden="true" style="display:none"></video>
@@ -1282,10 +1282,79 @@ function handMeasure(lm,world,intr){
   G=lm.map((p,i)=>[(r[i][0]-r[0][0])*s,(r[i][1]-r[0][1])*s,-((+p.z||0)-(+lm[0].z||0))*s*1.5]);
  }
  let num=0,den=0;for(const [a,b] of [[0,5],[0,17],[5,17],[0,9],[0,13],[5,9],[9,13],[13,17]]){num+=Math.hypot(G[a][0]-G[b][0],G[a][1]-G[b][1]);den+=Math.hypot(r[a][0]-r[b][0],r[a][1]-r[b][1])}
- return {r0:r[0],d:clamp(num/Math.max(1e-4,den),.14,1.25),G};
+ return {r0:r[0],sx:(r[0][0]+r[5][0]+r[9][0]+r[17][0])/4,d:clamp(num/Math.max(1e-4,den),.14,1.25),G};
 }
 function fistCurled(lm){return [8,12,16,20].filter((tip,k)=>{const m=[5,9,13,17][k],b=lm[m],e=lm[tip],w=lm[0];
  return Math.hypot(e.x-w.x,e.y-w.y)<Math.hypot(b.x-w.x,b.y-w.y)*1.40}).length}
+// ===== v3.5.5: ANATOMICAL HAND SOLVER =====
+// The tracker sometimes gives impossible hands while the wrist rotates: fingers bent backwards,
+// bones that stretch, and a "mirrored" depth where the palm suddenly becomes the back of the hand.
+// 1) chirality lock: which side is the palm is learned over time and kept; a mirrored frame is flipped back;
+// 2) every finger joint bends only the way a human joint can (with real angle limits);
+// 3) bone lengths are kept constant (learned for your hand);
+// 4) the whole hand shape is smoothed with ONE common filter, so it never deforms while turning.
+const _sv=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],_sa=(a,b,k=1)=>[a[0]+b[0]*k,a[1]+b[1]*k,a[2]+b[2]*k],_sl=a=>Math.hypot(a[0],a[1],a[2]);
+const _sn=a=>{const l=_sl(a)||1;return [a[0]/l,a[1]/l,a[2]/l]},_sd=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const _sx=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const HAND_CHAINS=[[0,1,2,3,4],[0,5,6,7,8],[0,9,10,11,12],[0,13,14,15,16],[0,17,18,19,20]];
+// joint limits [flex min, flex max, side ±] in radians, for the 3 finger joints (MCP, PIP, DIP)
+const FINGER_LIM=[[-.40,1.65,.38],[-.05,1.95,.10],[-.10,1.45,.10]];
+const BONE_RANGE=[[.30,.62],[.17,.42],[.13,.33]];          // finger bones, as part of palm length
+function handPalmCross(G){return _sn(_sx(_sv(G[17],G[5]),_sv(G[9],G[0])))}
+// curl evidence: fingertips and thumb lie on the palm side of the palm plane
+function handCurlEvidence(G){const c=handPalmCross(G),L=_sl(_sv(G[9],G[0]))||.09;let e=0;
+ for(const [m,t] of [[5,8],[9,12],[13,16],[17,20],[5,7],[9,11],[13,15],[17,19]])e+=_sd(_sv(G[t],G[m]),c);
+ e+=_sd(_sv(G[4],G[2]),c)*.6;return e/L}
+function handPalmNormal(s,P,side){const c=handPalmCross(P);
+ if(s&&s.chir)return s.chir>0?c:c.map(v=>-v);
+ const n0=_sn(_sx(_sv(P[5],P[0]),_sv(P[17],P[0])));return side>0?n0:n0.map(v=>-v)}
+function solveHand(s,G){
+ G=G.map(p=>p.slice());
+ // --- 1. chirality
+ let e=handCurlEvidence(G);
+ if(Math.abs(e)>.15){s.chirE=(s.chirE||0)*.93+clamp(e,-1.5,1.5)*.07;if(!s.chir||Math.abs(s.chirE)>.25)s.chir=Math.sign(s.chirE)||s.chir}
+ if(s.chir&&Math.abs(s.chirE||0)>.3&&e*s.chir<-.45){for(const p of G)p[2]=-p[2];e=-e;s.mirrored=(s.mirrored||0)+1}
+ const pn=s.chir?(s.chir>0?handPalmCross(G):handPalmCross(G).map(v=>-v)):handPalmCross(G);
+ const L=Math.max(.05,_sl(_sv(G[9],G[0])));
+ // --- 2+3. fingers: angle limits and fixed bone lengths
+ if(!s.bones)s.bones=HAND_CHAINS.map(ch=>ch.slice(1).map((j,k)=>_sl(_sv(G[j],G[ch[k]]))));
+ for(let f=0;f<5;f++){const ch=HAND_CHAINS[f],B=s.bones[f];
+  for(let k=0;k<4;k++){const m=_sl(_sv(G[ch[k+1]],G[ch[k]]));
+   let lo=.05*L,hi=.9*L;if(f>0&&k>0){lo=BONE_RANGE[k-1][0]*L;hi=BONE_RANGE[k-1][1]*L}
+   if(m>1e-4)B[k]+=(clamp(m,lo,hi)-B[k])*.05;B[k]=clamp(B[k],lo,hi)}
+  const out=[G[ch[0]],G[ch[1]]];
+  // MCP stays where the tracker puts it (palm is solid); only the next bones are constrained
+  let p=_sn(_sv(G[ch[1]],G[0])),u=_sn(_sa(pn,p,-_sd(pn,p)));
+  for(let k=1;k<4;k++){
+   const d=_sn(_sv(G[ch[k+1]],G[ch[k]]));
+   if(f===0&&k===1){const np=_sa(out[k],d,B[k]);out.push(np);const nu=_sa(u,d,-_sd(u,d));p=d;u=_sn(nu);continue}
+   let Lc=f===0?[-.35,1.30,.55]:FINGER_LIM[k-1];
+   const l=_sx(u,p);
+   let th=Math.atan2(_sd(d,u),_sd(d,p)),ph=Math.asin(clamp(_sd(d,l),-1,1));
+   th=clamp(th,Lc[0],Lc[1]);ph=clamp(ph,-Lc[2],Lc[2]);
+   const df=_sa(p.map(v=>v*Math.cos(th)),u,Math.sin(th));
+   const nd=_sn(_sa(df.map(v=>v*Math.cos(ph)),l,Math.sin(ph)));
+   const nu=_sa(u.map(v=>v*Math.cos(th)),p,-Math.sin(th));
+   const np=_sa(out[k],nd,B[k]);out.push(np);
+   p=nd;u=_sn(_sa(nu,p,-_sd(nu,p)));
+  }
+  for(let k=2;k<5;k++)G[ch[k]]=out[k];
+ }
+ return G;
+}
+// one shared adaptive low-pass for the whole shape (all joints move together -> no deformation)
+function handShapeFilter(F,G,t){const R=F.rs||(F.rs={S:null,t:0,v:0});
+ if(!R.S||t-R.t>.4||t<=R.t){R.S=G.map(p=>p.slice());R.t=t;R.v=0;return R.S.map(p=>p.slice())}
+ const dt=Math.max(.004,t-R.t);R.t=t;let mx=0;
+ for(let i=0;i<21;i++)mx=Math.max(mx,_sl(_sv(G[i],R.S[i]))/dt);
+ R.v+=(mx-R.v)*.5;const cut=2.4+R.v*14,a=1/(1+1/(2*Math.PI*cut*dt));
+ for(let i=0;i<21;i++)for(let j=0;j<3;j++)R.S[i][j]+=(G[i][j]-R.S[i][j])*a;
+ return R.S.map(p=>p.slice());
+}
+function handKeepBones(s,G){if(!s.bones)return G;
+ for(let f=0;f<5;f++){const ch=HAND_CHAINS[f];for(let k=1;k<4;k++){const a=G[ch[k]],b=G[ch[k+1]],d=_sv(b,a),l=_sl(d)||1;
+  const nb=_sa(a,d,s.bones[f][k]/l),off=_sv(nb,b);for(let q=k+1;q<5;q++)G[ch[q]]=_sa(G[ch[q]],off)}}
+ return G}
 function applyHandFrame(input){
  if(!input||!handVision.enabled)return;
  const raw=Array.isArray(input)?input:input.hands;if(!Array.isArray(raw))return;
@@ -1300,21 +1369,34 @@ function applyHandFrame(input){
   if(!Array.isArray(joints)||joints.length!==21||joints.some(p=>!p||!Number.isFinite(+p.x)||!Number.isFinite(+p.y)))continue;
   const lm=joints.map(p=>({x:+p.x,y:+p.y,z:+p.z||0})),m=handMeasure(lm,Array.isArray(h)?null:h.world,intr);
   const wcam=[m.r0[0]*m.d,m.r0[1]*m.d,-m.d];
-  dets.push({lm,m,x:lm[0].x,w:pose?_mulPt(pose,wcam):wcam});
+  dets.push({lm,m,x:lm[0].x,sx:m.sx,w:pose?_mulPt(pose,wcam):wcam});
  }
  if(dets.length===2&&_d3(dets[0].w,dets[1].w)<.07)dets.pop();
  const live=handSlots.map(s=>s&&now-s.seen<700&&!!s.pose===!!pose);
- const cost=(det,si)=>(live[si]?_d3(det.w,handSlots[si].w):.35)+(si===0?Math.max(0,det.x-.5):Math.max(0,.5-det.x))*.7;
+ // v3.5.5: the screen is split in two halves. A hand in the LEFT half of the view is always the
+ // left arm, a hand in the RIGHT half is the right arm (no more twisted arms from the wrong shoulder).
+ // When a hand changes side, its state (filters, held item) moves with it to the other arm.
+ const SIDE_DEAD=.05;   // small zone around the centre where a single hand keeps its arm (no flicker)
+ const moveSlot=(from,to)=>{if(from===to)return;const t=handSlots[to];handSlots[to]=handSlots[from];handSlots[from]=t;const l=live[to];live[to]=live[from];live[from]=l};
  let pairs=[];
- if(dets.length===1)pairs=cost(dets[0],0)<=cost(dets[0],1)?[[0,0]]:[[0,1]];
- else if(dets.length===2)pairs=cost(dets[0],0)+cost(dets[1],1)<=cost(dets[0],1)+cost(dets[1],0)?[[0,0],[1,1]]:[[0,1],[1,0]];
+ if(dets.length===1){const d=dets[0];let si=d.sx<0?0:1;
+  const cur=live[0]&&!live[1]?0:live[1]&&!live[0]?1:-1;
+  if(cur>=0&&Math.abs(d.sx)<SIDE_DEAD)si=cur;
+  if(cur>=0&&cur!==si)moveSlot(cur,si);
+  pairs=[[0,si]];
+ }else if(dets.length===2){const L=dets[0].sx<=dets[1].sx?0:1,R=1-L;
+  // keep each hand's own state when the two hands swap sides
+  if(live[0]&&live[1]&&_d3(dets[L].w,handSlots[1].w)+_d3(dets[R].w,handSlots[0].w)<_d3(dets[L].w,handSlots[0].w)+_d3(dets[R].w,handSlots[1].w)-.05)moveSlot(0,1);
+  pairs=[[L,0],[R,1]];
+ }
  for(const [di,si] of pairs){
   const det=dets[di];let s=handSlots[si];
   if(!s||!live[si])s=handSlots[si]={filt:makeHandFilters(),cur:null,vel:null,seen:now};
   const F=s.filt,M=det.m;
   const rx=F.ray[0].f(M.r0[0],t),ry=F.ray[1].f(M.r0[1],t),d=F.depth.f(M.d,t);
   const W=[rx*d,ry*d,-d];
-  const cam=M.G.map((g,i)=>[W[0]+F.shape[i*3].f(g[0],t),W[1]+F.shape[i*3+1].f(g[1],t),W[2]+F.shape[i*3+2].f(g[2],t)]);
+  const Sh=handKeepBones(s,handShapeFilter(F,solveHand(s,M.G),t));
+  const cam=Sh.map(g=>[W[0]+g[0],W[1]+g[1],W[2]+g[2]]);
   const pts=pose?cam.map(p=>_mulPt(pose,p)):cam;      // ARCore space when the frame pose is known
   if(s.pts&&t-s.t>.004&&t-s.t<.3){const dtc=t-s.t,a=.55;
    s.vel=pts.map((p,i)=>{const v=[(p[0]-s.pts[i][0])/dtc,(p[1]-s.pts[i][1])/dtc,(p[2]-s.pts[i][2])/dtc],o=s.vel?s.vel[i]:v;return [o[0]+(v[0]-o[0])*a,o[1]+(v[1]-o[1])*a,o[2]+(v[2]-o[2])*a]})}
@@ -1443,7 +1525,7 @@ function drawVoxelHands(mesh){
   capsule(mesh,_hmix(cuff,Wr,.46),_hmix(cuff,Wr,.59),.042,.041,sleeve2,H_MAT_CLOTH,null,1,seg);
   // Anatomical palm / dorsal colour. Per-vertex normal gradient is kept smooth in real time.
   const cross=_hnorm(_hv3(P[5],P[17]));
-  const n0=_hnorm(_hcross(_hv3(P[5],P[0]),_hv3(P[17],P[0]))),pn=side>0?n0:n0.map(v=>-v),bk=pn.map(v=>-v);
+  const pn=handPalmNormal(s,P,side),bk=pn.map(v=>-v);
   const tone=(base,palm)=>(n)=>{const t=clamp(_hdot(n,pn)*1.2+.47,0,1);
    return [base[0]+(palm[0]-base[0])*t,base[1]+(palm[1]-base[1])*t,base[2]+(palm[2]-base[2])*t]};
   const skinC=tone(skin,[.87,.64,.55]),fingerC=tone(finger,[.89,.67,.57]);
@@ -1549,7 +1631,7 @@ function handContact(s,P,dt,now){
 const PROP_SAVE='neon-block-props-v354';
 const PROP_KINDS={stone:{n:'КАМЕНЬ',m:0,s:[.16,.16,.16]},plank:{n:'ДОСКА',m:7,s:[.34,.05,.13]},log:{n:'ПОЛЕНО',m:9,s:[.30,.10,.10]},
  cobble:{n:'БУЛЫЖНИК',m:10,s:[.13,.13,.13]},dirt:{n:'ЗЕМЛЯ',m:2,s:[.14,.14,.14]},crystal:{n:'КРИСТАЛЛ',m:4,s:[.07,.17,.07],c:[.45,.95,1.15]}};
-const GRAB={reach:.10,hoverReach:.17,closeRatio:1.45,openRatio:1.66,pinchOn:.028,pinchOff:.055,maxThrow:8};
+const GRAB={reach:.10,hoverReach:.17,rayReach:1.45,closeRatio:1.5,openRatio:1.66,pinchOn:.028,pinchOff:.055,maxThrow:8};
 let props=[],propTable=null,propsInit=false,propSaveAt=0,propsAsked=false;
 const _pv=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],_pl=a=>Math.hypot(a[0],a[1],a[2]),_pn=a=>{const l=_pl(a)||1;return [a[0]/l,a[1]/l,a[2]/l]};
 const _px=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],_pd=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -1597,7 +1679,7 @@ function handGripState(s,P,side){
  const w=P[0];let sum=0,curled=0;
  for(const [tip,kn] of [[8,5],[12,9],[16,13],[20,17]]){const r=_pl(_pv(P[tip],w))/Math.max(.02,_pl(_pv(P[kn],w)));sum+=r;if(r<GRAB.closeRatio)curled++}
  const ratio=sum/4,pinch=_pl(_pv(P[4],P[8]));
- const n0=_pn(_px(_pv(P[5],P[0]),_pv(P[17],P[0]))),pn=side>0?n0:n0.map(v=>-v);
+ const pn=handPalmNormal(s,P,side);
  const palm=[0,5,9,13,17].reduce((a,i)=>[a[0]+P[i][0]/5,a[1]+P[i][1]/5,a[2]+P[i][2]/5],[0,0,0]);
  const fist=ratio<GRAB.closeRatio||curled>=3,pinching=pinch<GRAB.pinchOn&&!fist;
  const open=ratio>GRAB.openRatio&&pinch>GRAB.pinchOff&&curled<=1;
@@ -1608,11 +1690,18 @@ function handGripState(s,P,side){
 }
 function nearestProp(G,extra){let best=null,bd=1e9;
  for(const P of props){const d=_pl(_pv(P.p,G))-propRadius(P);if(d<extra&&d<bd){bd=d;best=P}}return best}
-function grabProp(s,P,st,now){
+// v3.5.5: item "under the hand" on the screen (behind it, up to ~80 cm): you don't have to touch it.
+// Handy for items on the ground — hold the hand over the item, squeeze, it flies into the palm.
+function propOnRay(G){const m=handVision.cam&&(handVision.cam.camM||invert(handVision.cam.view));if(!m)return null;
+ const E=[m[12],m[13],m[14]],dir=_pn(_pv(G,E));let best=null,ba=1e9;
+ for(const P of props){if(P.held)continue;const v=_pv(P.p,G),along=_pd(v,dir);if(along<-.05||along>GRAB.rayReach)continue;
+  const perp=_pl(_pv(v,dir.map(x=>x*along)));if(perp<propRadius(P)+.06+Math.max(0,along)*.10&&along<ba){ba=along;best=P}}
+ return best}
+function grabProp(s,P,st,now,pull=false){
  for(const o of handSlots)if(o&&o!==s&&o.held===P){o.held=null}       // pass from one hand to the other
  const [X,Y,Z]=st.F,d=_pv(P.p,st.G);
  s.held=P;P.held=s;P.rest=false;P.v=[0,0,0];
- s.hOff=[_pd(d,X),_pd(d,Y),_pd(d,Z)];
+ s.hOff=pull?[0,0,propRadius(P)*.5]:[_pd(d,X),_pd(d,Y),_pd(d,Z)];s.pullUntil=pull?now+260:0;
  s.hRot=P.ax.map(a=>[_pd(a,X),_pd(a,Y),_pd(a,Z)]);
  s.hVel=[0,0,0];s.hPrev=P.p.slice();
  sfx(P.m===7||P.m===9?'wood':'rock',P.p);
@@ -1629,12 +1718,13 @@ function releaseProp(s,throwIt=true){
 function handGrab(s,P,dt,now){
  const side=handSlots.indexOf(s)===0?-1:1,st=handGripState(s,P,side);s.grip=st;
  if(s.held){
-  if(st.open){releaseProp(s,true);s.closedLatch=false;return false}
+  // release only when the hand stays open for a moment (tracking of a fist often flickers)
+  if(st.open){if(!s.openSince)s.openSince=now;if(now-s.openSince>90){s.openSince=0;releaseProp(s,true);s.closedLatch=false;return false}}else s.openSince=0;
   const H=s.held,[X,Y,Z]=st.F;
   // the item settles into the palm a little, but keeps the place where you took it
   const lim=propRadius(H)*.55+.02,ol=_pl(s.hOff);if(ol>lim)s.hOff=s.hOff.map(v=>v*Math.max(lim/ol,1-dt*3));
   const o=s.hOff,tgt=[st.G[0]+X[0]*o[0]+Y[0]*o[1]+Z[0]*o[2],st.G[1]+X[1]*o[0]+Y[1]*o[1]+Z[1]*o[2],st.G[2]+X[2]*o[0]+Y[2]*o[1]+Z[2]*o[2]];
-  const k=1-Math.exp(-dt*34);
+  const k=1-Math.exp(-dt*(now<(s.pullUntil||0)?16:34));
   for(let j=0;j<3;j++)H.p[j]+=(tgt[j]-H.p[j])*k;
   const R=s.hRot.map(r=>[X[0]*r[0]+Y[0]*r[1]+Z[0]*r[2],X[1]*r[0]+Y[1]*r[1]+Z[1]*r[2],X[2]*r[0]+Y[2]*r[1]+Z[2]*r[2]]);
   const kr=1-Math.exp(-dt*26);H.ax=propOrtho(H.ax.map((a,i)=>[a[0]+(R[i][0]-a[0])*kr,a[1]+(R[i][1]-a[1])*kr,a[2]+(R[i][2]-a[2])*kr]));
@@ -1643,12 +1733,13 @@ function handGrab(s,P,dt,now){
   return true;
  }
  // open hand near an item -> remember it (highlight); closing soon after picks it up
- if(!st.closed){const c=nearestProp(st.G,GRAB.hoverReach);s.hover=c;if(c){s.lastHover=c;s.hoverAt=now}s.closedLatch=false;return false}
+ if(!st.closed){const c=nearestProp(st.G,GRAB.hoverReach)||propOnRay(st.G);s.hover=c;if(c){s.lastHover=c;s.hoverAt=now}s.closedLatch=false;return false}
  if(s.closedLatch)return false;           // fist made far from items: must open again first
  s.closedLatch=true;
  let c=nearestProp(st.G,GRAB.reach);
- const lh=s.lastHover;if(!c&&lh&&!lh.held&&now-(s.hoverAt||0)<600&&_pl(_pv(lh.p,st.G))-propRadius(lh)<GRAB.hoverReach+.04)c=lh;
+ const lh=s.lastHover;if(!c&&lh&&!lh.held&&now-(s.hoverAt||0)<600){if(_pl(_pv(lh.p,st.G))-propRadius(lh)<GRAB.hoverReach+.04)c=lh;else{grabProp(s,lh,st,now,true);return true}}
  if(c){grabProp(s,c,st,now);return true}
+ const far=(s.speed||0)<PUNCH.speed?propOnRay(st.G):null;if(far){grabProp(s,far,st,now,true);return true}
  return false;
 }
 function updateProps(dt){
@@ -1710,7 +1801,7 @@ function drawProps(mesh){
  }
 }
 window.__neonGrabTest={props:()=>props.map(P=>({n:P.n,p:P.p.map(v=>+v.toFixed(3)),held:!!P.held,rest:P.rest,ax:P.ax.map(a=>a.map(v=>+v.toFixed(2)))})),
- table:()=>propTable,summon:()=>summonProps(true),pitch:v=>{player.pitch=v},camM:()=>Array.from(handVision.cam.camM||invert(handVision.cam.view)),grip:i=>{const s=handSlots[i];return s&&s.grip?{closed:s.grip.closed,open:s.grip.open,G:s.grip.G,ratio:s.grip.ratio,pinch:s.grip.pinch,held:!!s.held}:null}};
+ table:()=>propTable,summon:()=>summonProps(true),drop:(x,y,z)=>dropProp(x,y,z,2),clear:()=>{props=[];propTable=null},pitch:v=>{player.pitch=v},camM:()=>Array.from(handVision.cam.camM||invert(handVision.cam.view)),solver:i=>{const s=handSlots[i];return s?{chir:s.chir,chirE:s.chirE,mirrored:s.mirrored||0,bones:s.bones}:null},grip:i=>{const s=handSlots[i];return s&&s.grip?{closed:s.grip.closed,open:s.grip.open,G:s.grip.G,ratio:s.grip.ratio,pinch:s.grip.pinch,held:!!s.held}:null}};
 window.__neonPunchTest={slot:i=>{const s=handSlots[i];return s&&s.cur?{cur:s.cur[0].slice(),raw:s.pts[0].slice()}:null},place:(x,y,z,m)=>{blockEdits.set(blockKey(x,y,z),m);if(innerWorld(x,z))rebuildVoxelScene();else refreshChunkAt(x,z)},mat:(x,y,z)=>voxelMat(x,y,z),
  stand:(x,z,a)=>{player.x=x;player.z=z;player.a=a;player.pitch=0},broken:()=>blocksBroken,fallen:()=>fallenTrees.size,
  tree:()=>{const t=allTreesNear(player.x,player.z,40).sort((a,b)=>Math.hypot(a.x-player.x,a.z-player.z)-Math.hypot(b.x-player.x,b.z-player.z))[0];return t&&{x:t.x,z:t.z,top:t.top,village:t.village}}};
