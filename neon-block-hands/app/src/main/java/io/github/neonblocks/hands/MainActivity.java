@@ -96,7 +96,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer {
         layout.addView(web,new FrameLayout.LayoutParams(-1,-1));
         setContentView(layout);
         web.loadUrl("file:///android_asset/index.html");
-        glView.setOnLayoutChangeListener((v,l,t,r,bm,ol,ot,or,ob)->{
+        glView.addOnLayoutChangeListener((v,l,t,r,bm,ol,ot,or,ob)->{
             viewW=Math.max(1,r-l);viewH=Math.max(1,bm-t);
             updateRotation();
         });
