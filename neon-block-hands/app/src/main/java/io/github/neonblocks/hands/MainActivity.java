@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
+import com.google.ar.core.CameraIntrinsics;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
@@ -195,17 +196,32 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer {
                 pose.set(result.toString());
             }else{pose.set("P,tracking");}
             long now=android.os.SystemClock.elapsedRealtimeNanos();
-            if(tracker.wantsFrames() && now-lastHandsNs>90_000_000L){
+            if(tracker.wantsFrames() && now-lastHandsNs>55_000_000L){   // ~18 Hz
                 lastHandsNs=now;
                 try{
+                    int rot=imageRotationDegrees();
+                    float[] intr=normalizedIntrinsics(c.getImageIntrinsics(),rot);
                     Image image=f.acquireCameraImage();
-                    tracker.onCameraImage(image,imageRotationDegrees());
+                    tracker.onCameraImage(image,rot,intr);
                 }catch(NotYetAvailableException ignore){ }
                 catch(Exception e){Log.w(TAG,"CPU frame",e);}
             }
             }
         }catch(Exception e){pose.set("E,"+e.getClass().getSimpleName());
             Log.w(TAG,"ARCore update",e);
+        }
+    }
+
+    /** Camera intrinsics of the CPU image, rotated like the bitmap given to MediaPipe,
+     *  normalized to 0..1: {fx/w, fy/h, cx/w, cy/h}. Lets the game turn hand pixels into real 3D rays. */
+    private static float[] normalizedIntrinsics(CameraIntrinsics ci,int rot){
+        float[] f=ci.getFocalLength(),p=ci.getPrincipalPoint();int[] d=ci.getImageDimensions();
+        float W=Math.max(1,d[0]),H=Math.max(1,d[1]),fx=f[0],fy=f[1],cx=p[0],cy=p[1];
+        switch(((rot%360)+360)%360){
+            case 90:  return new float[]{fy/H,fx/W,(H-cy)/H,cx/W};
+            case 180: return new float[]{fx/W,fy/H,(W-cx)/W,(H-cy)/H};
+            case 270: return new float[]{fy/H,fx/W,cy/H,(W-cx)/W};
+            default:  return new float[]{fx/W,fy/H,cx/W,cy/H};
         }
     }
 

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.google.mediapipe.framework.image.BitmapImageBuilder;
 import com.google.mediapipe.framework.image.MPImage;
 import com.google.mediapipe.tasks.components.containers.Category;
+import com.google.mediapipe.tasks.components.containers.Landmark;
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
 import com.google.mediapipe.tasks.core.BaseOptions;
 import com.google.mediapipe.tasks.vision.core.RunningMode;
@@ -71,7 +72,7 @@ final class HandTracker {
     void close(){requested.set(false);worker.execute(()->{if(landmarker!=null){landmarker.close();landmarker=null;}});worker.shutdown();}
 
     /** Called on the active ARCore GL thread at most 12Hz. Always closes Image. */
-    void onCameraImage(Image img,int rotationDeg) {
+    void onCameraImage(Image img,int rotationDeg,final float[] intr) {
         try {
             if (!wantsFrames()||!busy.compareAndSet(false,true)) return;
             final Bitmap small=toBitmap(img,320,rotationDeg);
@@ -82,7 +83,7 @@ final class HandTracker {
                     MPImage in=new BitmapImageBuilder(small).build();
                     HandLandmarkerResult result=landmarker.detectForVideo(in,timestamp);
                     lastInferenceMillis=timestamp;
-                    final JSONObject data=toJson(result);
+                    final JSONObject data=toJson(result,intr);
                     status="Камера работает • рук: "+result.landmarks().size();
                     listener.frame(data);
                 } catch (Exception e) {
@@ -94,9 +95,11 @@ final class HandTracker {
         finally {img.close();}
     }
 
-    private static JSONObject toJson(HandLandmarkerResult result) throws JSONException {
+    private static JSONObject toJson(HandLandmarkerResult result,float[] intr) throws JSONException {
         JSONObject obj=new JSONObject(); JSONArray all=new JSONArray();
+        if(intr!=null){JSONArray in=new JSONArray();for(float v:intr)in.put((double)v);obj.put("intr",in);}
         List<List<NormalizedLandmark>> hands=result.landmarks();
+        List<List<Landmark>> world=result.worldLandmarks();
         List<List<Category>> labels=result.handedness();
         for (int i=0;i<hands.size();i++) {
             JSONArray pts=new JSONArray();
@@ -105,7 +108,12 @@ final class HandTracker {
             }
             if(pts.length()!=21)continue;
             String side=i<labels.size() && !labels.get(i).isEmpty()?labels.get(i).get(0).categoryName():(i==0?"Left":"Right");
-            JSONObject h=new JSONObject();h.put("label",side);h.put("landmarks",pts);all.put(h);
+            JSONObject h=new JSONObject();h.put("label",side);h.put("landmarks",pts);
+            // metric 3D shape of the hand (meters), so the game gets real proportions and depth
+            if(i<world.size()&&world.get(i).size()==21){JSONArray wp=new JSONArray();
+                for(Landmark p:world.get(i)){JSONObject j=new JSONObject();j.put("x",p.x());j.put("y",p.y());j.put("z",p.z());wp.put(j);}
+                h.put("world",wp);}
+            all.put(h);
         }
         obj.put("hands",all);return obj;
     }

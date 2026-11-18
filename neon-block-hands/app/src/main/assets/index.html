@@ -71,7 +71,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.4 AR+VR</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.4.8 HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
 <div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>⛏</span><span><label>ДОБЫТО</label><strong id="ammo">0</strong></span></div><div><span>☠</span><span><label>МОБЫ</label><strong id="kill">0/5</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">⛏ КИРКА</button></div></div>
 <div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.4.5 / AR + VR</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
 <video id="handCam" autoplay muted playsinline aria-hidden="true" style="display:none"></video>
@@ -1124,7 +1124,7 @@ function toggleHandDemo(){
 }
 
 const handVision={enabled:false,status:'Выключено',stream:null,model:null,loading:false,video:$('handCam'),
- hands:[],frameAt:0,lastInfer:0,cam:null,poseStamp:0,swingAt:0,previous:[]};
+ hands:[],frameAt:0,lastInfer:0,cam:null,intr:null,drawAt:0,poseStamp:0,swingAt:0,previous:[]};
 try{handVision.enabled=localStorage.getItem(HAND_KEY)==='on'}catch(e){}
 function handsStatus(message){handVision.status=message;
  if($('handStatus'))$('handStatus').textContent=message;
@@ -1132,35 +1132,6 @@ function handsStatus(message){handVision.status=message;
  if($('handToggle'))$('handToggle').textContent=handVision.enabled?'РУКИ: ВКЛ':'РУКИ: ВЫКЛ';
  if($('vrHandsToggle'))$('vrHandsToggle').textContent=handVision.enabled?'🖐 РУКИ: ВКЛ':'🖐 РУКИ: ВЫКЛ';
  // HUD VR gets the latest state when its menu is opened; no startup access to the VR object.
-}
-function applyHandFrame(input){
- if(!input||!handVision.enabled)return;
- let raw=Array.isArray(input)?input:input.hands;
- if(!Array.isArray(raw))return;
- const now=performance.now(),accepted=[];
- for(let i=0;i<Math.min(2,raw.length);i++){
-  const h=raw[i],joints=Array.isArray(h)?h:h.landmarks;
-  if(!Array.isArray(joints)||joints.length!==21)continue;
-  if(joints.some(p=>!p||!Number.isFinite(+p.x)||!Number.isFinite(+p.y)))continue;
-  let tag=h.label||h.handedness||(['L','R'][i]);
-  if(tag==='Left')tag='L';else if(tag==='Right')tag='R';
-  const previous=handVision.hands.find(x=>x.label===tag);
-  const smooth=previous?joints.map((p,n)=>({x:lerp(previous.landmarks[n].x,+p.x,.46),y:lerp(previous.landmarks[n].y,+p.y,.46),z:lerp(previous.landmarks[n].z||0,+p.z||0,.46)})):
-     joints.map(p=>({x:+p.x,y:+p.y,z:+p.z||0}));
-  accepted.push({label:tag,landmarks:smooth});
-  // Quick closed-hand swing: only an optional mining gesture, no virtual weapon or camera steering.
-  // Note: this is approximate 2D gesture recognition, not 6DoF controller tracking.
-  const curled=[8,12,16,20].filter((tip,k)=>{
-   const m=[5,9,13,17][k],base=smooth[m],end=smooth[tip],w=smooth[0];
-   return Math.hypot(end.x-w.x,end.y-w.y) < Math.hypot(base.x-w.x,base.y-w.y)*1.40;
-  }).length;
-  const prev=handVision.previous.find(x=>x.label===tag);
-  const dy=prev?Math.hypot(smooth[0].x-prev.x,smooth[0].y-prev.y)/Math.max(.04,(now-prev.at)/1000):0;
-  if(prev&&curled>=3&&dy>1.9&&now-handVision.swingAt>650&&active&&!paused){handVision.swingAt=now;fire();}
- }
- handVision.previous=accepted.map(h=>({label:h.label,x:h.landmarks[0].x,y:h.landmarks[0].y,at:now}));
- handVision.hands=accepted;handVision.frameAt=now;document.body.classList.toggle('hand-tracked',accepted.length>0);
- handsStatus(accepted.length?'Найдены руки: '+accepted.length+' • кулак + взмах = удар':'Камера работает • покажи ладони');
 }
 window.onNativeHandLandmarks=function(payload){ // ARCore camera -> native MediaPipe -> 3D voxel hands
  try{applyHandFrame(typeof payload==='string'?JSON.parse(payload):payload)}catch(e){console.warn('NativeHandLandmarks',e)}
@@ -1238,37 +1209,97 @@ function voxelLimb(mesh,a,b,width,depth,color){
  face(mesh,a0,e,h0,d0,X.map(n=>-n),13,color);face(mesh,f,b0,c0,g,X,13,color);
  face(mesh,d0,h0,g,c0,Y,13,color);face(mesh,a0,b0,f,e,Y.map(n=>-n),13,color);
 }
+// v3.4.8 hands: real 3D placement + stable two-hand tracking + full arms (shoulder → elbow → wrist).
+// Native sends camera intrinsics ("intr") and MediaPipe world landmarks (metric hand shape, meters).
+const HAND_ARM={upper:.29,fore:.27,shoulderDown:.26,shoulderSide:.19};
+const handSlots=[null,null]; // slot 0 = left arm, slot 1 = right arm
+const _d3=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+function camRay(p,intr){
+ if(intr)return [(p.x-intr[2])/intr[0],-(p.y-intr[3])/intr[1],-1];
+ const t=Math.tan(75*Math.PI/360),asp=Math.max(.75,canvas.width/Math.max(1,canvas.height));
+ return [(p.x-.5)*2*t*asp,(.5-p.y)*2*t,-1];
+}
+// 21 points in the camera frame (meters, GL axes: x right, y up, -z forward)
+function handToCamera(lm,world,intr){
+ const r=lm.map(p=>camRay(p,intr));let G;
+ if(Array.isArray(world)&&world.length===21&&world.every(p=>p&&Number.isFinite(+p.x))){
+  const w0=world[0];G=world.map(p=>[(+p.x)-(+w0.x),-((+p.y)-(+w0.y)),-((+p.z)-(+w0.z))]);
+ }else{ // no metric data (demo / browser): assume an 8 cm wide palm
+  const s=.08/Math.max(.01,Math.hypot(r[5][0]-r[17][0],r[5][1]-r[17][1]));
+  G=lm.map((p,i)=>[(r[i][0]-r[0][0])*s,(r[i][1]-r[0][1])*s,-((+p.z||0)-(+lm[0].z||0))*s*1.5]);
+ }
+ // distance: metric size of the hand vs its size in the image
+ let num=0,den=0;for(const [a,b] of [[0,5],[0,17],[5,17],[0,9],[0,13]]){num+=Math.hypot(G[a][0]-G[b][0],G[a][1]-G[b][1]);den+=Math.hypot(r[a][0]-r[b][0],r[a][1]-r[b][1])}
+ const d=clamp(num/Math.max(1e-4,den),.14,1.25);
+ const W=[r[0][0]*d,r[0][1]*d,-d];
+ return G.map(g=>[W[0]+g[0],W[1]+g[1],W[2]+g[2]]);
+}
+function fistCurled(lm){return [8,12,16,20].filter((tip,k)=>{const m=[5,9,13,17][k],b=lm[m],e=lm[tip],w=lm[0];
+ return Math.hypot(e.x-w.x,e.y-w.y)<Math.hypot(b.x-w.x,b.y-w.y)*1.40}).length}
+function applyHandFrame(input){
+ if(!input||!handVision.enabled)return;
+ const raw=Array.isArray(input)?input:input.hands;if(!Array.isArray(raw))return;
+ if(!Array.isArray(input)&&Array.isArray(input.intr)&&input.intr.length===4&&input.intr.every(v=>Number.isFinite(+v)&&+v!==0))handVision.intr=input.intr.map(Number);
+ const intr=Array.isArray(input)?null:handVision.intr,now=performance.now(),dets=[];
+ for(const h of raw.slice(0,2)){
+  const joints=Array.isArray(h)?h:h.landmarks;
+  if(!Array.isArray(joints)||joints.length!==21||joints.some(p=>!p||!Number.isFinite(+p.x)||!Number.isFinite(+p.y)))continue;
+  const lm=joints.map(p=>({x:+p.x,y:+p.y,z:+p.z||0}));
+  dets.push({lm,pts:handToCamera(lm,Array.isArray(h)?null:h.world,intr),x:lm[0].x});
+ }
+ // the same hand found twice -> keep one
+ if(dets.length===2&&_d3(dets[0].pts[0],dets[1].pts[0])<.07)dets.pop();
+ // match detections to the two arms: continuity (wrist distance) + which half of the image
+ const live=handSlots.map(s=>s&&now-s.seen<700);
+ const cost=(det,si)=>(live[si]?_d3(det.pts[0],handSlots[si].target[0]):.35)+(si===0?Math.max(0,det.x-.5):Math.max(0,.5-det.x))*.7;
+ let pairs=[];
+ if(dets.length===1)pairs=cost(dets[0],0)<=cost(dets[0],1)?[[0,0]]:[[0,1]];
+ else if(dets.length===2)pairs=cost(dets[0],0)+cost(dets[1],1)<=cost(dets[0],1)+cost(dets[1],0)?[[0,0],[1,1]]:[[0,1],[1,0]];
+ for(const [di,si] of pairs){
+  const det=dets[di];let s=handSlots[si];
+  if(!s||!live[si]){s=handSlots[si]={target:det.pts,cur:det.pts.map(p=>p.slice()),seen:now,prevW:null,prevAt:0,lm:det.lm};}
+  else{s.target=det.pts;s.seen=now;s.lm=det.lm}
+  // mining gesture: fist + fast wrist movement (m/s, real units)
+  if(s.prevW){const v=_d3(det.pts[0],s.prevW)/Math.max(.03,(now-s.prevAt)/1000);
+   if(fistCurled(det.lm)>=3&&v>1.3&&now-handVision.swingAt>650&&active&&!paused){handVision.swingAt=now;fire()}}
+  s.prevW=det.pts[0];s.prevAt=now;
+ }
+ handVision.hands=dets.map(d=>({label:'',landmarks:d.lm}));handVision.frameAt=now;
+ document.body.classList.toggle('hand-tracked',dets.length>0);
+ handsStatus(dets.length?'Найдены руки: '+dets.length+' • кулак + взмах = удар':'Камера работает • покажи ладони');
+}
 function drawVoxelHands(mesh){
- if(!handVision.enabled||!handVision.cam||performance.now()-handVision.frameAt>550)return;
- const head=handVision.cam.camM||invert(handVision.cam.view);
- const fov=vr.on?(vr.cfg.fov||76)*Math.PI/180:75*Math.PI/180;
- const aspect=vr.on ? .85 :Math.max(.75,canvas.width/Math.max(1,canvas.height));
- const palmColor=[.85,.62,.43],fingerColor=[.90,.70,.51],sleeveColor=[.13,.30,.43],gloveTrim=[.23,.62,.57];
- for(const hand of handVision.hands){
-  const lm=hand.landmarks;
-  const width=Math.max(.035,Math.hypot(lm[5].x-lm[17].x,lm[5].y-lm[17].y));
-  const d=clamp(.13/(width*2*Math.tan(fov/2)*aspect),.32,1.70);
-  const hs=2*d*Math.tan(fov/2),ws=hs*aspect;
-  const points=lm.map(p=>{
-   const x=(p.x-.5)*ws,y=(.5-p.y)*hs,z=-d-p.z*d*.42;
-   return [head[12]+head[0]*x+head[4]*y+head[8]*z,
-    head[13]+head[1]*x+head[5]*y+head[9]*z,
-    head[14]+head[2]*x+head[6]*y+head[10]*z];
-  });
-  const wrist=points[0],mid=points[9];
-  const back=_hv3(wrist,mid),w0=[wrist[0]+back[0]*.70,wrist[1]+back[1]*.70,wrist[2]+back[2]*.70];
-  voxelLimb(mesh,w0,wrist,.125,.105,sleeveColor);
-  voxelLimb(mesh,wrist,mid,.135,.066,palmColor);
-  voxelLimb(mesh,wrist,points[5],.087,.049,palmColor);
-  voxelLimb(mesh,wrist,points[17],.085,.049,palmColor);
-  voxelLimb(mesh,wrist,[wrist[0]*.6+mid[0]*.4,wrist[1]*.6+mid[1]*.4,wrist[2]*.6+mid[2]*.4],.145,.073,gloveTrim);
-  const fingers=[[0,1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]];
-  fingers.forEach((ids,fi)=>{
-   for(let n=0;n<ids.length-1;n++){
-    const w=(fi===0?.034:fi===4?.022:.027)*(1-n*.10);
-    voxelLimb(mesh,points[ids[n]],points[ids[n+1]],w,w*.96,n===0?palmColor:fingerColor);
-   }
-  });
+ if(!handVision.enabled||!handVision.cam)return;
+ const now=performance.now(),dt=clamp((now-(handVision.drawAt||now))/1000,0,.1);handVision.drawAt=now;
+ const head=handVision.cam.camM||invert(handVision.cam.view),k=1-Math.exp(-dt*16);
+ const toW=p=>[head[12]+head[0]*p[0]+head[4]*p[1]+head[8]*p[2],head[13]+head[1]*p[0]+head[5]*p[1]+head[9]*p[2],head[14]+head[2]*p[0]+head[6]*p[1]+head[10]*p[2]];
+ // body frame: shoulders follow head position and heading, not head tilt
+ let fx=-head[8],fz=-head[10];const fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;const rx=-fz,rz=fx;
+ const skin=[.85,.62,.43],finger=[.90,.70,.51],sleeve=[.13,.30,.43],sleeve2=[.10,.24,.35],trim=[.23,.62,.57];
+ for(let si=0;si<2;si++){
+  const s=handSlots[si];if(!s||now-s.seen>450)continue;
+  for(let i=0;i<21;i++)for(let j=0;j<3;j++)s.cur[i][j]+=(s.target[i][j]-s.cur[i][j])*k;
+  const P=s.cur.map(toW),side=si===0?-1:1;
+  // arm: shoulder -> elbow (2-bone IK, elbow bends down and outwards) -> wrist
+  const S=[head[12]+rx*side*HAND_ARM.shoulderSide-fx*.03,head[13]-HAND_ARM.shoulderDown,head[14]+rz*side*HAND_ARM.shoulderSide-fz*.03];
+  const Wr=P[0],dir=_hv3(Wr,S),D=_hlength(dir),u=dir.map(v=>v/D),L1=HAND_ARM.upper,L2=HAND_ARM.fore;
+  let E;
+  if(D>=L1+L2-.002)E=[S[0]+u[0]*D*L1/(L1+L2),S[1]+u[1]*D*L1/(L1+L2),S[2]+u[2]*D*L1/(L1+L2)];
+  else{const Dc=Math.max(.05,D),a=(L1*L1-L2*L2+Dc*Dc)/(2*Dc),h=Math.sqrt(Math.max(0,L1*L1-a*a));
+   const hint=[rx*side*.5-fx*.25,-.8,rz*side*.5-fz*.25],dot=hint[0]*u[0]+hint[1]*u[1]+hint[2]*u[2];
+   const b=_hnorm([hint[0]-u[0]*dot,hint[1]-u[1]*dot,hint[2]-u[2]*dot]);
+   E=[S[0]+u[0]*a+b[0]*h,S[1]+u[1]*a+b[1]*h,S[2]+u[2]*a+b[2]*h];}
+  voxelLimb(mesh,S,E,.105,.095,sleeve2);
+  voxelLimb(mesh,E,Wr,.088,.08,sleeve);
+  const cuff=[Wr[0]+(E[0]-Wr[0])*.12,Wr[1]+(E[1]-Wr[1])*.12,Wr[2]+(E[2]-Wr[2])*.12];
+  voxelLimb(mesh,cuff,Wr,.096,.088,trim);
+  // palm and fingers (real size: ~8 cm palm)
+  const mid=P[9];
+  voxelLimb(mesh,Wr,mid,.075,.032,skin);
+  voxelLimb(mesh,Wr,P[5],.045,.028,skin);
+  voxelLimb(mesh,Wr,P[17],.042,.028,skin);
+  for(const [fi,ids] of [[0,1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]].entries())
+   for(let n=0;n<ids.length-1;n++){const w=(fi===0?.022:fi===4?.015:.018)*(1-n*.1);voxelLimb(mesh,P[ids[n]],P[ids[n+1]],w,w*.95,n===0?skin:finger)}
  }
 }
 window.__neonHandsTest={frame:applyHandFrame,info:()=>({enabled:handVision.enabled,status:handVision.status,hands:handVision.hands.length,points:handVision.hands.map(h=>h.landmarks.length),frameAt:handVision.frameAt}),toggle:toggleHands};
