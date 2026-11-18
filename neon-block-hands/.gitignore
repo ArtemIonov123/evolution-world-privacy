@@ -1,0 +1,4 @@
+app/build/
+.gradle/
+build/
+app/src/main/assets/hand_landmarker.task

@@ -1,0 +1,10 @@
+Source APK: NEON_BLOCK_WORLD_AR_VR_v3.4.6_HANDS_TEST.apk (uploaded by user)
+Android dex main class: io.github.artemionov123.neonbreach.ar.MainActivity
+Dex bridge methods found: MainActivity$Bridge.start, stop, pose, info.
+No native methods for hand-tracking or ARCore CPU camera frames.
+assets/index.html contains MediaPipe hand tracking (browser HTTPS) and voxel hand renderer,
+but browser getUserMedia cannot safely operate concurrently on the same camera used by ARCore.
+For this reason the original APK itself was not relabeled as a working hands APK.
+
+The provided Android Studio project is a NEW shell, not a bytecode patch of the old
+APK. It uses a separate application ID and reuses the full game HTML asset.

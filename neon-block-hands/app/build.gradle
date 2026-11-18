@@ -1,0 +1,56 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'io.github.neonblocks.hands'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'io.github.neonblocks.handtracking.test'
+        minSdk 29
+        targetSdk 33
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '347').toInteger())
+        versionName '3.4.7-hands-alpha'
+    }
+    // Test key from this repository (same as the other NEON APKs) so updates install over each other.
+    signingConfigs {
+        release {
+            storeFile file('../../neon-breach/android/neon-breach.keystore')
+            storePassword 'neonbreach'
+            keyAlias 'neonbreach'
+            keyPassword 'neonbreach'
+        }
+    }
+    lint { checkReleaseBuilds false; abortOnError false }
+    buildTypes {
+        release { minifyEnabled false; signingConfig signingConfigs.release }
+        debug { minifyEnabled false }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    packaging { resources { excludes += ['META-INF/DEPENDENCIES'] } }
+}
+
+dependencies {
+    implementation 'com.google.ar:core:1.46.0'
+    implementation 'com.google.mediapipe:tasks-vision:0.10.35'
+}
+
+// Download the official model once at BUILD time, never on the user's device.
+// Override it by placing an already downloaded hand_landmarker.task in src/main/assets.
+def handModel = file('src/main/assets/hand_landmarker.task')
+tasks.register('prepareHandModel') {
+    outputs.file(handModel)
+    doLast {
+        if (!handModel.exists()) {
+            handModel.parentFile.mkdirs()
+            def u = new URL('https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task')
+            def conn = u.openConnection()
+            conn.setConnectTimeout(30000)
+            conn.setReadTimeout(120000)
+            conn.getInputStream().withCloseable { input -> handModel.withOutputStream { out -> out << input } }
+        }
+        if (handModel.length() < 1000000L) throw new GradleException('Hand model missing or incomplete: ' + handModel)
+    }
+}
+tasks.named('preBuild').configure { dependsOn('prepareHandModel') }
