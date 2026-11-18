@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#050b13">
-<title>NEON BLOCK WORLD — AR + VR v3.4.6 HANDS DIAGNOSTICS</title>
+<title>NEON BLOCK WORLD — AR + VR v3.5.3 HD HANDS</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020509;color:#edf6ff;font:500 13px system-ui,Segoe UI,sans-serif;touch-action:none;user-select:none}#scene{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}#grain{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 28%,#03070a89 100%);z-index:2}#xrOverlay{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:hidden}#xrOverlay:xr-overlay{background:transparent;width:100%;height:100%}#hud{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#top{position:absolute;top:calc(9px + env(safe-area-inset-top));left:calc(9px + env(safe-area-inset-left));right:calc(9px + env(safe-area-inset-right));display:flex;gap:7px;align-items:center;justify-content:space-between}#brand{font-weight:1000;letter-spacing:1.8px;font-size:clamp(13px,1.9vw,20px);text-shadow:0 2px 9px #000}#brand b{color:#fc655d}#topMid{text-align:center;border:1px solid #49798a77;border-radius:4px;background:#051522be;padding:7px 12px;font-size:10px;letter-spacing:2px;color:#b1dbe5}#buttons{display:flex;gap:5px;pointer-events:auto}#buttons .arOnly{display:none}body.xr-active #buttons .arOnly{display:inline-block}button{cursor:pointer;border:1px solid #547a88;background:#0a202fdd;color:#e8f7ff;font-weight:850;padding:9px 11px;border-radius:6px;letter-spacing:.3px;touch-action:manipulation}button:active{transform:scale(.97)}button.on{border-color:#58e2d5;color:#9dfdf2;background:#103b46}#bottom{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:11px;min-width:260px;justify-content:center}#bottom>div{padding:7px 13px;background:linear-gradient(#153240dd,#060b14e8);border:1px solid #4e8fa499;border-radius:5px;min-width:80px;display:flex;align-items:center;gap:8px}#bottom label{font-size:9px;display:block;color:#8cbbcb;letter-spacing:1.5px}#bottom strong{font-size:22px;font-variant-numeric:tabular-nums}#health{color:#ff7669}#ammo{color:#ffcf79}#kill{color:#9ff8ed}#aim{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:23px;height:23px;opacity:.88;pointer-events:none}#aim:before,#aim:after{content:"";position:absolute;background:#aefcff;box-shadow:0 0 8px #4ff5ef}#aim:before{width:2px;height:23px;left:10px}#aim:after{height:2px;width:23px;top:10px}#aim i{position:absolute;left:9px;top:9px;width:5px;height:5px;background:#ff594b}#status{position:absolute;top:calc(57px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);border:1px solid #489da054;background:#071420cb;color:#b0e4eb;padding:5px 10px;border-radius:5px;max-width:65vw;text-align:center;font:700 10px monospace;white-space:nowrap}#notice{position:absolute;top:28%;left:50%;transform:translateX(-50%);background:#0b2639ef;border:1px solid #81cfdf;color:#fff;font-weight:850;letter-spacing:.4px;padding:12px 18px;border-radius:5px;opacity:0;transition:opacity .2s;text-align:center;max-width:85vw}#notice.visible{opacity:1}#hurt{position:absolute;inset:0;pointer-events:none;background:#df10004a;opacity:0}#intro,#settings{position:absolute;inset:0;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:radial-gradient(ellipse at center,#11283be0,#020509f8 77%)}#intro.hidden,#settings.hidden{display:none}#settings{z-index:4} .card{width:min(530px,98vw);background:linear-gradient(145deg,#13293a,#07121e 72%);border:1px solid #50798c;border-radius:12px;box-shadow:0 17px 65px #000c,inset 0 1px 0 #a3eefa16;padding:clamp(17px,3.8vw,30px);text-align:center}.micro{color:#5de7de;letter-spacing:3.4px;font-weight:900;font-size:11px}.card h1{font-size:clamp(38px,9vw,64px);font-weight:1000;letter-spacing:2px;line-height:1;margin:12px 0;color:#f2f9ff;text-shadow:0 3px 0 #000}.card h1 span{color:#fc675b}.card p{line-height:1.6;color:#acbeca;font-size:13px}.cta{background:linear-gradient(#ff6759,#b92329);border:1px solid #ff9e92;color:white;padding:13px 30px;letter-spacing:1.5px;box-shadow:0 6px 24px #e828214d;font-size:14px}.card .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:13px}.tip{font-size:11px!important;color:#7fa1b8!important}.card h2{margin:0 0 10px;font-size:24px}.setting{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:9px 0;padding:8px 0;border-bottom:1px solid #42596a55;text-align:left}.setting span{font-size:12px;color:#b3d1de}.setting button{white-space:nowrap}#touch{display:none;pointer-events:none}#stick{position:absolute;left:16px;bottom:80px;width:108px;height:108px;border-radius:50%;border:2px solid #6dd6dd8c;background:#11425465;pointer-events:auto;touch-action:none}#nub{position:absolute;left:32px;top:32px;width:40px;height:40px;border:2px solid #cdffff;background:#88f4e581;border-radius:50%;pointer-events:none}#lookzone{position:absolute;right:0;top:14%;height:68%;width:44%;pointer-events:auto;touch-action:none}#fire{position:absolute;right:17px;bottom:91px;width:88px;height:88px;border-radius:50%;border:2px solid #ffaf85;background:radial-gradient(#f95f47e8,#761a25db);color:white;pointer-events:auto;touch-action:none;box-shadow:0 0 27px #fa4a3877}#weapon{position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);width:min(28vw,210px);height:min(19vw,128px);pointer-events:none;filter:drop-shadow(0 0 8px #000)}#weapon:before{content:"";position:absolute;bottom:0;left:28%;width:44%;height:108%;clip-path:polygon(32% 0,68% 0,80% 44%,95% 67%,100% 100%,0 100%,5% 67%,20% 44%);background:linear-gradient(90deg,#111a20,#526c73 22%,#18252b 35%,#879aa0 50%,#253843 65%,#162127 82%,#09161c);border-top:6px solid #1b2f3b}#weapon:after{content:"";position:absolute;bottom:12%;left:44%;width:12%;height:84%;background:linear-gradient(90deg,#06131b,#2c4453 48%,#0b1c24);box-shadow:0 0 8px #151c1b}#weapon.firing{filter:drop-shadow(0 -9px 20px #ffb064);transform:translateX(-50%) translateY(13px)}#flash{position:absolute;left:50%;bottom:min(18vw,140px);transform:translateX(-50%);width:72px;height:72px;pointer-events:none;opacity:0;background:radial-gradient(ellipse,#fff7bd,#ffac45a8 30%,transparent 68%);filter:blur(6px)}#flash.show{opacity:1}@media(pointer:coarse){#touch{display:block}}@media(max-width:700px){#topMid{display:none}#brand{font-size:12px;letter-spacing:1px}#buttons button{font-size:10px;padding:7px 8px}#bottom{gap:5px}#bottom>div{min-width:65px;padding:5px 7px;gap:2px}#bottom strong{font-size:16px}#bottom label{font-size:8px}#weapon{width:145px;height:100px}}@media(orientation:portrait) and (pointer:coarse){#status{top:calc(60px + env(safe-area-inset-top));font-size:9px}#bottom{bottom:22px}#fire{bottom:105px}#stick{bottom:100px}}
 
@@ -71,9 +71,9 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 </head>
 <body>
 <canvas id="scene" tabindex="0"></canvas><div id="grain"></div>
-<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.2 HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
+<div id="xrOverlay"><div id="hud"><div id="top"><div id="brand">NEON <b>BLOCK</b> <small style="color:#77e5d9;font-size:8px">VOXEL 3D v3.5.3 HD HANDS</small></div><div id="topMid">☀ ДЕНЬ • ОТКРЫТЫЙ МИР</div><div id="buttons"><button id="arBtn">◉ AR</button><button id="rotateBtn" class="arOnly" title="Повторить запрос горизонтальной ориентации в Chrome">↻ ГОРИЗ.</button><button id="centerBtn">⊙ ЦЕНТР</button><button id="padBtn" title="Проверить геймпад" aria-label="Геймпад">🎮</button><button id="settingsBtn">⚙</button></div></div><div id="blockTools"><span id="blockName">КАМЕНЬ</span><button id="mineBlock">⛏ ЛОМАТЬ</button><button id="placeBlock">▣ СТАВИТЬ</button><button id="cycleBlock">🔁 БЛОК</button><button id="throwRock">🪨 КАМЕНЬ</button><button id="torchBtn">🔥 ФАКЕЛ: НЕТ</button></div>
 <div id="status">ЗАГРУЗКА WEBGL2...</div><div id="aim"><i></i></div><div id="notice"></div><div id="hurt"></div><div id="bottom"><div><span>♥</span><span><label>ЖИЗНЬ</label><strong id="health">100</strong></span></div><div><span>⛏</span><span><label>ДОБЫТО</label><strong id="ammo">0</strong></span></div><div><span>☠</span><span><label>МОБЫ</label><strong id="kill">0/5</strong></span></div></div><div id="weapon"></div><div id="flash"></div><div id="touch"><div id="lookzone"></div><div id="stick"><div id="nub"></div></div><button id="fire">⛏ КИРКА</button></div></div>
-<div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.4.5 / AR + VR</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
+<div id="intro"><div class="card"><div class="micro">VOXEL WEBGL3D • V3.5.3 / AR + VR • HD HANDS</div><h1>NEON <span>BLOCK</span></h1><div style="color:#74f8df;font-size:13px;font-weight:900;letter-spacing:1.9px">НОВЫЕ ТЕКСТУРЫ • AO • ВОДА • ТРЕЩИНЫ</div><p>Живой свет солнца и луны, дождь, грозы, снег и пространственные голоса животных в наушниках. Тихая авторская музыка и звуки шагов, камней, воды и ветра. Для звука один раз нажми «ИГРАТЬ» или «🔊 ВКЛЮЧИТЬ». ARCore, VR, кирка R2, камень R1, факел L2 и плавание сохранены.</p><button id="startBtn" class="cta">ИГРАТЬ</button><div class="row"><button id="introAR">ЗАПУСТИТЬ ARCORE</button><button id="introSettings">НАСТРОЙКИ</button><button id="introPad">🎮 ГЕЙМПАД</button></div><p class="tip">ПК: WASD, ЛКМ/Space/F — кирка, G — поставить, Q — выбрать блок, E — разговор. Геймпад: R2 или L1 — кирка, R1 — бросить камень, A — поставить блок, R3 — выбрать блок, X — поговорить, L2 — факел, B (удерживать в воде) — всплывать. AR + VR и столкновения сохранены.</p></div></div>
 <video id="handCam" autoplay muted playsinline aria-hidden="true" style="display:none"></video>
 <div id="settings" class="hidden"><div class="card"><div class="micro">КУБИЧЕСКИЙ МИР</div><h2>НАСТРОЙКИ</h2><div class="setting"><span>Качество рендера</span><button id="quality">ВЫСОКОЕ</button></div>
 <div class="setting"><span>🌈 Насыщенность: <strong id="satVal">×1.22</strong></span><input id="satSlider" type="range" min="0.8" max="1.7" step="0.05" value="1.22"></div><div class="setting"><span>☀ Яркость: <strong id="brightVal">×1.10</strong></span><input id="brightSlider" type="range" min="0.8" max="1.6" step="0.05" value="1.10"></div>
@@ -88,7 +88,7 @@ body.vr #blockTools{display:none}body.pad-hide-touch #blockTools{display:none}
 <div class="setting walkSetting"><span>🎮 Скорость левого стика: <strong id="padWalkVal">×1.00</strong></span><input id="padWalk" aria-label="Скорость ходьбы геймпадом" type="range" min="0.5" max="3" step="0.1" value="1"></div>
 <div class="setting"><span>Скорость ходьбы</span><button id="resetWalk">↺ СБРОС ХОДЬБЫ</button></div><div class="setting"><span>Цикл дня и ночи (проверка освещения)</span><button id="timeToggle">🌙 ПОКАЗАТЬ НОЧЬ</button></div><div class="setting"><span>Факел в руке • L2 / клавиша H</span><button id="settingsTorch">🔥 ДОСТАТЬ ФАКЕЛ</button></div><div class="setting"><span>VR-очки (VR Box / Cardboard), стерео</span><button id="vrBtn">VR: ВЫКЛ</button></div><div class="setting"><span>Линзы, IPD, масштаб</span><button id="vrSettingsBtn">VR SETTINGS</button></div><div class="setting"><span>Настройка линз прямо в очках</span><button id="vrCalibBtn">🥽 НАСТРОИТЬ В ОЧКАХ</button></div><div class="setting"><span>🖐 3D-руки персонажа (камера) <small id="handStatus" style="display:block;opacity:.8">Выключено</small></span><button id="handToggle" aria-label="Включить или выключить отслеживание рук">РУКИ: ВЫКЛ</button></div>
 <div class="setting"><span>🧪 Проверить 3D-модели рук без камеры</span><button id="handDemoBtn">ТЕСТ РУК: ВЫКЛ</button></div>
-<div class="setting"><span>Сканирование рук через браузер доступно по HTTPS и требует разрешения камеры; в APK нужен обновлённый NativeAR.</span></div>
+<div class="setting"><span>В APK отслеживание рук работает через ARCore и MediaPipe. В игре отображаются 3D-руки персонажа, а не изображение настоящих рук.</span></div>
 <div class="setting"><span>Геймпад: проверка и назначение кнопок</span><button id="settingsPad">🎮 ТЕСТ / КНОПКИ</button></div><div class="setting"><span>Экранные стики при геймпаде</span><button id="touchModeBtn">АВТО</button></div><div class="setting"><span>Взгляд с гироскопом (без AR)</span><button id="gyroBtn">ВЫКЛ</button></div><div class="setting"><span>Реальная камера и предупреждения</span><button id="cameraBtn">ВЫКЛ</button></div><div class="setting"><span>Полноэкранный режим (не во время AR)</span><button id="fullBtn">ЭКРАН</button></div><div class="setting"><span>Сброс положения головы / AR</span><button id="calibrateBtn">КАЛИБРОВКА</button></div><p class="tip">При запуске AR игра сама запрашивает горизонтальную ориентацию. Если Chrome сохраняет портретный режим, включи «Автоповорот» в настройках Samsung, поверни телефон и нажми «↻ ГОРИЗ.» ещё раз. Мы НЕ растягиваем или не вращаем сцену вручную, чтобы сохранить кнопки и правильные пропорции. ARCore в браузере использует камеру для трекинга даже когда её изображение скрыто. Горы теперь имеют настоящую ступенчатую высоту: по склону можно подниматься, но отвесные уступы выше одного блока недоступны. Озёра имеют глубину: игрок погружается, удерживай B или клавишу B, чтобы всплывать. Карта подгружается участками 16×16. Цикл дня и ночи длится 8 минут, ночь темнее, а факел L2 освещает пространство вокруг. Мобы активнее ночью; здоровье рядом с деревней днём медленно восстанавливается. Масштаб реальной ходьбы AR относится только к горизонтальному движению; повороты головы и приседание не ускоряются. Игровые стены блокируют перемещение, но игра не обнаруживает реальные препятствия. Ходи с открытым обзором.</p><div class="row"><button id="resumeBtn" class="cta">ПРОДОЛЖИТЬ</button><button id="resetBtn">НАЧАТЬ ЗАНОВО</button></div></div></div>
 </div>
 
@@ -184,7 +184,31 @@ void main(){
  float large=hash(vec3(floor(vUV*4.0),float(vMaterial)*3.0));
  vec3 c=vColor;
  float pix=0.83+noise*0.27+large*.08;
- if(vMaterial==20){ /* smooth hands: keep vertex colour */ }
+ if(vMaterial==20||vMaterial==21||vMaterial==22||vMaterial==23||vMaterial==24){
+   // High-definition procedural hand materials: independent of the low-res voxel terrain.
+   // Stable texel-space pores & subtle skin mottling (no camera photographs are used).
+   if(vMaterial==21||vMaterial==24){
+     float pore=hash(vec3(floor(vUV*vec2(128.0,192.0)),37.0));
+     float fine=hash(vec3(floor(vUV*vec2(71.0,109.0))+17.0,61.0));
+     c=vColor*(0.974+0.030*pore+0.025*fine);
+     // Faint finger-joint shading, no dark outlines around round geometry.
+     float fold=exp(-pow((vUV.y-.28)*48.0,2.0))+exp(-pow((vUV.y-.77)*53.0,2.0));
+     if(vMaterial==21)c*=1.0-0.020*fold;
+     // Palm life-lines: only on the palmar face and never on the back of the hand.
+     if(vMaterial==24){
+       float palmar=1.0-smoothstep(.11,.36,abs(vUV.x-.25));
+       float crease1=exp(-pow((vUV.y-(.33+.045*sin(vUV.x*9.0)))*95.0,2.0));
+       float crease2=exp(-pow((vUV.y-(.66-.055*sin(vUV.x*7.0)))*105.0,2.0));
+       c*=1.0-.075*palmar*(crease1+crease2);
+     }
+   }else if(vMaterial==22){ // satin semi-translucent nail plate
+     float edge=smoothstep(0.01,.17,abs(vUV.x-.5));
+     c=vColor*(1.0-.055*edge);
+   }else if(vMaterial==23){ // fabric micro-weave on the gloves/sleeves, not skin
+     float weave=hash(vec3(floor(vUV*vec2(72.0,84.0)),24.0));
+     c=vColor*(.91+.12*weave);
+   }
+ }
  else if(vMaterial==1){ // grass-covered dirt blocks
    if(n.y>.4) c=vec3(.20,.91,.15)*(0.82+noise*.37);
    else {c=vec3(.47,.29,.15)*pix;float grassLine=step(.71,fract(vUV.y));c=mix(c,vec3(.17,.76,.12)*pix,grassLine);}
@@ -259,10 +283,13 @@ else if(vMaterial==14){
  light*=cornerShade;
  if(vMaterial==19)light=max(light,vec3(.55));
  vec3 col=c*light;float dist=length(p-uEye);
- if(vMaterial==20){vec3 vd=normalize(uEye-p);float ndv=max(dot(n,vd),0.0);
-  col=mix(col,c*max(light,vec3(.30)),.22);                       // light passing through skin: no harsh dark side
-  col+=c*vec3(1.0,.55,.45)*pow(1.0-ndv,2.5)*.16;                 // warm rim (subsurface look)
-  col+=vec3(1.0,.95,.9)*pow(max(dot(reflect(-vd,n),normalize(vec3(.3,1.0,.2))),0.0),24.0)*.06*vColor.r;} // soft sheen
+ if(vMaterial==20||vMaterial==21||vMaterial==22||vMaterial==24){
+  vec3 vd=normalize(uEye-p);float ndv=max(dot(n,vd),0.0);
+  col=mix(col,c*max(light,vec3(.30)),.23);
+  col+=c*vec3(.93,.50,.39)*pow(1.0-ndv,2.8)*.12; // warm translucent skin rim
+  float gloss=vMaterial==22?.15:.055;
+  col+=vec3(1.0,.96,.91)*pow(max(dot(reflect(-vd,n),normalize(vec3(.3,1.0,.2))),0.0),28.0)*gloss;
+ }
  vec3 fogColor=mix(vec3(.012,.029,.074),mix(vec3(.48,.75,1.00),vec3(.32,.42,.56),uStorm*.86),uOutdoor);
  float fog=1.0-exp(-pow(dist/61.0,2.0)*.67);
  float waterFog=1.0-exp(-dist/9.0);
@@ -1311,79 +1338,134 @@ function handCamPoints(s,dt,now){
  return s.cur.map(p=>_mulPt(_invRaw.m,p));
 }
 
-// Smooth capsule (rounded tube) with per-vertex normals: hands are no longer made of boxes.
-// ra/rb: radius at a/b; flatAxis+flat: elliptical cross-section (palm is flatter than a finger).
-function _hvert(mesh,p,n,mat,col){const c=typeof col==='function'?col(n,p):col;mesh.v.push(p[0],p[1],p[2],n[0],n[1],n[2],0,0,mat,c[0],c[1],c[2],1);mesh.count++}
-function capsule(mesh,a,b,ra,rb,col,mat=20,flatAxis=null,flat=1,seg=10){
- const d=_hv3(b,a),len=_hlength(d);if(len<1e-4)return;const Y=d.map(v=>v/len);
- let X;if(flatAxis){const k=flatAxis[0]*Y[0]+flatAxis[1]*Y[1]+flatAxis[2]*Y[2];X=_hnorm([flatAxis[0]-Y[0]*k,flatAxis[1]-Y[1]*k,flatAxis[2]-Y[2]*k])}
- else{const N=Math.abs(Y[1])>.9?[1,0,0]:[0,1,0];X=_hnorm(_hcross(N,Y))}
- const Z=_hcross(Y,X),rings=[];
+// ===== v3.5.3 HD HANDS: solid anatomical palm, rounded joints, real 5-finger landmarks =====
+// No external textures or GLB requests: everything is generated locally each frame.
+const H_MAT_SKIN=21,H_MAT_NAIL=22,H_MAT_CLOTH=23,H_MAT_PALM=24;
+const _hmix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+const _hadd=(a,b,s=1)=>[a[0]+b[0]*s,a[1]+b[1]*s,a[2]+b[2]*s];
+const _hdot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+function _hvert(mesh,p,n,mat,col,uv=[0,0]){
+ const c=typeof col==='function'?col(n,p):col;
+ mesh.v.push(p[0],p[1],p[2],n[0],n[1],n[2],uv[0],uv[1],mat,c[0],c[1],c[2],1);mesh.count++;
+}
+function _hquad(mesh,a,b,c,d,mat,col){
+ for(const v of [a,b,c,a,c,d])_hvert(mesh,v[0],v[1],mat,col,v[2]);
+}
+// Rounded tapered cylinders; the caps are hemispheres, with normals and continuous texture UV.
+function capsule(mesh,a,b,ra,rb,col,mat=H_MAT_SKIN,flatAxis=null,flat=1,seg=10){
+ const d=_hv3(b,a),len=_hlength(d);if(len<.0003)return;const Y=d.map(v=>v/len);
+ let X;
+ if(flatAxis){const k=_hdot(flatAxis,Y),f=_hv3(flatAxis,Y.map(v=>v*k));
+  X=Math.hypot(...f)>.0001?_hnorm(f):_hnorm(_hcross(Math.abs(Y[1])>.9?[1,0,0]:[0,1,0],Y));}
+ else X=_hnorm(_hcross(Math.abs(Y[1])>.9?[1,0,0]:[0,1,0],Y));
+ const Z=_hnorm(_hcross(Y,X)),rings=[];
  for(const ph of [-90,-60,-30,0])rings.push({c:a,r:ra,ph:ph*Math.PI/180});
  for(const ph of [0,30,60,90])rings.push({c:b,r:rb,ph:ph*Math.PI/180});
- const pts=rings.map(R=>{const cp=Math.cos(R.ph),sp=Math.sin(R.ph),row=[];
+ const pts=rings.map((R,ri)=>{const cp=Math.cos(R.ph),sp=Math.sin(R.ph),row=[];
   for(let i=0;i<=seg;i++){const t=i/seg*Math.PI*2,ct=Math.cos(t),st=Math.sin(t);
    const o=[X[0]*ct*R.r*flat+Z[0]*st*R.r,X[1]*ct*R.r*flat+Z[1]*st*R.r,X[2]*ct*R.r*flat+Z[2]*st*R.r];
    const p=[R.c[0]+o[0]*cp+Y[0]*R.r*sp,R.c[1]+o[1]*cp+Y[1]*R.r*sp,R.c[2]+o[2]*cp+Y[2]*R.r*sp];
    const n=_hnorm([(X[0]*ct/flat+Z[0]*st)*cp+Y[0]*sp,(X[1]*ct/flat+Z[1]*st)*cp+Y[1]*sp,(X[2]*ct/flat+Z[2]*st)*cp+Y[2]*sp]);
-   row.push([p,n])}return row});
- for(let r=0;r<pts.length-1;r++){const A=pts[r],B=pts[r+1];if(A[0][0]===B[0][0])continue;
-  for(let i=0;i<seg;i++){const q=[A[i],A[i+1],B[i+1],B[i]];
-   _hvert(mesh,q[0][0],q[0][1],mat,col);_hvert(mesh,q[1][0],q[1][1],mat,col);_hvert(mesh,q[2][0],q[2][1],mat,col);
-   _hvert(mesh,q[0][0],q[0][1],mat,col);_hvert(mesh,q[2][0],q[2][1],mat,col);_hvert(mesh,q[3][0],q[3][1],mat,col)}}
+   row.push([p,n,[i/seg,ri/(rings.length-1)]])}return row});
+ for(let r=0;r<pts.length-1;r++)for(let i=0;i<seg;i++){
+  _hquad(mesh,pts[r][i],pts[r][i+1],pts[r+1][i+1],pts[r+1][i],mat,col);
+ }
+}
+// Actual continuous palm volume. It follows all four knuckles, not four overlapping rods.
+function handPalm(mesh,P,skinC,front){
+ const wrist=P[0],kn=[5,9,13,17],mid=kn.reduce((v,i)=>_hadd(v,P[i]),[0,0,0]).map(v=>v/4);
+ const across=_hnorm(_hv3(P[17],P[5]));
+ const main=_hnorm(_hv3(mid,wrist));
+ const normal=_hnorm(_hcross(across,main));
+ const width=Math.max(.032,Math.min(.062,_d3(P[5],P[17])*.54));
+ const rings=[
+  [0.035,.58,.69],[.16,.74,.87],[.38,.98,1.10],[.60,1.08,1.16],[.82,1.06,1.00],[.97,.96,.86]
+ ];
+ const around=14,RR=[];
+ for(let j=0;j<rings.length;j++){
+  const [t,w,th]=rings[j],center=_hmix(wrist,mid,t),row=[];
+  // Arched palm surface: middle palm slightly fuller, thenar swelling stays near thumb.
+  for(let i=0;i<=around;i++){
+   const phi=i/around*Math.PI*2,co=Math.cos(phi),si=Math.sin(phi),w0=width*w,t0=.0175*th;
+   const thumbSwelling=Math.max(0,1-t)*.005*Math.max(0,co);
+   const p=_hadd(_hadd(center,across,(w0+thumbSwelling)*co),normal,t0*si);
+   const n=_hnorm([across[0]*co/w0+normal[0]*si/t0,across[1]*co/w0+normal[1]*si/t0,across[2]*co/w0+normal[2]*si/t0]);
+   row.push([p,n,[i/around,t]]);
+  }RR.push(row);
+ }
+ for(let j=0;j<RR.length-1;j++)for(let i=0;i<around;i++)
+  _hquad(mesh,RR[j][i],RR[j][i+1],RR[j+1][i+1],RR[j+1][i],H_MAT_PALM,skinC);
+ // End cap: prevents open holes when seen from unusual camera angles.
+ for(const [idx,n] of [[0,main.map(v=>-v)],[RR.length-1,main]]){
+  const center=idx===0?_hmix(wrist,mid,rings[0][0]):_hmix(wrist,mid,rings[rings.length-1][0]);
+  for(let i=0;i<around;i++){
+   _hvert(mesh,center,n,H_MAT_PALM,skinC,[.5,idx===0?0:1]);
+   _hvert(mesh,RR[idx][i][0],n,H_MAT_PALM,skinC,[i/around,idx===0?0:1]);
+   _hvert(mesh,RR[idx][i+1][0],n,H_MAT_PALM,skinC,[(i+1)/around,idx===0?0:1]);
+  }
+ }
+}
+function handNail(mesh,prev,tip,back,rad,color){
+ const axis=_hnorm(_hv3(tip,prev)),forward=_hnorm(_hv3(tip,prev));
+ const out=_hnorm(_hadd(back,forward,-_hdot(back,forward)));
+ const start=_hadd(tip,forward,-rad*1.15),stop=_hadd(tip,forward,-rad*.06);
+ const a=_hadd(start,out,rad*.80),b=_hadd(stop,out,rad*.78);
+ capsule(mesh,a,b,rad*.66,rad*.59,color,H_MAT_NAIL,out,.28,10);
 }
 function drawVoxelHands(mesh){
  if(!handVision.enabled||!handVision.cam)return;
  const now=performance.now(),dt=clamp((now-(handVision.drawAt||now))/1000,0,.1);handVision.drawAt=now;
- const head=handVision.cam.camM||invert(handVision.cam.view),k=1-Math.exp(-dt*16);
+ const head=handVision.cam.camM||invert(handVision.cam.view);
  const cr=handVision.crack;if(cr&&now-cr.at<2500&&voxelMat(cr.hit.x,cr.hit.y,cr.hit.z)>=0)drawVoxelCracks(mesh,cr,cr.stage);
  const toW=p=>[head[12]+head[0]*p[0]+head[4]*p[1]+head[8]*p[2],head[13]+head[1]*p[0]+head[5]*p[1]+head[9]*p[2],head[14]+head[2]*p[0]+head[6]*p[1]+head[10]*p[2]];
- // body frame: shoulders follow head position and heading, not head tilt
+ // Shoulder direction follows heading but not camera roll; no separate tracking device needed.
  let fx=-head[8],fz=-head[10];const fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;const rx=-fz,rz=fx;
- const skin=[.72,.49,.35],finger=[.76,.53,.38],sleeve=[.13,.30,.43],sleeve2=[.10,.24,.35],trim=[.23,.62,.57];
+ const skin=[.76,.54,.42],finger=[.79,.56,.44],sleeve=[.12,.31,.45],sleeve2=[.09,.24,.37],trim=[.23,.62,.57];
+ const seg=quality==='low'?8:quality==='medium'?10:12;
  for(let si=0;si<2;si++){
   const s=handSlots[si];if(!s||!s.pts||now-s.seen>450)continue;
   const C=handCamPoints(s,dt,now);if(!C)continue;
   const P=C.map(toW),side=si===0?-1:1;
   handContact(s,P,dt,now);
-  // arm: shoulder -> elbow (2-bone IK, elbow bends down and outwards) -> wrist
   const S=[head[12]+rx*side*HAND_ARM.shoulderSide-fx*.03,head[13]-HAND_ARM.shoulderDown,head[14]+rz*side*HAND_ARM.shoulderSide-fz*.03];
   const Wr=P[0],dir=_hv3(Wr,S),D=_hlength(dir),u=dir.map(v=>v/D),L1=HAND_ARM.upper,L2=HAND_ARM.fore;
   let E;
   if(D>=L1+L2-.002)E=[S[0]+u[0]*D*L1/(L1+L2),S[1]+u[1]*D*L1/(L1+L2),S[2]+u[2]*D*L1/(L1+L2)];
   else{const Dc=Math.max(.05,D),a=(L1*L1-L2*L2+Dc*Dc)/(2*Dc),h=Math.sqrt(Math.max(0,L1*L1-a*a));
-   const hint=[rx*side*.5-fx*.25,-.8,rz*side*.5-fz*.25],dot=hint[0]*u[0]+hint[1]*u[1]+hint[2]*u[2];
-   const b=_hnorm([hint[0]-u[0]*dot,hint[1]-u[1]*dot,hint[2]-u[2]*dot]);
-   E=[S[0]+u[0]*a+b[0]*h,S[1]+u[1]*a+b[1]*h,S[2]+u[2]*a+b[2]*h];}
-  // sleeve: upper arm + forearm, tapering towards the wrist, with a soft cuff
-  capsule(mesh,S,E,.058,.05,sleeve2,20,null,1,10);
-  const cuff=[Wr[0]+(E[0]-Wr[0])*.16,Wr[1]+(E[1]-Wr[1])*.16,Wr[2]+(E[2]-Wr[2])*.16];
-  capsule(mesh,E,cuff,.049,.042,sleeve,20,null,1,10);
-  capsule(mesh,cuff,[cuff[0]+(Wr[0]-cuff[0])*.45,cuff[1]+(Wr[1]-cuff[1])*.45,cuff[2]+(Wr[2]-cuff[2])*.45],.045,.044,trim,20,null,1,10);
-  // palm side is lighter and pinker than the back of the hand; chirality comes from which arm (slot) it is
+   const hint=[rx*side*.5-fx*.25,-.8,rz*side*.5-fz*.25],dot=_hdot(hint,u);
+   const b=_hnorm(_hadd(hint,u,-dot));
+   E=_hadd(_hadd(S,u,a),b,h);}
+  // Smooth textile sleeves and raised cuff trim.
+  capsule(mesh,S,E,.062,.053,sleeve2,H_MAT_CLOTH,null,1,seg);
+  const cuff=_hmix(Wr,E,.16);
+  capsule(mesh,E,cuff,.053,.044,sleeve,H_MAT_CLOTH,null,1,seg);
+  capsule(mesh,cuff,_hmix(cuff,Wr,.42),.046,.043,trim,H_MAT_CLOTH,null,1,seg);
+  capsule(mesh,_hmix(cuff,Wr,.46),_hmix(cuff,Wr,.59),.042,.041,sleeve2,H_MAT_CLOTH,null,1,seg);
+  // Anatomical palm / dorsal colour. Per-vertex normal gradient is kept smooth in real time.
+  const cross=_hnorm(_hv3(P[5],P[17]));
   const n0=_hnorm(_hcross(_hv3(P[5],P[0]),_hv3(P[17],P[0]))),pn=side>0?n0:n0.map(v=>-v),bk=pn.map(v=>-v);
-  const across=_hnorm(_hv3(P[5],P[17]));
-  const tone=(base,palm)=>(n)=>{const t=clamp((n[0]*pn[0]+n[1]*pn[1]+n[2]*pn[2])*1.6+.5,0,1);return [base[0]+(palm[0]-base[0])*t,base[1]+(palm[1]-base[1])*t,base[2]+(palm[2]-base[2])*t]};
-  const skinC=tone(skin,[.84,.60,.50]),fingerC=tone(finger,[.86,.62,.52]);
-  const wristIn=[Wr[0]+(P[9][0]-Wr[0])*.12,Wr[1]+(P[9][1]-Wr[1])*.12,Wr[2]+(P[9][2]-Wr[2])*.12];
-  capsule(mesh,Wr,wristIn,.03,.032,skinC,20,across,1.15,12);
-  capsule(mesh,wristIn,P[9],.034,.03,skinC,20,across,1.45,12);
-  capsule(mesh,wristIn,P[5],.022,.021,skinC,20,pn,.75,10);
-  capsule(mesh,wristIn,P[17],.021,.019,skinC,20,pn,.75,10);
-  capsule(mesh,P[5],P[17],.019,.017,skinC,20,null,1,10);
-  capsule(mesh,wristIn,P[1],.02,.019,skinC,20,null,1,10);   // thumb base (thenar)
-  // knuckles: small bumps on the back of the hand
-  for(const m of [5,9,13,17]){const q=P[m],o=[q[0]+bk[0]*.007,q[1]+bk[1]*.007,q[2]+bk[2]*.007];
-   capsule(mesh,[o[0]-across[0]*.005,o[1]-across[1]*.005,o[2]-across[2]*.005],[o[0]+across[0]*.005,o[1]+across[1]*.005,o[2]+across[2]*.005],.0095,.0095,skinC,20,null,1,8)}
-  // fingers: tapered rounded segments, thicker joints, rounded tips and nails
-  const R=[[.0125,.011,.0098,.009],[.0098,.0090,.0080,.0072],[.0102,.0094,.0084,.0075],[.0096,.0088,.0078,.0070],[.0085,.0077,.0069,.0062]];
-  const nail=[.90,.74,.70];
-  for(const [fi,ids] of [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,20,20]].entries()){
-   for(let n=0;n<ids.length-1;n++)capsule(mesh,P[ids[n]],P[ids[n+1]],R[fi][n]*1.04,R[fi][n+1],fingerC,20,null,1,10);
-   const tip=P[ids[ids.length-1]],prev=P[ids[ids.length-2]],Y=_hnorm(_hv3(tip,prev)),r=R[fi][3];
-   const nb=_hnorm([bk[0]-Y[0]*(bk[0]*Y[0]+bk[1]*Y[1]+bk[2]*Y[2]),bk[1]-Y[1]*(bk[0]*Y[0]+bk[1]*Y[1]+bk[2]*Y[2]),bk[2]-Y[2]*(bk[0]*Y[0]+bk[1]*Y[1]+bk[2]*Y[2])]);
-   const c0=[tip[0]-Y[0]*r*1.5+nb[0]*r*.72,tip[1]-Y[1]*r*1.5+nb[1]*r*.72,tip[2]-Y[2]*r*1.5+nb[2]*r*.72];
-   capsule(mesh,c0,[c0[0]+Y[0]*r*1.25,c0[1]+Y[1]*r*1.25,c0[2]+Y[2]*r*1.25],r*.62,r*.6,nail,20,nb,.32,8);
+  const tone=(base,palm)=>(n)=>{const t=clamp(_hdot(n,pn)*1.2+.47,0,1);
+   return [base[0]+(palm[0]-base[0])*t,base[1]+(palm[1]-base[1])*t,base[2]+(palm[2]-base[2])*t]};
+  const skinC=tone(skin,[.87,.64,.55]),fingerC=tone(finger,[.89,.67,.57]);
+  handPalm(mesh,P,skinC,pn);
+  // Thumb mound, exposed wrist and gently raised knuckles; palm is NOT empty between them.
+  const wristIn=_hmix(Wr,P[9],.18);
+  capsule(mesh,Wr,wristIn,.031,.034,skinC,H_MAT_SKIN,cross,1.06,seg);
+  capsule(mesh,wristIn,P[1],.026,.020,skinC,H_MAT_SKIN,pn,.79,seg);
+  for(const m of [5,9,13,17]){
+   const q=_hadd(P[m],bk,.0045);
+   capsule(mesh,_hadd(q,cross,-.004),_hadd(q,cross,.004),.010,.0095,skinC,H_MAT_SKIN,null,1,seg);
+  }
+  const R=[[.0124,.0113,.0098,.0088],[.0106,.0098,.0087,.0075],[.0111,.0102,.0090,.0079],[.0101,.0091,.0080,.0071],[.0090,.0083,.0073,.0064]];
+  const nail=[.92,.76,.70];
+  // Five correct joint sequences. Earlier build repeated point 20 and omitted 19 (broken little finger).
+  const ids5=[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]];
+  for(let fi=0;fi<5;fi++){
+   const ids=ids5[fi];
+   for(let n=0;n<3;n++){
+    capsule(mesh,P[ids[n]],P[ids[n+1]],R[fi][n]*1.10,R[fi][n+1],fingerC,H_MAT_SKIN,null,1,seg);
+   }
+   handNail(mesh,P[ids[2]],P[ids[3]],bk,R[fi][3],nail);
   }
  }
 }
